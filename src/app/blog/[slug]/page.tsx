@@ -70,6 +70,12 @@ const blogPosts = [
   // Other blog posts would be here
 ]
 
+export async function generateStaticParams() {
+  return blogPosts.map((post) => ({
+    slug: post.id,
+  }))
+}
+
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = blogPosts.find(post => post.id === params.slug)
   
