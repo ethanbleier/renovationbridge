@@ -14,6 +14,7 @@ type FormValues = {
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   
   const { 
     register, 
@@ -24,19 +25,34 @@ const ContactForm = () => {
   
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true)
+    setError(null)
     
-    // Here you would normally send data to your API
-    console.log(data)
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setIsSubmitting(false)
-    setIsSuccess(true)
-    reset()
-    
-    // Reset success message after 5 seconds
-    setTimeout(() => setIsSuccess(false), 5000)
+    try {
+      // Send data to our API route that connects to GoHighLevel
+      const response = await fetch('/api/submit-to-ghl', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit form');
+      }
+      
+      setIsSuccess(true)
+      reset()
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => setIsSuccess(false), 5000)
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setError(err instanceof Error ? err.message : 'Failed to submit form');
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   
   return (
@@ -46,6 +62,12 @@ const ContactForm = () => {
       {isSuccess ? (
         <div className="bg-green-50 text-green-800 p-3 md:p-4 rounded-md mb-4 md:mb-6">
           Thank you! We'll be in touch with you soon.
+        </div>
+      ) : null}
+      
+      {error ? (
+        <div className="bg-red-50 text-red-800 p-3 md:p-4 rounded-md mb-4 md:mb-6">
+          {error}
         </div>
       ) : null}
       
