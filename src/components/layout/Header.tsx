@@ -20,6 +20,7 @@ const Header = () => {
               alt="Renovation Bridge Logo" 
               width={180} 
               height={40} 
+              style={{ height: "auto" }}
               priority
             />
           </Link>
@@ -52,7 +53,7 @@ const Header = () => {
                   Blog
                 </Link>
                 <Link href="/pricing" className="block px-4 py-2 text-sm text-gray-800 hover:bg-lavender hover:text-primary">
-                  Price Calculator
+                  Quick Quote
                 </Link>
                 <Link href="/real-estate-referral" className="block px-4 py-2 text-sm text-gray-800 hover:bg-lavender hover:text-primary">
                   Real Estate Referral Program
@@ -63,10 +64,10 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/for-contractors" className="contractor-btn">
+            <Link href="/for-contractors" className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105">
               For Contractors
             </Link>
-            <Link href="/get-started" className="btn btn-primary">
+            <Link href="/get-started" className="contractor-btn transform hover:scale-105 transition-transform duration-200">
               GET STARTED
             </Link>
           </div>
@@ -146,14 +147,14 @@ const Header = () => {
             <div className="pt-2 flex flex-col space-y-3">
               <Link 
                 href="/for-contractors" 
-                className="contractor-btn"
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 For Contractors
               </Link>
               <Link 
                 href="/get-started" 
-                className="btn btn-primary text-center"
+                className="contractor-btn text-center transform hover:scale-105 transition-transform duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 GET STARTED

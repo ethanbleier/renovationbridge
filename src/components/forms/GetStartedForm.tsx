@@ -58,7 +58,7 @@ const ProjectTypeStep = ({ onNext }: { onNext: (data: any) => void }) => {
       <div className="flex justify-between mt-8">
         <div>
           <p className="text-sm text-gray">
-            Don't see your project type? <a href="#" className="text-primary underline">Book a call.</a>
+            Don't see your project type? Chat with our team <a href="tel:+19256937590" className="text-primary underline">(925) 693-7590</a>
           </p>
         </div>
         <button
@@ -194,7 +194,7 @@ const ProjectProcessStep = ({ onBack, onNext }: { onBack: () => void, onNext: (d
   )
 }
 
-const SuccessStep = ({ onBack, onFinish }: { onBack: () => void, onFinish: () => void }) => {
+const SuccessStep = ({ onBack, onNext }: { onBack: () => void, onNext: () => void }) => {
   return (
     <div className="flex flex-col md:flex-row">
       <div className="w-full md:w-1/2 md:pr-8 mb-8 md:mb-0">
@@ -212,7 +212,7 @@ const SuccessStep = ({ onBack, onFinish }: { onBack: () => void, onFinish: () =>
             <span className="mr-1">←</span> Back
           </button>
           <button
-            onClick={onFinish}
+            onClick={onNext}
             className="btn btn-primary flex items-center"
           >
             Next <span className="ml-1">→</span>
@@ -221,13 +221,10 @@ const SuccessStep = ({ onBack, onFinish }: { onBack: () => void, onFinish: () =>
       </div>
       
       <div className="w-full md:w-1/2 bg-lavender/50 rounded-lg p-6">
-        <div className="flex justify-center mb-8">
-          <div className="flex -space-x-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="w-12 h-12 rounded-full bg-gray/20 border-2 border-white overflow-hidden">
-                {/* These would be real profile images */}
-              </div>
-            ))}
+        <div className="text-center mb-8">
+          <div className="bg-white p-4 rounded-lg shadow-sm inline-block">
+            <div className="text-4xl font-bold text-primary mb-2">500+</div>
+            <div className="text-secondary font-medium">Vetted Professionals</div>
           </div>
         </div>
         
@@ -262,15 +259,203 @@ const SuccessStep = ({ onBack, onFinish }: { onBack: () => void, onFinish: () =>
         </div>
         
         <div className="flex justify-center mt-8">
-          <div className="flex -space-x-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="w-16 h-16 rounded-full bg-gray/20 border-2 border-white overflow-hidden">
-                {/* These would be real contractor images */}
-              </div>
-            ))}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white p-3 rounded-lg shadow-sm text-center">
+              <div className="text-2xl font-bold text-primary">96%</div>
+              <div className="text-xs text-gray-700">Satisfaction Rate</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm text-center">
+              <div className="text-2xl font-bold text-primary">5%</div>
+              <div className="text-xs text-gray-700">Top Talent</div>
+            </div>
+            <div className="bg-white p-3 rounded-lg shadow-sm text-center">
+              <div className="text-2xl font-bold text-primary">10+</div>
+              <div className="text-xs text-gray-700">Years Experience</div>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, onFinish: () => void, formData: any }) => {
+  const [contactData, setContactData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    zipCode: '',
+    comments: ''
+  })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setContactData({
+      ...contactData,
+      [name]: value
+    })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onFinish()
+  }
+
+  const projectTypeLabels: Record<string, string> = {
+    'adu': 'Accessory Dwelling Unit (ADU)',
+    'kitchen': 'Kitchen Renovation',
+    'bathroom': 'Bathroom Renovation',
+    'addition': 'Addition',
+    'full-home': 'Full Home Renovation',
+    'new-home': 'New Custom Home',
+  }
+
+  const processStageLabels: Record<string, string> = {
+    'need-plans': 'Need architectural plans or designs',
+    'have-plans': 'Have architectural plans, need contractor'
+  }
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold text-secondary mb-4">Almost there! Let's get your contact details</h1>
+      <p className="text-gray mb-6">
+        Please provide your contact information so we can connect you with our vetted professionals.
+      </p>
+
+      <div className="mb-6 p-4 bg-lavender/20 rounded-lg">
+        <h3 className="font-semibold text-secondary mb-2">Your Project Summary</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray">Project Type</p>
+            <p className="font-medium">
+              {formData.projectTypes.map((type: string) => projectTypeLabels[type]).join(', ')}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray">Project Size</p>
+            <p className="font-medium">{formData.size} sq. ft.</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray">Process Stage</p>
+            <p className="font-medium">{processStageLabels[formData.processStage]}</p>
+          </div>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={contactData.name}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray/30 rounded-md"
+              placeholder="Your full name"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={contactData.email}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray/30 rounded-md"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={contactData.phone}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray/30 rounded-md"
+              placeholder="(123) 456-7890"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
+              Zip Code
+            </label>
+            <input
+              type="text"
+              id="zipCode"
+              name="zipCode"
+              value={contactData.zipCode}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray/30 rounded-md"
+              placeholder="12345"
+              required
+            />
+          </div>
+          
+          <div className="md:col-span-2">
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+              Project Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value={contactData.address}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray/30 rounded-md"
+              placeholder="123 Main St, City, State"
+              required
+            />
+          </div>
+          
+          <div className="md:col-span-2">
+            <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">
+              Additional Comments (Optional)
+            </label>
+            <textarea
+              id="comments"
+              name="comments"
+              value={contactData.comments}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray/30 rounded-md h-24"
+              placeholder="Tell us more about your project..."
+            />
+          </div>
+        </div>
+        
+        <div className="flex justify-between mt-8">
+          <button
+            type="button"
+            onClick={onBack}
+            className="border border-gray/30 px-6 py-2 rounded-md hover:bg-gray/10 flex items-center"
+          >
+            <span className="mr-1">←</span> Back
+          </button>
+          <button
+            type="submit"
+            className="btn btn-primary"
+          >
+            Submit <span className="ml-1">→</span>
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
@@ -294,7 +479,6 @@ export default function GetStartedForm() {
   }
 
   const handleFinish = () => {
-    // No matter what the user inputs, we redirect to the same page
     router.push('/thank-you')
   }
 
@@ -305,7 +489,7 @@ export default function GetStartedForm() {
         <div className="w-full bg-gray/20 h-1 mb-2 rounded-full overflow-hidden">
           <div 
             className="bg-primary h-full transition-all duration-300 ease-in-out" 
-            style={{ width: `${(step / 4) * 100}%` }}
+            style={{ width: `${(step / 5) * 100}%` }}
           ></div>
         </div>
       </div>
@@ -314,7 +498,8 @@ export default function GetStartedForm() {
       {step === 1 && <ProjectTypeStep onNext={handleNext} />}
       {step === 2 && <ProjectSizeStep onBack={handleBack} onNext={handleNext} />}
       {step === 3 && <ProjectProcessStep onBack={handleBack} onNext={handleNext} />}
-      {step === 4 && <SuccessStep onBack={handleBack} onFinish={handleFinish} />}
+      {step === 4 && <SuccessStep onBack={handleBack} onNext={() => setStep(step + 1)} />}
+      {step === 5 && <ContactFormStep onBack={handleBack} onFinish={handleFinish} formData={formData} />}
     </div>
   )
 } 
