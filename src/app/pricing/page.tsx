@@ -1,7 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+
+// Format currency input with $ and commas
+const formatCurrencyInput = (value: string): string => {
+  // If we're clearing the input, just return the dollar sign
+  if (value === '' || value === '$') return '$';
+  
+  // Remove all non-digit characters
+  const digits = value.replace(/\D/g, '');
+  
+  // Return just $ if no digits
+  if (!digits) return '$';
+  
+  // Format with commas
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number(digits));
+  
+  return formatted;
+};
+
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: {
+      (options: any): jsPDF;
+      previous: {
+        finalY: number;
+      };
+    };
+  }
+}
 
 type FormData = {
   homeValue: string;
@@ -30,8 +65,16 @@ type TierResult = {
 export default function PricingCalculator() {
   const [results, setResults] = useState<CalculationResults | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [homeValueFormatted, setHomeValueFormatted] = useState('$');
+  const [yearlyIncomeFormatted, setYearlyIncomeFormatted] = useState('$');
   
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<FormData>();
+
+  // Initialize form values
+  useEffect(() => {
+    setValue('homeValue', '$');
+    setValue('yearlyIncome', '$');
+  }, [setValue]);
 
   const projectTypes = [
     "Bathroom",
@@ -49,10 +92,31 @@ export default function PricingCalculator() {
     "Solar Panel Installation"
   ];
 
+  // Register inputs with react-hook-form
+  const homeValueRef = register('homeValue', { required: true });
+  const yearlyIncomeRef = register('yearlyIncome', { required: true });
+
+  // Update input handlers for currency formatting
+  const handleHomeValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCurrencyInput(e.target.value);
+    setHomeValueFormatted(formatted);
+    setValue('homeValue', formatted);
+  };
+
+  const handleYearlyIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCurrencyInput(e.target.value);
+    setYearlyIncomeFormatted(formatted);
+    setValue('yearlyIncome', formatted);
+  };
+
   const onSubmit = (data: FormData) => {
     try {
-      const homeValue = Number(data.homeValue);
-      const yearlyIncome = Number(data.yearlyIncome);
+      // Clean the input values by removing currency symbols and commas
+      const cleanHomeValue = data.homeValue.replace(/[$,]/g, '');
+      const cleanYearlyIncome = data.yearlyIncome.replace(/[$,]/g, '');
+      
+      const homeValue = Number(cleanHomeValue);
+      const yearlyIncome = Number(cleanYearlyIncome);
       const projectType = data.projectType;
 
       // Validate inputs
@@ -81,6 +145,8 @@ export default function PricingCalculator() {
     reset();
     setResults(null);
     setShowResults(false);
+    setHomeValueFormatted('$');
+    setYearlyIncomeFormatted('$');
   };
 
   function calculateTier(homeValue: number, yearlyIncome: number, projectType: string, tier: 'low' | 'middle' | 'high') {
@@ -252,59 +318,141 @@ export default function PricingCalculator() {
     return Math.round(value) + " months";
   }
 
+  const downloadPDF = () => {
+    if (!results) return;
+    
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(60, 60, 60);
+    doc.text("Renovation Budget Calculation Results", 20, 20);
+    
+    // Add project type
+    doc.setFontSize(14);
+    doc.text(`Project: ${results.low.projectType}`, 20, 30);
+    
+    // Add date
+    const today = new Date();
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on: ${today.toLocaleDateString()}`, 20, 40);
+    
+    // Add logo/branding
+    doc.setFontSize(10);
+    doc.setTextColor(150, 100, 200);
+    doc.text("Renovation Bridge", 170, 20);
+    
+    // Create table with results
+    const tableColumn = ["", "Low Tier", "Middle Tier", "High Tier"];
+    const tableRows = [
+      ["Initial Budget", formatCurrency(results.low.initialBudget), formatCurrency(results.middle.initialBudget), formatCurrency(results.high.initialBudget)],
+      ["Contingency Fund", formatCurrency(results.low.contingencyFund), formatCurrency(results.middle.contingencyFund), formatCurrency(results.high.contingencyFund)],
+      ["Time To Save", formatMonths(results.low.timeToSave), formatMonths(results.middle.timeToSave), formatMonths(results.high.timeToSave)],
+      ["Monthly Savings", formatCurrency(results.low.monthlySavings), formatCurrency(results.middle.monthlySavings), formatCurrency(results.high.monthlySavings)],
+      ["Estimated ROI", `${results.low.roi.toFixed(2)}%`, `${results.middle.roi.toFixed(2)}%`, `${results.high.roi.toFixed(2)}%`],
+      ["Total Budget", formatCurrency(results.low.totalBudget), formatCurrency(results.middle.totalBudget), formatCurrency(results.high.totalBudget)],
+      ["Value Increase", formatCurrency(results.low.valueIncrease), formatCurrency(results.middle.valueIncrease), formatCurrency(results.high.valueIncrease)],
+      ["Updated Home Value", formatCurrency(results.low.updatedHomeValue), formatCurrency(results.middle.updatedHomeValue), formatCurrency(results.high.updatedHomeValue)]
+    ];
+    
+    // @ts-ignore - jspdf-autotable typings
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 50,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [108, 99, 255], textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [240, 240, 255] },
+      columnStyles: { 0: { fontStyle: 'bold' } },
+    });
+    
+    // Add notes
+    doc.setFontSize(11);
+    doc.setTextColor(80, 80, 80);
+    doc.text("Notes:", 20, doc.autoTable.previous.finalY + 15);
+    doc.setFontSize(10);
+    doc.text("• The total budget includes both the initial budget and the contingency fund.", 25, doc.autoTable.previous.finalY + 25);
+    doc.text("• Contingency funds help cover unexpected expenses during your renovation.", 25, doc.autoTable.previous.finalY + 35);
+    doc.text("• ROI estimates are based on industry averages and local market conditions may vary.", 25, doc.autoTable.previous.finalY + 45);
+    
+    // Add footer
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text("Generated by Renovation Bridge Calculator • www.renovationbridge.com", 20, 280);
+    
+    // Save PDF
+    doc.save("renovation-budget-calculation.pdf");
+  };
+
   return (
-    <div className="container-custom py-8 md:py-12">
-      <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">Renovation Budget Calculator</h1>
+    <div className="container-custom py-12 md:py-16">
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-lavender/30 to-primary/10 rounded-3xl transform -rotate-1 scale-105"></div>
+        <h1 className="relative text-3xl md:text-4xl font-bold text-center mb-6 pt-8 text-primary">
+          Renovation Budget Calculator
+        </h1>
+        <p className="relative text-center text-gray-600 mb-10 max-w-2xl mx-auto">
+          Plan your perfect renovation with our budget calculator. Estimate costs, ROI, and savings timeline.
+        </p>
+      </div>
       
-      <div className="max-w-4xl mx-auto bg-lavender/30 p-6 md:p-8 rounded-xl shadow-md">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="max-w-4xl mx-auto bg-white p-8 md:p-10 rounded-xl shadow-lg border border-lavender/20 relative z-10 overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-primary/5 to-lavender/10 rounded-full transform translate-x-16 -translate-y-16"></div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
           <div className="md:col-span-1">
-            <label className="block text-lg font-medium mb-2">Estimated Value of your Home ($):</label>
+            <label className="block text-lg font-medium mb-2 text-gray-700">Estimated Home Value:</label>
             <input 
               type="text" 
-              {...register('homeValue', { required: true })}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="e.g. 600000"
+              {...homeValueRef}
+              className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white/80 shadow-sm"
+              placeholder="$0"
+              value={homeValueFormatted}
+              onChange={handleHomeValueChange}
             />
-            {errors.homeValue && <span className="text-red-500">This field is required</span>}
+            {errors.homeValue && <span className="text-red-500 text-sm mt-1 block">This field is required</span>}
           </div>
           
           <div className="md:col-span-1">
-            <label className="block text-lg font-medium mb-2">Yearly Income ($):</label>
+            <label className="block text-lg font-medium mb-2 text-gray-700">Annual Income:</label>
             <input 
               type="text" 
-              {...register('yearlyIncome', { required: true })}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="e.g. 85000"
+              {...yearlyIncomeRef}
+              className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white/80 shadow-sm"
+              placeholder="$0"
+              value={yearlyIncomeFormatted}
+              onChange={handleYearlyIncomeChange}
             />
-            {errors.yearlyIncome && <span className="text-red-500">This field is required</span>}
+            {errors.yearlyIncome && <span className="text-red-500 text-sm mt-1 block">This field is required</span>}
           </div>
           
           <div className="md:col-span-1">
-            <label className="block text-lg font-medium mb-2">Project Type:</label>
+            <label className="block text-lg font-medium mb-2 text-gray-700">Project Type:</label>
             <select 
               {...register('projectType', { required: true })}
-              className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white/80 shadow-sm"
             >
               <option value="">Select</option>
               {projectTypes.map((type) => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
-            {errors.projectType && <span className="text-red-500">This field is required</span>}
+            {errors.projectType && <span className="text-red-500 text-sm mt-1 block">This field is required</span>}
           </div>
         </div>
         
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-10">
           <button 
             onClick={handleSubmit(onSubmit)}
-            className="btn btn-primary mx-2"
+            className="btn btn-primary mx-2 px-8 py-3 font-semibold rounded-lg shadow-md transform transition-transform hover:scale-105"
           >
             Calculate
           </button>
           <button 
             onClick={onReset}
-            className="btn bg-white text-primary border border-primary hover:bg-lavender mx-2"
+            className="btn bg-white text-primary border border-primary hover:bg-lavender/20 mx-2 px-8 py-3 font-semibold rounded-lg shadow-sm"
           >
             Reset
           </button>
@@ -312,77 +460,108 @@ export default function PricingCalculator() {
       </div>
       
       {showResults && results && (
-        <div className="max-w-6xl mx-auto mt-12 bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-2xl font-bold mb-6">Renovation Budget Calculation Results</h2>
+        <div className="max-w-6xl mx-auto mt-16 bg-white p-8 rounded-xl shadow-lg border border-lavender/20 relative z-10 overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-secondary/5 to-primary/10 rounded-full transform -translate-x-32 -translate-y-32"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tr from-lavender/10 to-primary/5 rounded-full transform translate-x-24 translate-y-24"></div>
           
-          <div className="overflow-x-auto">
+          <div className="flex justify-between items-center mb-6 relative z-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary">Renovation Budget Calculation Results</h2>
+            <button 
+              onClick={downloadPDF}
+              className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 shadow-md transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              Download PDF
+            </button>
+          </div>
+          
+          <div className="overflow-x-auto relative z-10">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-4 text-left"></th>
-                  <th className="p-4 text-center font-medium text-lg">Low</th>
-                  <th className="p-4 text-center font-medium text-lg">Middle</th>
-                  <th className="p-4 text-center font-medium text-lg">High</th>
+                <tr className="bg-gradient-to-r from-primary/90 to-secondary/90 text-white">
+                  <th className="p-5 text-left rounded-tl-lg"></th>
+                  <th className="p-5 text-center font-medium text-lg">Low</th>
+                  <th className="p-5 text-center font-medium text-lg">Middle</th>
+                  <th className="p-5 text-center font-medium text-lg rounded-tr-lg">High</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">Initial Budget</td>
-                  <td className="p-4 text-center">{formatCurrency(results.low.initialBudget)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.middle.initialBudget)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.high.initialBudget)}</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">Initial Budget</td>
+                  <td className="p-5 text-center">{formatCurrency(results.low.initialBudget)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.middle.initialBudget)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.high.initialBudget)}</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">Contingency Fund</td>
-                  <td className="p-4 text-center">{formatCurrency(results.low.contingencyFund)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.middle.contingencyFund)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.high.contingencyFund)}</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">Contingency Fund</td>
+                  <td className="p-5 text-center">{formatCurrency(results.low.contingencyFund)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.middle.contingencyFund)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.high.contingencyFund)}</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">Time To Save In Months</td>
-                  <td className="p-4 text-center">{formatMonths(results.low.timeToSave)}</td>
-                  <td className="p-4 text-center">{formatMonths(results.middle.timeToSave)}</td>
-                  <td className="p-4 text-center">{formatMonths(results.high.timeToSave)}</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">Time To Save In Months</td>
+                  <td className="p-5 text-center">{formatMonths(results.low.timeToSave)}</td>
+                  <td className="p-5 text-center">{formatMonths(results.middle.timeToSave)}</td>
+                  <td className="p-5 text-center">{formatMonths(results.high.timeToSave)}</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">How Much To Save Per Month</td>
-                  <td className="p-4 text-center">{formatCurrency(results.low.monthlySavings)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.middle.monthlySavings)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.high.monthlySavings)}</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">How Much To Save Per Month</td>
+                  <td className="p-5 text-center">{formatCurrency(results.low.monthlySavings)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.middle.monthlySavings)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.high.monthlySavings)}</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">Estimated ROI</td>
-                  <td className="p-4 text-center">{results.low.roi.toFixed(2)}%</td>
-                  <td className="p-4 text-center">{results.middle.roi.toFixed(2)}%</td>
-                  <td className="p-4 text-center">{results.high.roi.toFixed(2)}%</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">Estimated ROI</td>
+                  <td className="p-5 text-center">{results.low.roi.toFixed(2)}%</td>
+                  <td className="p-5 text-center">{results.middle.roi.toFixed(2)}%</td>
+                  <td className="p-5 text-center">{results.high.roi.toFixed(2)}%</td>
                 </tr>
-                <tr className="border-b bg-gray-50">
-                  <td className="p-4 font-medium text-lg">Total Budget</td>
-                  <td className="p-4 text-center font-bold">{formatCurrency(results.low.totalBudget)}</td>
-                  <td className="p-4 text-center font-bold">{formatCurrency(results.middle.totalBudget)}</td>
-                  <td className="p-4 text-center font-bold">{formatCurrency(results.high.totalBudget)}</td>
+                <tr className="border-b bg-primary/5 font-semibold">
+                  <td className="p-5 text-lg">Total Budget</td>
+                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.low.totalBudget)}</td>
+                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.middle.totalBudget)}</td>
+                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.high.totalBudget)}</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">Value Increase</td>
-                  <td className="p-4 text-center">{formatCurrency(results.low.valueIncrease)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.middle.valueIncrease)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.high.valueIncrease)}</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">Value Increase</td>
+                  <td className="p-5 text-center">{formatCurrency(results.low.valueIncrease)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.middle.valueIncrease)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.high.valueIncrease)}</td>
                 </tr>
-                <tr className="border-b">
-                  <td className="p-4 font-medium">Estimated Updated Home Value</td>
-                  <td className="p-4 text-center">{formatCurrency(results.low.updatedHomeValue)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.middle.updatedHomeValue)}</td>
-                  <td className="p-4 text-center">{formatCurrency(results.high.updatedHomeValue)}</td>
+                <tr className="border-b hover:bg-gray-50 transition-colors">
+                  <td className="p-5 font-medium">Estimated Updated Home Value</td>
+                  <td className="p-5 text-center">{formatCurrency(results.low.updatedHomeValue)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.middle.updatedHomeValue)}</td>
+                  <td className="p-5 text-center">{formatCurrency(results.high.updatedHomeValue)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           
-          <div className="mt-10 p-6 bg-cream rounded-lg">
-            <h3 className="text-xl font-bold mb-4">Total Budget</h3>
-            <p className="text-gray-700">
-              The total budget includes both the initial budget and the contingency fund. The contingency fund is recommended to cover unexpected expenses that may arise during your renovation project.
-            </p>
+          <div className="mt-10 p-8 bg-gradient-to-r from-lavender/20 to-cream rounded-lg shadow-inner relative z-10">
+            <h3 className="text-xl font-bold mb-4 text-primary">Understanding Your Budget</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-5 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-lg mb-2">Total Budget</h4>
+                <p className="text-gray-700">
+                  Includes both initial budget and contingency fund to cover unexpected expenses during your renovation.
+                </p>
+              </div>
+              <div className="bg-white p-5 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-lg mb-2">Monthly Savings</h4>
+                <p className="text-gray-700">
+                  Recommended amount to set aside each month based on your income to reach your renovation goal.
+                </p>
+              </div>
+              <div className="bg-white p-5 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-lg mb-2">Return on Investment</h4>
+                <p className="text-gray-700">
+                  Estimated percentage of your investment that may be recouped through increased home value.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

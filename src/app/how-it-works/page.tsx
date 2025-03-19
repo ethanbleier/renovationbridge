@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
               <div className="relative">
                 <div className="bg-lavender/20 rounded-lg overflow-hidden aspect-video">
                   <Image
-                    src="/images/step1-placeholder.jpg" 
+                    src="/images/how-it-works/step-1.png" 
                     alt="Tell us your vision"
                     fill
                     className="object-cover rounded-lg"
@@ -65,7 +65,7 @@ export default function HowItWorksPage() {
               <div className="relative">
                 <div className="bg-lavender/20 rounded-lg overflow-hidden aspect-video">
                   <Image
-                    src="/images/step2-placeholder.jpg" 
+                    src="/images/how-it-works/step-2.png" 
                     alt="Expert matchmaking"
                     fill
                     className="object-cover rounded-lg"
@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
               <div className="relative">
                 <div className="bg-lavender/20 rounded-lg overflow-hidden aspect-video">
                   <Image
-                    src="/images/step3-placeholder.jpg" 
+                    src="/images/how-it-works/step-3.png" 
                     alt="Contractor walkthroughs"
                     fill
                     className="object-cover rounded-lg"
@@ -117,7 +117,7 @@ export default function HowItWorksPage() {
               <div className="relative">
                 <div className="bg-lavender/20 rounded-lg overflow-hidden aspect-video">
                   <Image
-                    src="/images/step4-placeholder.jpg" 
+                    src="/images/how-it-works/step-4.png" 
                     alt="Make confident decisions"
                     fill
                     className="object-cover rounded-lg"
@@ -143,7 +143,7 @@ export default function HowItWorksPage() {
               <div className="relative">
                 <div className="bg-lavender/20 rounded-lg overflow-hidden aspect-video">
                   <Image
-                    src="/images/step5-placeholder.jpg" 
+                    src="/images/how-it-works/step-5.png" 
                     alt="Ongoing support"
                     fill
                     className="object-cover rounded-lg"

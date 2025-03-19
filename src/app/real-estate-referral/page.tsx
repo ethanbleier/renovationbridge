@@ -69,7 +69,7 @@ export default function RealEstateReferral() {
           </div>
           <div className="md:w-1/2 relative h-[400px] rounded-lg overflow-hidden shadow-2xl">
             <Image
-              src="/images/projects/house-2.jpg"
+              src="/images/projects/interior-1.jpg"
               alt="Stylish home interior"
               fill
               className="object-cover"

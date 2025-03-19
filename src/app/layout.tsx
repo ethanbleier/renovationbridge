@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     apple: '/favicon.ico',
     shortcut: '/favicon.ico',
   },
+  other: {
+    'Permissions-Policy': 'accelerometer=(), autoplay=(), clipboard-write=(), encrypted-media=(), gyroscope=(), picture-in-picture=()'
+  }
 }
 
 export const viewport: Viewport = {
