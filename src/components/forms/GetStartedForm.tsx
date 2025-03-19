@@ -7,12 +7,12 @@ import Image from 'next/image'
 // Step components
 const ProjectTypeStep = ({ onNext }: { onNext: (data: any) => void }) => {
   const projectTypes = [
-    { id: 'adu', label: 'Accessory Dwelling Unit (ADU)', image: '/images/projects/adu.jpg' },
-    { id: 'kitchen', label: 'Kitchen Renovation', image: '/images/projects/kitchen.jpg' },
-    { id: 'bathroom', label: 'Bathroom Renovation', image: '/images/projects/bathroom.jpg' },
-    { id: 'addition', label: 'Addition', image: '/images/projects/addition.jpg' },
-    { id: 'full-home', label: 'Full Home Renovation', image: '/images/projects/full-home.jpg' },
-    { id: 'new-home', label: 'New Custom Home', image: '/images/projects/new-home.jpg' },
+    { id: 'adu', label: 'Accessory Dwelling Unit (ADU)', image: '/images/projects/adu-1.jpg' },
+    { id: 'kitchen', label: 'Kitchen Renovation', image: '/images/projects/kitchen-1.jpg' },
+    { id: 'bathroom', label: 'Bathroom Renovation', image: '/images/projects/bathroom-1.jpg' },
+    { id: 'addition', label: 'Addition', image: '/images/projects/addition-1.jpg' },
+    { id: 'full-home', label: 'Full Home Renovation', image: '/images/projects/full-home-1.jpg' },
+    { id: 'new-home', label: 'New Custom Home', image: '/images/projects/new-home-1.jpg' },
   ]
 
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
