@@ -6,87 +6,77 @@ export const metadata = {
   description: 'Read the latest articles and guides on home renovation from Renovation Bridge.',
 }
 
-// This would typically come from a CMS or database
+// TODO: GET posts from a CMS or database
 const blogPosts = [
   {
-    id: 'renovation-bridge-36-month-guarantee',
-    title: 'The Renovation Bridge 36-Month Guarantee',
-    excerpt: 'Are you thinking about renovating your home? Your choice plays a crucial role in transforming your space into the home of your dreams.',
+    id: 'kitchen-renovation-mistakes',
+    title: '4 Common Kitchen Renovation Mistakes Bay Area Homeowners Make & How To Avoid Them',
+    excerpt: 'Discover the most common mistakes homeowners make during kitchen renovations in the Bay Area and learn expert strategies to avoid them.',
     author: 'Onn Matalon',
-    date: 'Mar 6',
-    readTime: '3 min read',
-    coverImage: '/images/blog/kitchen-remodel-1.jpg', // These would be replaced with actual images
-    views: 8,
-    comments: 0,
-  },
-  {
-    id: 'san-jose-kitchen-renovation',
-    title: 'San Jose Kitchen Renovation – Transform Your Space with Expert Design',
-    excerpt: 'Discover how our team transformed a dated kitchen into a modern culinary haven in San Jose.',
-    author: 'Onn Matalon',
-    date: 'Feb 19',
+    date: 'Jun 12',
     readTime: '2 min read',
-    coverImage: '/images/blog/kitchen-remodel-2.jpg',
-    views: 3,
-    comments: 0,
-    likes: 1,
-  },
-  {
-    id: 'walnut-creek-kitchen-renovation',
-    title: 'Walnut Creek Kitchen Renovation – Transform Your Home\'s Heart',
-    excerpt: 'See how this Walnut Creek kitchen was transformed from outdated to stunning with our expert renovation.',
-    author: 'Onn Matalon',
-    date: 'Feb 19',
-    readTime: '2 min read',
-    coverImage: '/images/blog/kitchen-remodel-3.jpg',
-    views: 5,
-    comments: 0,
-  },
-  {
-    id: 'bathroom-renovation-tips',
-    title: 'Essential Bathroom Renovation Tips for 2024',
-    excerpt: 'Learn the top bathroom renovation trends and practical tips to maximize your investment.',
-    author: 'Onn Matalon',
-    date: 'Jan 24',
-    readTime: '4 min read',
-    coverImage: '/images/blog/bathroom-renovation.jpg',
+    coverImage: '/images/blog/kitchen-remodel-1.jpg',
     views: 12,
     comments: 2,
+    likes: 4,
   },
   {
-    id: 'how-to-choose-contractor',
-    title: 'How to Choose the Right Contractor for Your Project',
-    excerpt: 'Avoid costly mistakes by following these expert tips for selecting the perfect contractor.',
+    id: 'choosing-the-right-contractor',
+    title: 'Choosing the Right Contractor for Your Home Renovation',
+    excerpt: 'Learn how to select the perfect contractor for your home renovation project with this comprehensive guide from Renovation Bridge.',
     author: 'Onn Matalon',
-    date: 'Jan 12',
-    readTime: '5 min read',
+    date: 'Apr 17',
+    readTime: '2 min read',
     coverImage: '/images/blog/contractor-selection.jpg',
     views: 15,
     comments: 3,
     likes: 2,
   },
   {
-    id: 'renovation-budget-planning',
-    title: 'Renovation Budget Planning: Save Without Compromising Quality',
-    excerpt: 'Smart strategies to keep your renovation costs in check while achieving beautiful results.',
+    id: 'pricing-calculator-budgeting',
+    title: "How Can Renovation Bridge's Pricing Calculator Simplify Your Home Improvement Budgeting?",
+    excerpt: 'Discover how our pricing calculator tool can help you budget accurately for your next home renovation project.',
     author: 'Onn Matalon',
-    date: 'Dec 28',
+    date: 'Feb 11',
     readTime: '3 min read',
-    coverImage: '/images/blog/budget-planning.jpg',
+    coverImage: '/images/blog/guide.png',
     views: 9,
     comments: 1,
   },
   {
-    id: 'sustainable-home-renovations',
-    title: 'Sustainable Home Renovations: Eco-Friendly Choices',
-    excerpt: 'Discover how to make environmentally responsible choices for your next home renovation project.',
+    id: 'kim-caffaro-success-story',
+    title: 'Redefining Home Renovation: The Success Story of Kim Caffaro',
+    excerpt: 'Learn how Renovation Bridge helped homeowner Kim Caffaro transform her kitchen and gain attention from NBC Bay Area.',
     author: 'Onn Matalon',
-    date: 'Dec 15',
-    readTime: '4 min read',
-    coverImage: '/images/blog/eco-friendly-renovation.jpg',
+    date: 'Feb 12',
+    readTime: '3 min read',
+    coverImage: '/images/blog/kim.jpeg',
     views: 7,
     comments: 0,
-    likes: 3,
+  },
+  {
+    id: 'san-jose-kitchen-renovation',
+    title: 'San Jose Kitchen Renovation – Transform Your Space with Expert Craftsmanship',
+    excerpt: 'Learn how a well-designed kitchen renovation in San Jose can transform the heart of your home with expert craftsmanship and personalized design.',
+    author: 'Onn Matalon',
+    date: 'Feb 19',
+    readTime: '2 min read',
+    coverImage: '/images/blog/kitchen-3.jpg',
+    views: 3,
+    comments: 0,
+    likes: 1,
+  },
+  {
+    id: 'walnut-creek-kitchen-renovation',
+    title: "Walnut Creek Kitchen Renovation – Transform Your Home's Heart with Premium Quality",
+    excerpt: "Learn how a kitchen renovation in Walnut Creek can elevate your home's value and lifestyle with premium materials and expert craftsmanship.",
+    author: 'Onn Matalon',
+    date: 'Feb 15',
+    readTime: '2 min read',
+    coverImage: '/images/blog/kitchen-2.jpg',
+    views: 5,
+    comments: 1,
+    likes: 2,
   },
 ]
 
@@ -239,16 +229,18 @@ export default function BlogPage() {
                   placeholder="Your email address" 
                   className="flex-grow px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   required
+                  disabled
                 />
                 <button 
                   type="submit" 
-                  className="btn btn-primary whitespace-nowrap"
+                  className="btn btn-primary whitespace-nowrap opacity-50 cursor-not-allowed"
+                  disabled
                 >
-                  Subscribe
+                  Coming Soon
                 </button>
               </form>
               <p className="text-xs text-gray mt-2">
-                We respect your privacy. Unsubscribe at any time.
+                Newsletter subscription will be available soon. Stay tuned!
               </p>
             </div>
           </div>

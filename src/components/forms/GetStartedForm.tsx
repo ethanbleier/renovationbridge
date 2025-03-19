@@ -72,49 +72,97 @@ const ProjectTypeStep = ({ onNext }: { onNext: (data: any) => void }) => {
   )
 }
 
-const ProjectSizeStep = ({ onBack, onNext }: { onBack: () => void, onNext: (data: any) => void }) => {
-  const [size, setSize] = useState(2000)
+const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onNext: (data: any) => void, formData: any }) => {
+  const [size, setSize] = useState(getDefaultSize(formData.projectTypes))
+  
+  // Determine if slider should be shown based on project type
+  const showSlider = formData.projectTypes.some((type: string) => 
+    ['adu', 'addition', 'new-home'].includes(type)
+  )
+  
+  // Get slider min/max values based on project types
+  const getSliderConfig = () => {
+    if (formData.projectTypes.includes('new-home')) {
+      return { min: 500, max: 5000 }
+    }
+    if (formData.projectTypes.some((type: string) => ['adu', 'addition'].includes(type))) {
+      return { min: 115, max: 1200 }
+    }
+    return { min: 1200, max: 3000 } // fallback
+  }
+  
+  // Set appropriate default size
+  function getDefaultSize(projectTypes: string[]) {
+    if (projectTypes.includes('new-home')) {
+      return 2000
+    }
+    if (projectTypes.some((type: string) => ['adu', 'addition'].includes(type))) {
+      return 500
+    }
+    return 2000 // fallback
+  }
+  
+  const { min, max } = getSliderConfig()
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-secondary mb-4">What size are you looking to build?</h1>
-      <p className="text-gray mb-6">
-        2 bedrooms generally start at 1,000 sq. ft., 3 bedrooms at 1,400 sq. ft.
-        and 4 bedrooms at 1,800 sq. ft.
-      </p>
       
-      <div className="bg-lavender rounded-lg p-8 mb-8">
-        <div className="text-center mb-8">
-          <div className="inline-block bg-white py-4 px-12 rounded-lg shadow-sm">
-            <div className="text-5xl font-bold text-secondary">{size}</div>
-            <div className="text-primary">sq. ft.</div>
+      {showSlider ? (
+        <>
+          <p className="text-gray mb-6">
+            {formData.projectTypes.includes('new-home') 
+              ? 'Custom homes typically range from 1,000 to 5,000+ sq. ft. depending on your needs.'
+              : 'ADUs and additions typically range from 115 to 1,200 sq. ft.'}
+          </p>
+          
+          <div className="bg-lavender rounded-lg p-8 mb-8">
+            <div className="text-center mb-8">
+              <div className="inline-block bg-white py-4 px-12 rounded-lg shadow-sm">
+                <div className="text-5xl font-bold text-secondary">{size}</div>
+                <div className="text-primary">sq. ft.</div>
+              </div>
+            </div>
+            
+            <div className="relative mb-4">
+              <input 
+                type="range" 
+                min={min} 
+                max={max} 
+                step={min < 200 ? 5 : 100} 
+                value={size}
+                onChange={(e) => setSize(parseInt(e.target.value))}
+                className="w-full h-2 bg-gray/20 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray mt-2">
+                <span>{min} sq. ft.</span>
+                <span>{max}+ sq. ft.</span>
+              </div>
+              <div className="text-center text-sm text-gray mt-4">
+                <span className="flex items-center justify-center gap-1">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Drag the slider
+                </span>
+              </div>
+            </div>
           </div>
+        </>
+      ) : (
+        <div className="bg-lavender rounded-lg p-8 mb-8 text-center">
+          <p className="mb-4 text-gray-700">
+            For {formData.projectTypes.map((type: string) => {
+              const labels: Record<string, string> = {
+                'kitchen': 'Kitchen Renovations',
+                'bathroom': 'Bathroom Renovations',
+                'full-home': 'Full Home Renovations'
+              };
+              return labels[type];
+            }).join(', ')}, we'll get more detailed space requirements in the next steps.
+          </p>
         </div>
-        
-        <div className="relative mb-4">
-          <input 
-            type="range" 
-            min="1200" 
-            max="3000" 
-            step="100" 
-            value={size}
-            onChange={(e) => setSize(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray/20 rounded-lg appearance-none cursor-pointer"
-          />
-          <div className="flex justify-between text-xs text-gray mt-2">
-            <span>1,200 sq. ft.</span>
-            <span>3,000+ sq. ft.</span>
-          </div>
-          <div className="text-center text-sm text-gray mt-4">
-            <span className="flex items-center justify-center gap-1">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Drag the slider
-            </span>
-          </div>
-        </div>
-      </div>
+      )}
       
       <div className="flex justify-between mt-8">
         <button
@@ -124,7 +172,7 @@ const ProjectSizeStep = ({ onBack, onNext }: { onBack: () => void, onNext: (data
           <span className="mr-1">←</span> Back
         </button>
         <button
-          onClick={() => onNext({ size })}
+          onClick={() => onNext({ size: showSlider ? size : null })}
           className="btn btn-primary"
         >
           Next <span className="ml-1">→</span>
@@ -198,6 +246,18 @@ const SuccessStep = ({ onBack, onNext }: { onBack: () => void, onNext: () => voi
   return (
     <div className="flex flex-col md:flex-row">
       <div className="w-full md:w-1/2 md:pr-8 mb-8 md:mb-0">
+        {/* Success checkmark card */}
+        <div className="mb-6 bg-green-50 rounded-lg p-6 shadow-sm border border-green-100">
+          <div className="flex justify-center">
+            <div className="bg-green-100 rounded-full p-4 mb-4">
+              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+          </div>
+          <p className="text-center text-green-800 font-medium">Great! Your project is a perfect match for our services.</p>
+        </div>
+        
         <h1 className="text-3xl font-bold text-secondary mb-2">You're in the right place! Renovation Bridge finds the <span className="text-primary">best pros near you.</span></h1>
         
         <p className="text-gray mb-6">
@@ -465,7 +525,7 @@ export default function GetStartedForm() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     projectTypes: [],
-    size: 2000,
+    size: null,
     processStage: null
   })
 
@@ -496,7 +556,7 @@ export default function GetStartedForm() {
 
       {/* Form steps */}
       {step === 1 && <ProjectTypeStep onNext={handleNext} />}
-      {step === 2 && <ProjectSizeStep onBack={handleBack} onNext={handleNext} />}
+      {step === 2 && <ProjectSizeStep onBack={handleBack} onNext={handleNext} formData={formData} />}
       {step === 3 && <ProjectProcessStep onBack={handleBack} onNext={handleNext} />}
       {step === 4 && <SuccessStep onBack={handleBack} onNext={() => setStep(step + 1)} />}
       {step === 5 && <ContactFormStep onBack={handleBack} onFinish={handleFinish} formData={formData} />}

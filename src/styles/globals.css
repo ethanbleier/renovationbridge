@@ -48,11 +48,11 @@
   .contractor-btn {
     @apply relative inline-block px-4 py-2 font-medium text-black rounded-md z-10 overflow-hidden;
   }
-  
+  /* 90deg, #6496DC, #9664C8, #B482DC, #9664C8, #6496DC */
   .contractor-btn:before {
     content: '';
     @apply absolute top-0 left-0 right-0 bottom-0 rounded-md z-[-1] opacity-90;
-    background: linear-gradient(90deg, #6496DC, #9664C8, #B482DC, #9664C8, #6496DC);
+    background: linear-gradient(90deg, #6496DC, #6496DC, #A7E5FF, #07049D, #6496DC);
     background-size: 400% 400%;
     animation: glowing-border 3s ease infinite;
     box-shadow: 0 0 8px rgba(100, 150, 220, 0.5);

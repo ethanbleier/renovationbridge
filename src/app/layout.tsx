@@ -12,7 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Renovation Bridge - Connecting Homeowners with Quality Contractors',
+  title: 'Renovation Bridge',
   description: 'Renovation Bridge helps Bay Area homeowners renovate smarter by connecting them with vetted contractors for their renovation projects.',
   icons: {
     icon: '/favicon.ico',
