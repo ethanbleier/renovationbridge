@@ -2,9 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { FaFacebookF, FaTwitter, FaInstagram } from 'react-icons/fa'
+import { FaFacebookF, FaInstagram } from 'react-icons/fa'
 import { FaThumbsUp, FaShare, FaEye, FaRegComment } from 'react-icons/fa'
-import { FaTiktok } from 'react-icons/fa6'
+import { FaTiktok, FaXTwitter } from 'react-icons/fa6'
 
 const AsSeenOnTV = () => {
   return (
@@ -82,17 +82,17 @@ const AsSeenOnTV = () => {
                   <div className="flex space-x-3">
                     <Link href="https://www.facebook.com/profile.php?id=100093963673999" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
                       <div className="hover:bg-[#3b3b3b] rounded-full p-2 transition-colors">
-                        <FaFacebookF className="h-4 w-4" />
+                        <FaFacebookF className="h-4 w-4 text-[#1877F2]" />
                       </div>
                     </Link>
                     <Link href="https://x.com/RenovationBridg" target="_blank" rel="noopener noreferrer" aria-label="Share on X (Twitter)">
                       <div className="hover:bg-[#3b3b3b] rounded-full p-2 transition-colors">
-                        <FaTwitter className="h-4 w-4" />
+                        <FaXTwitter className="h-4 w-4 text-black" />
                       </div>
                     </Link>
                     <Link href="https://www.instagram.com/renovationbridge/" target="_blank" rel="noopener noreferrer" aria-label="Share on Instagram">
                       <div className="hover:bg-[#3b3b3b] rounded-full p-2 transition-colors">
-                        <FaInstagram className="h-4 w-4" />
+                        <FaInstagram className="h-4 w-4 text-[#E4405F]" />
                       </div>
                     </Link>
                   </div>
@@ -113,16 +113,16 @@ const AsSeenOnTV = () => {
                 <p className="text-sm text-gray-400 mb-2">Stay connected:</p>
                 <div className="grid grid-cols-2 gap-2">
                   <Link href="https://twitter.com/nbcbayarea" target="_blank" className="text-sm text-gray-300 hover:text-blue-400 flex items-center">
-                    <FaTwitter className="mr-2" /> Follow us on Twitter: @nbcbayarea
+                    <FaXTwitter className="mr-2 text-black" /> Follow us on X: @nbcbayarea
                   </Link>
                   <Link href="https://facebook.com/nbcbayarea" target="_blank" className="text-sm text-gray-300 hover:text-blue-400 flex items-center">
-                    <FaFacebookF className="mr-2" /> Like us on Facebook: @nbcbayarea
+                    <FaFacebookF className="mr-2 text-[#1877F2]" /> Like us on Facebook: @nbcbayarea
                   </Link>
                   <Link href="https://instagram.com/nbcbayarea" target="_blank" className="text-sm text-gray-300 hover:text-blue-400 flex items-center">
-                    <FaInstagram className="mr-2" /> Follow us on Instagram: @nbcbayarea
+                    <FaInstagram className="mr-2 text-[#E4405F]" /> Follow us on Instagram: @nbcbayarea
                   </Link>
                   <Link href="https://tiktok.com/@nbcbayarea" target="_blank" className="text-sm text-gray-300 hover:text-blue-400 flex items-center">
-                    <FaTiktok className="mr-2" /> Follow us on TikTok: @nbcbayarea
+                    <FaTiktok className="mr-2 text-black" /> Follow us on TikTok: @nbcbayarea
                   </Link>
                 </div>
               </div>

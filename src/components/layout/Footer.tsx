@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa'
+import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok, FaXTwitter } from 'react-icons/fa6'
 
 const Footer = () => {
   return (
@@ -49,16 +49,16 @@ const Footer = () => {
             {/* Social Media Links */}
             <div className="flex space-x-4 mt-6">
               <Link href="https://www.facebook.com/profile.php?id=100093963673999" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                <FaFacebookF className="h-5 w-5 text-gray hover:text-primary transition-colors" />
+                <FaFacebookF className="h-5 w-5 text-[#1877F2] hover:opacity-80 transition-opacity" />
               </Link>
               <Link href="https://x.com/RenovationBridg" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-                <FaTwitter className="h-5 w-5 text-gray hover:text-primary transition-colors" />
+                <FaXTwitter className="h-5 w-5 text-black hover:opacity-80 transition-opacity" />
               </Link>
               <Link href="https://www.instagram.com/renovationbridge/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                <FaInstagram className="h-5 w-5 text-gray hover:text-primary transition-colors" />
+                <FaInstagram className="h-5 w-5 text-[#E4405F] hover:opacity-80 transition-opacity" />
               </Link>
               <Link href="https://www.youtube.com/@Renovationbridge" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                <FaYoutube className="h-5 w-5 text-gray hover:text-primary transition-colors" />
+                <FaYoutube className="h-5 w-5 text-[#FF0000] hover:opacity-80 transition-opacity" />
               </Link>
             </div>
           </div>
