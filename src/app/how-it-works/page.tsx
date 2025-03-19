@@ -9,17 +9,23 @@ export default function HowItWorksPage() {
     <div className="bg-gray-50">
       {/* Hero Section */}
       <section className="pt-16 pb-12 md:pt-24 md:pb-16 bg-gradient-to-r from-lavender to-blue-50">
-        <div className="container-custom">
+        <div className="container-custom relative">
+          <Link href="/" className="absolute left-0 top-0 inline-flex items-center text-blue-600 hover:text-blue-700">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Back
+          </Link>
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">How We Work</h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8">
-              We make home renovations simple by connecting you with the perfect contractors for your project.
+              We make home renovations easy by connecting you with the perfect contractors for your project.
             </p>
             <Link 
               href="/get-started" 
-              className="btn btn-primary text-lg px-8 py-3"
+              className="btn btn-primary text-lg px-8 py-3 hover:bg-primary-dark hover:scale-105 hover:shadow-lg transition-all duration-300"
             >
-              Get Started Today
+              Next
             </Link>
           </div>
         </div>

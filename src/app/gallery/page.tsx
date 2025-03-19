@@ -86,7 +86,13 @@ export default function GalleryPage() {
     <div className="bg-cream">
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 bg-gradient-to-b from-lavender to-cream">
-        <div className="container-custom">
+        <div className="container-custom relative">
+          <Link href="/" className="absolute left-0 top-0 inline-flex items-center text-blue-600 hover:text-blue-700">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Back
+          </Link>
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="mb-4 text-secondary">Our Project Gallery</h1>
             <p className="text-lg md:text-xl mb-8 text-gray">
@@ -137,21 +143,6 @@ export default function GalleryPage() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-lavender">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-secondary mb-6">Ready to Start Your Project?</h2>
-            <p className="text-lg mb-8">
-              Let us help you connect with trusted contractors for your next renovation project.
-            </p>
-            <Link href="/get-started" className="btn btn-primary">
-              Get Started Today
-            </Link>
           </div>
         </div>
       </section>

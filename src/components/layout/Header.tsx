@@ -56,7 +56,7 @@ const Header = () => {
                   Quick Quote
                 </Link>
                 <Link href="/real-estate-referral" className="block px-4 py-2 text-sm text-gray-800 hover:bg-lavender hover:text-primary">
-                  Real Estate Referral Program
+                  Referral Program
                 </Link>
               </div>
             </div>
