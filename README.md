@@ -1,6 +1,7 @@
 # Renovation Bridge Website
 
 A modern redesign of the Renovation Bridge website using Next.js and Tailwind CSS. This website connects homeowners with quality contractors for renovation projects.
+![Renovation Bridge Website Screenshot](screenshot.png)
 
 ## Color Scheme
 
