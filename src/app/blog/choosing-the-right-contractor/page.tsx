@@ -342,7 +342,7 @@ export default function ChoosingTheRightContractorPage() {
                 <div className="flex gap-4">
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/blog/kim-caffaro-success-story.jpg"
+                      src="/images/blog/kims-kitchen.jpg"
                       alt="Kim Caffaro Success Story"
                       fill
                       className="object-cover"

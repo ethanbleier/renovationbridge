@@ -2,19 +2,19 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Walnut Creek Kitchen Renovation – Transform Your Home's Heart | Renovation Bridge',
+  title: "Walnut Creek Kitchen Renovation – Transform Your Home's Heart | Renovation Bridge",
   description: 'Discover how a Walnut Creek kitchen renovation can transform your space with premium quality, expert design, and trusted contractors through Renovation Bridge.',
 }
 
 export default function WalnutCreekKitchenRenovationPage() {
   const post = {
-    title: 'Walnut Creek Kitchen Renovation – Transform Your Home's Heart with Premium Quality',
-    excerpt: 'Learn how a kitchen renovation in Walnut Creek can elevate your home's value and lifestyle with premium materials and expert craftsmanship.',
+    title: "Walnut Creek Kitchen Renovation – Transform Your Home's Heart with Premium Quality",
+    excerpt: "Learn how a kitchen renovation in Walnut Creek can elevate your home's value and lifestyle with premium materials and expert craftsmanship.",
     author: 'Onn Matalon',
     authorRole: 'CEO & Founder',
     date: 'Feb 15, 2024',
     readTime: '2 min read',
-    coverImage: '/images/blog/kitchen-remodel-3.jpg',
+    coverImage: '/images/blog/interior-1.jpg',
     views: 5,
     comments: 1,
     likes: 2,
@@ -293,7 +293,7 @@ export default function WalnutCreekKitchenRenovationPage() {
                 <div className="flex gap-4">
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/blog/kitchen-remodel-2.jpg"
+                      src="/images/blog/kitchen-5.jpg"
                       alt="San Jose Kitchen Renovation"
                       fill
                       className="object-cover"
@@ -309,7 +309,7 @@ export default function WalnutCreekKitchenRenovationPage() {
                 <div className="flex gap-4">
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/blog/kitchen-remodel-1.jpg"
+                      src="/images/blog/kitchen-2.jpg"
                       alt="Kitchen Renovation Mistakes"
                       fill
                       className="object-cover"
@@ -332,7 +332,7 @@ export default function WalnutCreekKitchenRenovationPage() {
               <div className="grid grid-cols-2 gap-2 mb-4">
                 <div className="aspect-square relative rounded-lg overflow-hidden">
                   <Image
-                    src="/images/blog/gallery-1.jpg"
+                    src="/images/blog/kitchen-1.jpg"
                     alt="Kitchen inspiration"
                     fill
                     className="object-cover"
@@ -340,7 +340,7 @@ export default function WalnutCreekKitchenRenovationPage() {
                 </div>
                 <div className="aspect-square relative rounded-lg overflow-hidden">
                   <Image
-                    src="/images/blog/gallery-2.jpg"
+                    src="/images/blog/kitchen-2.jpg"
                     alt="Kitchen inspiration"
                     fill
                     className="object-cover"
@@ -348,7 +348,7 @@ export default function WalnutCreekKitchenRenovationPage() {
                 </div>
                 <div className="aspect-square relative rounded-lg overflow-hidden">
                   <Image
-                    src="/images/blog/gallery-3.jpg"
+                    src="/images/blog/kitchen-3.jpg"
                     alt="Kitchen inspiration"
                     fill
                     className="object-cover"
@@ -356,7 +356,7 @@ export default function WalnutCreekKitchenRenovationPage() {
                 </div>
                 <div className="aspect-square relative rounded-lg overflow-hidden">
                   <Image
-                    src="/images/blog/gallery-4.jpg"
+                    src="/images/blog/kitchen-4.jpg"
                     alt="Kitchen inspiration"
                     fill
                     className="object-cover"

@@ -530,12 +530,29 @@ export default function GetStartedForm() {
   })
 
   const handleNext = (data: any) => {
-    setFormData({ ...formData, ...data })
-    setStep(step + 1)
+    const updatedFormData = { ...formData, ...data }
+    setFormData(updatedFormData)
+    
+    // If we're on step 1 (project type) and the selected types don't need size info, skip to step 3
+    if (step === 1 && !needsSizeInfo(updatedFormData.projectTypes)) {
+      setStep(3) // Skip to ProcessStep
+    } else {
+      setStep(step + 1)
+    }
+  }
+  
+  // Helper function to determine if size information is needed
+  const needsSizeInfo = (projectTypes: string[]) => {
+    return projectTypes.some(type => ['adu', 'addition', 'new-home'].includes(type))
   }
 
   const handleBack = () => {
-    setStep(step - 1)
+    // If we're on step 3 and we skipped step 2, go back to step 1
+    if (step === 3 && !needsSizeInfo(formData.projectTypes)) {
+      setStep(1)
+    } else {
+      setStep(step - 1)
+    }
   }
 
   const handleFinish = () => {

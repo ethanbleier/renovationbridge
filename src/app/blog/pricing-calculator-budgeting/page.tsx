@@ -92,7 +92,7 @@ export default function PricingCalculatorBudgetingPage() {
                 
                 <figure className="my-8 text-center">
                   <Image
-                    src="/images/blog/modern-kitchen-renovation.jpg"
+                    src="/images/blog/kitchen-remodel-2.jpg"
                     alt="Planning layout for a modern kitchen renovation"
                     width={700}
                     height={400}
@@ -113,14 +113,14 @@ export default function PricingCalculatorBudgetingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </span>
-                  <h4 className="font-bold text-xl mb-4">Get our Ultimate Renovation Guide</h4>
-                  <p className="font-medium mb-5">Detailed pricing breakdowns and professional renovation planning tips</p>
+                  <h4 className="font-bold text-xl mb-4">Access Our Ultimate Renovation Guide</h4>
+                  <p className="font-medium mb-5">Free download with complete pricing information and expert renovation tips</p>
                   <a 
                     href="/pdfs/guide.pdf" 
                     download 
                     className="contractor-btn text-lg px-8 py-3 font-bold no-underline"
                   >
-                    Download Free Guide
+                    Download Free Guide Now
                   </a>
                 </div>
                 
@@ -151,11 +151,6 @@ export default function PricingCalculatorBudgetingPage() {
                 
                 <p>If you're curious about the calculations behind the estimates, you can access the FREE Ultimate Renovation Guide on the Renovation Bridge website. This resource offers an in-depth breakdown of the pricing structure. By understanding the details, you can make better-informed decisions for your renovation.</p>
                 
-                <div className="bg-lavender/30 p-4 rounded-lg my-6 flex items-center">
-                  <span className="text-primary text-lg mr-2">📥</span>
-                  <p className="font-medium mb-0"><a href="#" className="text-primary hover:underline">Download it here: Ultimate Renovation Guide</a></p>
-                </div>
-                
                 <h2>Why Use Our Pricing Calculator?</h2>
                 
                 <h3>Quick & Easy</h3>
@@ -172,7 +167,7 @@ export default function PricingCalculatorBudgetingPage() {
                 
                 <figure className="my-8 text-center">
                   <Image
-                    src="/images/blog/patio-kitchen.jpg"
+                    src="/images/blog/interior-1.jpg"
                     alt="Beautiful patio and open style kitchen"
                     width={700}
                     height={400}

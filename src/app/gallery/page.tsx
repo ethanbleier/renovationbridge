@@ -99,6 +99,11 @@ export default function GalleryPage() {
               Explore our portfolio of successful renovation projects across the Bay Area.
               Each project represents our commitment to quality craftsmanship and customer satisfaction.
             </p>
+            <div className="bg-primary bg-opacity-10 rounded-lg p-4 mb-8 inline-block">
+              <p className="font-medium text-primary">
+                Our detailed project gallery is coming soon! Check back for complete project showcases.
+              </p>
+            </div>
           </div>
         </div>
         
@@ -135,10 +140,14 @@ export default function GalleryPage() {
                   <h3 className="text-xl font-bold mb-2 text-secondary">{project.title}</h3>
                   <p className="text-sm text-gray mb-3">{project.location}</p>
                   <p className="text-gray mb-4">{project.description}</p>
-                  <div className="mt-4 flex justify-end">
-                    <Link href={`#${project.id}`} className="btn-primary btn text-sm">
+                  <div className="mt-4 flex justify-between items-center">
+                    <span className="text-xs italic text-gray-500">Detailed showcase coming soon</span>
+                    <button 
+                      disabled
+                      className="btn text-sm bg-gray-300 text-gray-600 cursor-not-allowed"
+                    >
                       View Project
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>

@@ -1,10 +1,8 @@
+"use client"
+
 import Image from 'next/image'
 import Link from 'next/link'
-
-export const metadata = {
-  title: 'Blog | Renovation Bridge',
-  description: 'Read the latest articles and guides on home renovation from Renovation Bridge.',
-}
+import { useState } from 'react'
 
 // TODO: GET posts from a CMS or database
 const blogPosts = [
@@ -17,8 +15,8 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/kitchen-remodel-1.jpg',
     views: 12,
-    comments: 2,
-    likes: 4,
+    comments: 0,
+    likes: 0,
   },
   {
     id: 'choosing-the-right-contractor',
@@ -29,8 +27,8 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/contractor-selection.jpg',
     views: 15,
-    comments: 3,
-    likes: 2,
+    comments: 0,
+    likes: 0,
   },
   {
     id: 'pricing-calculator-budgeting',
@@ -41,7 +39,8 @@ const blogPosts = [
     readTime: '3 min read',
     coverImage: '/images/blog/guide.png',
     views: 9,
-    comments: 1,
+    comments: 0,
+    likes: 0,
   },
   {
     id: 'kim-caffaro-success-story',
@@ -64,7 +63,7 @@ const blogPosts = [
     coverImage: '/images/blog/kitchen-3.jpg',
     views: 3,
     comments: 0,
-    likes: 1,
+    likes: 0,
   },
   {
     id: 'walnut-creek-kitchen-renovation',
@@ -75,12 +74,21 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/kitchen-2.jpg',
     views: 5,
-    comments: 1,
-    likes: 2,
+    comments: 0,
+    likes: 0,
   },
 ]
 
 export default function BlogPage() {
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  
+  const handleLike = (postId: string) => {
+    setLikedPosts(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
   return (
     <main className="pt-24 pb-16 bg-cream">
       {/* Hero Section */}
@@ -91,6 +99,14 @@ export default function BlogPage() {
             <p className="text-lg text-gray">
               Expert advice, industry trends, and inspiring stories to help you transform your home
             </p>
+            <div className="mt-4 flex items-center justify-center gap-2 text-sm font-mono bg-amber-50 py-2 px-4 rounded-md border border-amber-200">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <p className="text-amber-700">
+                Our blog service is currently undergoing maintenance. Full functionality coming soon.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -129,19 +145,64 @@ export default function BlogPage() {
                     </div>
                     <span className="font-medium">{blogPosts[0].author}</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray">
-                    <span className="flex items-center mr-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  <div className="flex items-center space-x-4 text-sm">
+                    <button 
+                      className="flex items-center transition-all duration-300 focus:outline-none px-2 py-1 rounded-full hover:bg-rose-50 hover:scale-105"
+                      onClick={() => handleLike(blogPosts[0].id)}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className={`h-5 w-5 mr-1 ${likedPosts[blogPosts[0].id] ? 'text-rose-500 fill-rose-500' : 'text-gray-400'}`}
+                        viewBox="0 0 20 20" 
+                        fill={likedPosts[blogPosts[0].id] ? 'currentColor' : 'none'}
+                        stroke="currentColor"
+                        strokeWidth={likedPosts[blogPosts[0].id] ? "0" : "1"}
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                      <span className={likedPosts[blogPosts[0].id] ? 'text-rose-500' : 'text-gray-400'}>
+                        {likedPosts[blogPosts[0].id] ? 1 : 0}
+                      </span>
+                    </button>
+                    <button 
+                      className="flex items-center text-gray-400 cursor-not-allowed px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-300"
+                      disabled
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-5 w-5 mr-1" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                      0
+                    </button>
+                    <span className="flex items-center text-gray-400 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-300">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-5 w-5 mr-1" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                        <path 
+                          d="M10 12a2 2 0 100-4 2 2 0 000 4z" 
+                        />
+                        <path 
+                          fillRule="evenodd" 
+                          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" 
+                          clipRule="evenodd" 
+                        />
                       </svg>
                       {blogPosts[0].views}
-                    </span>
-                    <span className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                      </svg>
-                      {blogPosts[0].comments}
                     </span>
                   </div>
                 </div>
@@ -158,26 +219,18 @@ export default function BlogPage() {
               className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:translate-y-[-5px] transition-all duration-300"
             >
               <Link href={`/blog/${post.id}`} className="block">
-                <div className="relative h-52 w-full overflow-hidden">
+                <div className={`relative ${post.id === 'kim-caffaro-success-story' ? 'h-64' : 'h-52'} w-full overflow-hidden rounded-t-lg`}>
                   <Image
                     src={post.coverImage}
                     alt={post.title}
                     fill
-                    className="object-cover transition-transform duration-500 hover:scale-110"
+                    className={`${post.id === 'kim-caffaro-success-story' ? 'object-cover object-top' : 'object-cover'} transition-transform duration-500 hover:scale-110`}
                   />
                 </div>
               </Link>
               <div className="p-6">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-sm text-gray">{post.date} • {post.readTime}</span>
-                  {post.likes && (
-                    <span className="flex items-center text-rose-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
-                      {post.likes}
-                    </span>
-                  )}
                 </div>
                 <Link href={`/blog/${post.id}`} className="group">
                   <h3 className="text-xl font-bold text-secondary mb-2 line-clamp-2 group-hover:text-primary transition-colors">
@@ -192,19 +245,62 @@ export default function BlogPage() {
                     </div>
                     <span className="font-medium text-sm">{post.author}</span>
                   </div>
-                  <div className="flex items-center text-xs text-gray">
-                    <span className="flex items-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <div className="flex items-center space-x-3 text-xs">
+                    <button 
+                      className="flex items-center transition-all duration-300 focus:outline-none px-2 py-1 rounded-full hover:bg-rose-50 hover:scale-105"
+                      onClick={() => handleLike(post.id)}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className={`h-4 w-4 mr-1 ${likedPosts[post.id] ? 'text-rose-500 fill-rose-500' : 'text-gray-400'}`}
+                        viewBox="0 0 20 20" 
+                        fill={likedPosts[post.id] ? 'currentColor' : 'none'}
+                        stroke="currentColor"
+                        strokeWidth={likedPosts[post.id] ? "0" : "1"}
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                      <span className={likedPosts[post.id] ? 'text-rose-500' : 'text-gray-400'}>
+                        {likedPosts[post.id] ? 1 : 0}
+                      </span>
+                    </button>
+                    <button 
+                      className="flex items-center text-gray-400 cursor-not-allowed px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-300"
+                      disabled
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-4 w-4 mr-1" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
+                        <path 
+                          fillRule="evenodd" 
+                          d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" 
+                          clipRule="evenodd" 
+                        />
+                      </svg>
+                      0
+                    </button>
+                    <span className="flex items-center text-gray-400 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-300">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-4 w-4 mr-1" 
+                        viewBox="0 0 20 20" 
+                        fill="currentColor"
+                      >
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                        <path 
+                          fillRule="evenodd" 
+                          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" 
+                          clipRule="evenodd" 
+                        />
                       </svg>
                       {post.views}
-                    </span>
-                    <span className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                      </svg>
-                      {post.comments}
                     </span>
                   </div>
                 </div>

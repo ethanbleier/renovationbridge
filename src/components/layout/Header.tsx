@@ -45,17 +45,17 @@ const Header = () => {
                 onClick={() => setIsResourcesOpen(!isResourcesOpen)}
               >
                 Resources
-                <FiChevronDown className="ml-1 h-4 w-4" />
+                <FiChevronDown className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
               </button>
               
-              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200">
-                <Link href="/blog" className="block px-4 py-2 text-sm text-gray-800 hover:bg-lavender hover:text-primary">
+              <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 transform origin-top scale-95 group-hover:scale-100 border border-lavender/30 overflow-hidden">
+                <Link href="/blog" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px]">
                   Blog
                 </Link>
-                <Link href="/pricing" className="block px-4 py-2 text-sm text-gray-800 hover:bg-lavender hover:text-primary">
+                <Link href="/pricing" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px] animate-[fadeIn_0.3s_0.1s_both]">
                   Quick Quote
                 </Link>
-                <Link href="/real-estate-referral" className="block px-4 py-2 text-sm text-gray-800 hover:bg-lavender hover:text-primary">
+                <Link href="/real-estate-referral" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px] animate-[fadeIn_0.3s_0.2s_both]">
                   Referral Program
                 </Link>
               </div>
@@ -115,28 +115,28 @@ const Header = () => {
               onClick={() => setIsResourcesOpen(!isResourcesOpen)}
             >
               <span>Resources</span>
-              <FiChevronDown className={`h-4 w-4 transition-transform ${isResourcesOpen ? 'rotate-180' : ''}`} />
+              <FiChevronDown className={`h-4 w-4 transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`} />
             </button>
             
             {isResourcesOpen && (
-              <div className="pl-4 space-y-2 border-l-2 border-lavender">
+              <div className="pl-4 space-y-2 border-l-2 border-lavender animate-slideDown overflow-hidden">
                 <Link 
                   href="/blog" 
-                  className="block py-2 text-gray-800 hover:text-primary"
+                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.05s_both]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Blog
                 </Link>
                 <Link 
                   href="/pricing" 
-                  className="block py-2 text-gray-800 hover:text-primary"
+                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.15s_both]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Price Calculator
                 </Link>
                 <Link 
                   href="/real-estate-referral" 
-                  className="block py-2 text-gray-800 hover:text-primary"
+                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.25s_both]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Real Estate Referral Program

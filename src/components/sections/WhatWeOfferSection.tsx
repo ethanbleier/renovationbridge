@@ -1,6 +1,6 @@
 export default function WhatWeOfferSection() {
   return (
-    <section className="py-20 bg-white">
+    <section id="what-we-offer-section" className="py-20 bg-white">
       <div className="container-custom">
         <h2 className="text-3xl font-bold text-center mb-4">What We Offer</h2>
         <p className="text-center text-gray max-w-3xl mx-auto mb-12">
