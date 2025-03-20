@@ -23,18 +23,18 @@ export default function HeroSection() {
       highlight: "with Confidence"
     },
     {
-      prefix: "Renovate",
-      keyword: "Your Kitchen",
+      prefix: "",
+      keyword: "Renovate Your Kitchen",
       highlight: "with Confidence"
     },
     {
-      prefix: "Renovate",
-      keyword: "Your Bathroom",
+      prefix: "",
+      keyword: "Renovate Your Bathroom",
       highlight: "with Confidence"
     },
     {
-      prefix: "Renovate",
-      keyword: "Your Home",
+      prefix: "",
+      keyword: "Renovate Your Home",
       highlight: "with Confidence"
     }
   ];
@@ -43,7 +43,7 @@ export default function HeroSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    }, 5000); // slide chnge in ms
+    }, 5500); // slide change in ms
     
     return () => clearInterval(interval);
   }, [slides.length]);
@@ -58,7 +58,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden pt-16 md:pt-24 pb-20 md:pb-32">
+    <section className="relative pt-16 md:pt-24 pb-20 md:pb-32">
       {/* Image Carousel Background */}
       <div className="absolute inset-0 w-full h-full">
         {slides.map((slide, index) => (
@@ -85,17 +85,23 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
           <div className="space-y-6 md:space-y-8">
             <div className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm backdrop-blur-sm">
-              Transform Your Space
+              Welcome to Renovation Bridge
             </div>
             
-            <div className="text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-4 lg:max-w-[650px]">
+            <div className="text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
               {/* Main title with static prefix and animated keyword */}
-              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis">
+              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-2xl md:text-3xl lg:text-4xl">
                 <span>{titles[currentSlide].prefix} </span>
                 <TypeAnimation
-                  sequence={[titles[currentSlide].keyword]}
+                  sequence={[
+                    titles[currentSlide].keyword,
+                    3000, // Wait 3s
+                    '',   // Delete text
+                    1000, // Wait 1s before next slide
+                  ]}
                   wrapper="span"
                   speed={50}
+                  deletionSpeed={40}
                   className="inline-block"
                   repeat={0}
                   cursor={true}

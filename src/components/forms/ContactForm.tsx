@@ -20,8 +20,34 @@ const ContactForm = () => {
     register, 
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors } 
   } = useForm<FormValues>()
+  
+  // Watch phone field to apply formatting
+  const phone = watch('phone')
+  
+  // Format phone number as user types
+  const formatPhoneNumber = (value: string) => {
+    // Strip all non-numeric characters
+    const phoneNumber = value.replace(/\D/g, '')
+    
+    // Apply formatting based on the length of the number
+    if (phoneNumber.length < 4) {
+      return phoneNumber.length ? `(${phoneNumber}` : ''
+    } else if (phoneNumber.length < 7) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`
+    } else {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
+    }
+  }
+  
+  // Handle phone input changes
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedPhone = formatPhoneNumber(e.target.value)
+    setValue('phone', formattedPhone, { shouldValidate: true })
+  }
   
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true)
@@ -45,8 +71,8 @@ const ContactForm = () => {
       setIsSuccess(true)
       reset()
       
-      // Reset success message after 5 seconds
-      setTimeout(() => setIsSuccess(false), 5000)
+      // Reset success message after 15 seconds
+      setTimeout(() => setIsSuccess(false), 15000)
     } catch (err) {
       console.error('Error submitting form:', err);
       setError(err instanceof Error ? err.message : 'Failed to submit form');
@@ -158,10 +184,12 @@ const ContactForm = () => {
             {...register('phone', { 
               required: true,
               pattern: {
-                value: /^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                value: /^\(\d{3}\)\s\d{3}-\d{4}$/,
                 message: 'Invalid phone number'
               }
             })}
+            onChange={handlePhoneChange}
+            value={phone || ''}
           />
           {errors.phone && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
