@@ -1,0 +1,47 @@
+import { NextRequest, NextResponse } from 'next/server';
+import dbConnect from '@/lib/db/connection';
+import User from '@/lib/models/User';
+import { getCurrentUser } from '@/lib/utils/auth';
+
+export async function GET(request: NextRequest) {
+  try {
+    // Get the current user from the auth token
+    const userToken = getCurrentUser(request);
+    
+    if (!userToken) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
+    // Connect to the database
+    await dbConnect();
+    
+    // Find the user
+    const user = await User.findById(userToken.userId).select('-password');
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
+    // Return the user
+    return NextResponse.json({ 
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      } 
+    });
+  } catch (error) {
+    console.error('Get current user error:', error);
+    return NextResponse.json(
+      { error: 'Failed to get user information' },
+      { status: 500 }
+    );
+  }
+} 

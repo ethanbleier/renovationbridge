@@ -7,7 +7,6 @@ out
 
 # Environment variables
 .env
-.env.local.example
 .env.local
 .env.development.local
 .env.test.local

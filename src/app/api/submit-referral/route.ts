@@ -1,52 +1,47 @@
 import { NextResponse } from 'next/server';
+import { submitToGHL } from '@/lib/utils/formSubmission';
+import { z } from 'zod';
+
+// Referral specific validation schema
+const referralSchema = z.object({
+  homeownersEmail: z.string().email({ message: 'Invalid email address' }),
+  homeownersPhone: z.string().optional(),
+  homeownersFullName: z.string().min(2, { message: 'Name must be at least 2 characters long' }),
+  homeownersAddress: z.string().min(5, { message: 'Address must be at least 5 characters long' }),
+  projectDescription: z.string().min(10, { message: 'Description must be at least 10 characters long' }),
+  agentsFullName: z.string().min(2, { message: 'Agent name must be at least 2 characters long' })
+});
 
 export async function POST(request: Request) {
   try {
     // Parse the incoming request body
     const formData = await request.json();
     
-    // Get your GoHighLevel API key from environment variables
-    const apiKey = process.env.GHL_API_KEY;
-    const locationId = process.env.GHL_LOCATION_ID;
-    
-    if (!apiKey || !locationId) {
-      throw new Error('GoHighLevel API credentials not configured');
+    // Validate the form data
+    const validationResult = referralSchema.safeParse(formData);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: validationResult.error.format() },
+        { status: 400 }
+      );
     }
     
-    // Format the data for GoHighLevel - adjusted for real estate referral form
+    // Prepare data for GoHighLevel
     const ghlData = {
-      email: formData.homeownersEmail,
-      phone: formData.homeownersPhone,
-      firstName: formData.homeownersFullName.split(' ')[0],
-      lastName: formData.homeownersFullName.includes(' ') ? formData.homeownersFullName.split(' ').slice(1).join(' ') : '',
-      customField: {
-        "homeownersAddress": formData.homeownersAddress,
-        "projectDescription": formData.projectDescription,
-        "agentsFullName": formData.agentsFullName,
-        "referralSource": "Real Estate Agent"
-      },
-      tags: ["website-lead", "renovation-bridge", "real-estate-referral"]
+      ...validationResult.data,
+      // Map fields to standard form field names
+      email: validationResult.data.homeownersEmail,
+      phone: validationResult.data.homeownersPhone,
+      name: validationResult.data.homeownersFullName,
+      referralSource: "Real Estate Agent"
     };
     
-    // Send the data to GoHighLevel's contact API
-    const ghlResponse = await fetch(`https://rest.gohighlevel.com/v1/contacts/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(ghlData)
-    });
-    
-    if (!ghlResponse.ok) {
-      const errorData = await ghlResponse.json();
-      console.error('GoHighLevel API error:', errorData);
-      throw new Error('Failed to submit to GoHighLevel');
-    }
+    // Submit to GoHighLevel with the 'referral' form type (which will add urgent-call tag)
+    await submitToGHL(ghlData, 'referral');
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in GoHighLevel submission:', error);
+    console.error('Error in referral form submission:', error);
     return NextResponse.json(
       { error: 'Failed to process submission' },
       { status: 500 }

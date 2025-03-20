@@ -2,14 +2,13 @@ import { NextResponse } from 'next/server';
 import { submitToGHL } from '@/lib/utils/formSubmission';
 import { z } from 'zod';
 
-// Calculator specific validation schema
-const calculatorSchema = z.object({
+// Guide download form validation schema
+const guideFormSchema = z.object({
+  name: z.string().min(2, { message: 'Name must be at least 2 characters long' }),
   email: z.string().email({ message: 'Invalid email address' }),
   phone: z.string().optional(),
-  homeValue: z.string().or(z.number()),
-  yearlyIncome: z.string().or(z.number()),
-  projectType: z.string(),
-  results: z.any()
+  guideTitle: z.string().optional(), // The title of the guide being downloaded
+  guideType: z.string().optional()   // Type of guide (renovation, contractor, etc.)
 });
 
 export async function POST(request: Request) {
@@ -18,7 +17,7 @@ export async function POST(request: Request) {
     const formData = await request.json();
     
     // Validate the form data
-    const validationResult = calculatorSchema.safeParse(formData);
+    const validationResult = guideFormSchema.safeParse(formData);
     if (!validationResult.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: validationResult.error.format() },
@@ -26,12 +25,12 @@ export async function POST(request: Request) {
       );
     }
     
-    // Submit to GoHighLevel with the 'calculator' form type (which will add urgent-call tag)
-    await submitToGHL(validationResult.data, 'calculator');
+    // Submit to GoHighLevel with the 'guide' form type - this will use urgent-guide instead of urgent-call
+    await submitToGHL(validationResult.data, 'guide');
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in calculator form submission:', error);
+    console.error('Error in guide download submission:', error);
     return NextResponse.json(
       { error: 'Failed to process submission' },
       { status: 500 }
