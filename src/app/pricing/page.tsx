@@ -67,6 +67,10 @@ export default function PricingCalculator() {
   const [showResults, setShowResults] = useState(false);
   const [homeValueFormatted, setHomeValueFormatted] = useState('$');
   const [yearlyIncomeFormatted, setYearlyIncomeFormatted] = useState('$');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
   
   const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<FormData>();
 
@@ -385,6 +389,41 @@ export default function PricingCalculator() {
     doc.save("renovation-budget-calculation.pdf");
   };
 
+  const captureLeadData = async () => {
+    if (email && phone && results) {  // Only if user provided contact info
+      try {
+        setIsLeadSubmitting(true);
+        
+        const response = await fetch('/api/submit-calculator', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            homeValue: homeValueFormatted,
+            yearlyIncome: yearlyIncomeFormatted,
+            projectType: results.low.projectType,
+            results: {
+              lowBudget: results.low.totalBudget,
+              middleBudget: results.middle.totalBudget,
+              highBudget: results.high.totalBudget
+            },
+            email,
+            phone
+          }),
+        });
+        
+        if (response.ok) {
+          setLeadSubmitted(true);
+        }
+      } catch (error) {
+        console.error('Error capturing lead:', error);
+      } finally {
+        setIsLeadSubmitting(false);
+      }
+    }
+  };
+
   return (
     <div className="container-custom py-12 md:py-16">
       <div className="relative">
@@ -564,6 +603,60 @@ export default function PricingCalculator() {
                 </p>
               </div>
             </div>
+          </div>
+          
+          <div className="mt-12 p-8 bg-white rounded-lg shadow-sm">
+            <h3 className="text-xl font-bold mb-2">Save Your Results</h3>
+            <p className="text-gray-700 mb-4">
+              Enter your contact information to save these results and receive additional renovation insights.
+            </p>
+            
+            {leadSubmitted ? (
+              <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Thank you! Your results have been saved.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="(123) 456-7890"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <button
+                    onClick={captureLeadData}
+                    disabled={!email || !phone || isLeadSubmitting}
+                    className="btn btn-primary w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLeadSubmitting ? 'Saving...' : 'Save My Results'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

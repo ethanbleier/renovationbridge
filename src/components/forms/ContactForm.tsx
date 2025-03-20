@@ -55,7 +55,7 @@ const ContactForm = () => {
     
     try {
       // Send data to our API route that connects to GoHighLevel
-      const response = await fetch('/api/submit-to-ghl', {
+      const response = await fetch('/api/submit-contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

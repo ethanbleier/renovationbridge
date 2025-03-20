@@ -349,6 +349,9 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
     comments: ''
   })
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -358,14 +361,54 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitted(true)
     
     // Only proceed if the form is valid
     const form = e.target as HTMLFormElement
     if (form.checkValidity()) {
-      onFinish()
+      setIsSubmitting(true)
+      setError(null)
+      
+      try {
+        // Prepare data for GHL submission
+        const ghlData = {
+          name: contactData.name,
+          email: contactData.email,
+          phone: contactData.phone,
+          city: contactData.zipCode, // Using zipCode as city for GHL
+          description: `
+            Project Types: ${formData.projectTypes.join(', ')}
+            Size: ${formData.size || 'N/A'} sq ft
+            Process Stage: ${formData.processStage}
+            Address: ${contactData.address}
+            Additional Comments: ${contactData.comments}
+          `.trim()
+        }
+        
+        // Send data to our API route that connects to GoHighLevel
+        const response = await fetch('/api/submit-get-started', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(ghlData),
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to submit form');
+        }
+        
+        setIsSuccess(true)
+        onFinish()
+      } catch (err) {
+        console.error('Error submitting form:', err);
+        setError(err instanceof Error ? err.message : 'Failed to submit form');
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -397,6 +440,24 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
       <p className="text-gray mb-6">
         Please provide your contact information so we can connect you with our vetted professionals.
       </p>
+
+      {isSuccess && (
+        <div className="mb-6 bg-green-50 text-green-800 p-4 rounded-md border-l-4 border-green-500 flex items-center">
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          Thank you! We'll be in touch with you soon.
+        </div>
+      )}
+      
+      {error && (
+        <div className="mb-6 bg-red-50 text-red-800 p-4 rounded-md border-l-4 border-red-500 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          {error}
+        </div>
+      )}
 
       <div className="mb-6 p-4 bg-lavender/20 rounded-lg">
         <h3 className="font-semibold text-secondary mb-2">Your Project Summary</h3>
@@ -529,8 +590,19 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
           <button
             type="submit"
             className="btn btn-primary"
+            disabled={isSubmitting}
           >
-            Submit <span className="ml-1">→</span>
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+              </span>
+            ) : (
+              <>Submit <span className="ml-1">→</span></>
+            )}
           </button>
         </div>
       </form>
