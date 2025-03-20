@@ -30,7 +30,7 @@ export default function PlatformSection() {
             <motion.div 
               className="flex space-x-16 absolute whitespace-nowrap pl-8"
               animate={{
-                x: [0, "-100%"]
+                x: ["0%", "-50%"]
               }}
               transition={{
                 x: {

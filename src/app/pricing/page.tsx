@@ -351,7 +351,6 @@ export default function PricingCalculator() {
       ["Time To Save", formatMonths(results.low.timeToSave), formatMonths(results.middle.timeToSave), formatMonths(results.high.timeToSave)],
       ["Monthly Savings", formatCurrency(results.low.monthlySavings), formatCurrency(results.middle.monthlySavings), formatCurrency(results.high.monthlySavings)],
       ["Estimated ROI", `${results.low.roi.toFixed(2)}%`, `${results.middle.roi.toFixed(2)}%`, `${results.high.roi.toFixed(2)}%`],
-      ["Total Budget", formatCurrency(results.low.totalBudget), formatCurrency(results.middle.totalBudget), formatCurrency(results.high.totalBudget)],
       ["Value Increase", formatCurrency(results.low.valueIncrease), formatCurrency(results.middle.valueIncrease), formatCurrency(results.high.valueIncrease)],
       ["Updated Home Value", formatCurrency(results.low.updatedHomeValue), formatCurrency(results.middle.updatedHomeValue), formatCurrency(results.high.updatedHomeValue)]
     ];
@@ -467,13 +466,16 @@ export default function PricingCalculator() {
           <div className="flex justify-between items-center mb-6 relative z-10">
             <h2 className="text-2xl md:text-3xl font-bold text-primary">Renovation Budget Calculation Results</h2>
             <button 
-              onClick={downloadPDF}
-              className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 shadow-md transition-all"
+              disabled
+              className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg shadow-md transition-all cursor-not-allowed relative group"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
               Download PDF
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-primary text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                Coming Soon
+              </span>
             </button>
           </div>
           
@@ -518,12 +520,6 @@ export default function PricingCalculator() {
                   <td className="p-5 text-center">{results.middle.roi.toFixed(2)}%</td>
                   <td className="p-5 text-center">{results.high.roi.toFixed(2)}%</td>
                 </tr>
-                <tr className="border-b bg-primary/5 font-semibold">
-                  <td className="p-5 text-lg">Total Budget</td>
-                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.low.totalBudget)}</td>
-                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.middle.totalBudget)}</td>
-                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.high.totalBudget)}</td>
-                </tr>
                 <tr className="border-b hover:bg-gray-50 transition-colors">
                   <td className="p-5 font-medium">Value Increase</td>
                   <td className="p-5 text-center">{formatCurrency(results.low.valueIncrease)}</td>
@@ -535,6 +531,12 @@ export default function PricingCalculator() {
                   <td className="p-5 text-center">{formatCurrency(results.low.updatedHomeValue)}</td>
                   <td className="p-5 text-center">{formatCurrency(results.middle.updatedHomeValue)}</td>
                   <td className="p-5 text-center">{formatCurrency(results.high.updatedHomeValue)}</td>
+                </tr>
+                <tr className="border-b bg-primary/5 font-semibold">
+                  <td className="p-5 text-lg">Total Budget</td>
+                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.low.totalBudget)}</td>
+                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.middle.totalBudget)}</td>
+                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.high.totalBudget)}</td>
                 </tr>
               </tbody>
             </table>

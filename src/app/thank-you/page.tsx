@@ -31,7 +31,7 @@ export default function ThankYouPage() {
           
           <div className="bg-lavender/50 p-4 rounded-lg">
             <h2 className="font-semibold text-secondary mb-1">Have questions?</h2>
-            <p className="text-gray">Feel free to reach out to our support team at <a href="mailto:support@renovationbridge.com" className="text-primary">support@renovationbridge.com</a> or call us at (555) 123-4567.</p>
+            <p className="text-gray">Feel free to reach out to our support team at <a href="mailto:support@renovationbridge.com" className="text-primary">support@renovationbridge.com</a> or call us at (925) 693-7590.</p>
           </div>
         </div>
         

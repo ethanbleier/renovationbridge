@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok, FaXTwitter } from 'react-icons/fa6'
+import { FaFacebookF, FaInstagram, FaYoutube, FaTiktok, FaXTwitter, FaPhone } from 'react-icons/fa6'
+import ContactForm from '../forms/ContactForm'
 
 const Footer = () => {
   return (
@@ -37,7 +38,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-              <Link href="/pdfs/guide.pdf" download className="text-gray hover:text-primary transition-colors flex items-center gap-2">
+              <Link href="/pdfs/guide.pdf" download className="text-blue-500 hover:text-primary transition-colors flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
                 </svg>
@@ -104,47 +105,7 @@ const Footer = () => {
           
           {/* Contact Form Column (Spans 2 columns on lg screens) */}
           <div className="lg:col-span-2">
-            <h4 className="text-lg font-semibold text-black mb-4">Get Started Today</h4>
-            <form className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input 
-                  type="text" 
-                  placeholder="Name" 
-                  className="form-input"
-                  required
-                />
-                <input 
-                  type="text" 
-                  placeholder="City" 
-                  className="form-input"
-                  required
-                />
-              </div>
-              <input 
-                type="email" 
-                placeholder="Email" 
-                className="form-input"
-                required
-              />
-              <input 
-                type="tel" 
-                placeholder="Phone Number" 
-                className="form-input"
-                required
-              />
-              <textarea 
-                placeholder="Description of work" 
-                className="form-input resize-none"
-                rows={4}
-                required
-              ></textarea>
-              <button 
-                type="submit" 
-                className="btn btn-primary w-full sm:w-auto"
-              >
-                Submit
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </div>
         
@@ -154,11 +115,8 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} Renovation Bridge. All rights reserved.
           </p>
           <div className="mt-2 flex justify-center space-x-6 text-sm">
-            <Link href="/privacy" className="text-gray hover:text-primary transition-colors">
+            <Link href="/privacy" className="text-gray hover:text-primary transition-colors px-4 py-1.5 rounded-full border border-gray/20 hover:border-primary">
               Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-gray hover:text-primary transition-colors">
-              Terms of Service
             </Link>
           </div>
         </div>

@@ -41,12 +41,12 @@ const ProjectTypeStep = ({ onNext }: { onNext: (data: any) => void }) => {
             }`}
             onClick={() => toggleSelection(type.id)}
           >
-            <div className="aspect-w-16 aspect-h-9 mb-4">
+            <div className="relative h-48 w-full mb-4">
               <Image 
                 src={type.image} 
                 alt={type.label} 
-                width={300} 
-                height={200}
+                fill={true}
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="rounded-md object-cover"
               />
             </div>
@@ -348,6 +348,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
     zipCode: '',
     comments: ''
   })
+  const [submitted, setSubmitted] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -359,8 +360,22 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onFinish()
+    setSubmitted(true)
+    
+    // Only proceed if the form is valid
+    const form = e.target as HTMLFormElement
+    if (form.checkValidity()) {
+      onFinish()
+    }
   }
+
+  // Determine if we should show validation errors
+  const shouldShowError = (fieldName: string) => {
+    if (!submitted) return false;
+    
+    const inputElem = document.getElementById(fieldName) as HTMLInputElement;
+    return inputElem ? !inputElem.validity.valid : false;
+  };
 
   const projectTypeLabels: Record<string, string> = {
     'adu': 'Accessory Dwelling Unit (ADU)',
@@ -403,7 +418,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
         </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -415,7 +430,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="name"
               value={contactData.name}
               onChange={handleChange}
-              className="w-full p-3 border border-gray/30 rounded-md"
+              className={`w-full p-3 border ${shouldShowError('name') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="Your full name"
               required
             />
@@ -431,7 +446,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="email"
               value={contactData.email}
               onChange={handleChange}
-              className="w-full p-3 border border-gray/30 rounded-md"
+              className={`w-full p-3 border ${shouldShowError('email') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="you@example.com"
               required
             />
@@ -447,10 +462,13 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="phone"
               value={contactData.phone}
               onChange={handleChange}
-              className="w-full p-3 border border-gray/30 rounded-md"
+              className={`w-full p-3 border ${shouldShowError('phone') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="(123) 456-7890"
               required
             />
+            {shouldShowError('phone') && (
+              <p className="text-red-500 text-sm mt-1">Please enter a valid phone number</p>
+            )}
           </div>
           
           <div>
@@ -463,7 +481,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="zipCode"
               value={contactData.zipCode}
               onChange={handleChange}
-              className="w-full p-3 border border-gray/30 rounded-md"
+              className={`w-full p-3 border ${shouldShowError('zipCode') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="12345"
               required
             />
@@ -479,7 +497,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="address"
               value={contactData.address}
               onChange={handleChange}
-              className="w-full p-3 border border-gray/30 rounded-md"
+              className={`w-full p-3 border ${shouldShowError('address') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="123 Main St, City, State"
               required
             />
@@ -494,7 +512,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="comments"
               value={contactData.comments}
               onChange={handleChange}
-              className="w-full p-3 border border-gray/30 rounded-md h-24"
+              className={`w-full p-3 border ${shouldShowError('comments') ? 'border-red-500' : 'border-gray/30'} rounded-md h-24`}
               placeholder="Tell us more about your project..."
             />
           </div>
