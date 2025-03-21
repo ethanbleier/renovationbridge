@@ -72,6 +72,7 @@ export default function HeroSection() {
               src={slide}
               alt="Renovation project"
               fill
+              sizes="100vw"
               className="object-cover"
               priority={index === 0}
             />

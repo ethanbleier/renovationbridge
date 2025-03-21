@@ -372,18 +372,19 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
       setError(null)
       
       try {
-        // Prepare data for GHL submission
+        // Prepare data for GHL submission - mapping fields to match validation schema
         const ghlData = {
           name: contactData.name,
           email: contactData.email,
           phone: contactData.phone,
-          city: contactData.zipCode, // Using zipCode as city for GHL
-          description: `
+          propertyAddress: contactData.address,
+          propertyZip: contactData.zipCode,
+          projectType: formData.projectTypes.join(', '),
+          projectDescription: `
             Project Types: ${formData.projectTypes.join(', ')}
             Size: ${formData.size || 'N/A'} sq ft
             Process Stage: ${formData.processStage}
-            Address: ${contactData.address}
-            Additional Comments: ${contactData.comments}
+            Additional Comments: ${contactData.comments || 'None'}
           `.trim()
         }
         
@@ -398,7 +399,12 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to submit form');
+          console.error('Validation error details:', errorData);
+          if (errorData.details) {
+            throw new Error(`Validation failed: ${JSON.stringify(errorData.details)}`);
+          } else {
+            throw new Error(errorData.error || 'Failed to submit form');
+          }
         }
         
         setIsSuccess(true)

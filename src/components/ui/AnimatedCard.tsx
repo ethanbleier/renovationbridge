@@ -20,7 +20,6 @@ const cardVariants = {
   }
 }
 
-// Define interface for AnimatedCard props
 interface AnimatedCardProps {
   step: string | number;
   title: string;

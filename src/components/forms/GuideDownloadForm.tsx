@@ -52,7 +52,12 @@ export default function GuideDownloadForm({
       const data = await response.json()
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit form')
+        console.error('Form validation error:', data);
+        if (data.details) {
+          throw new Error(`Validation failed: ${JSON.stringify(data.details)}`);
+        } else {
+          throw new Error(data.error || 'Failed to submit form')
+        }
       }
       
       // Set the download URL from the response if available
@@ -63,7 +68,8 @@ export default function GuideDownloadForm({
       // After successful submission
       setIsSubmitted(true)
     } catch (err) {
-      setError('Something went wrong. Please try again.')
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setError(errorMessage)
       console.error('Error submitting guide form:', err)
     } finally {
       setIsLoading(false)

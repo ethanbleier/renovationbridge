@@ -1,6 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide';
+type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor';
 
 // Default tags to apply to all submissions
 const DEFAULT_TAGS = ['website-lead', 'renovation-bridge'];
@@ -12,6 +10,9 @@ export function getFormTags(formType: FormType): string[] {
   switch (formType) {
     case 'guide':
       tags.push('urgent-guide');
+      break;
+    case 'contractor':
+      tags.push('contractor-application');
       break;
     default:
       tags.push('urgent-call');

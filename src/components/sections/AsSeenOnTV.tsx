@@ -141,6 +141,7 @@ const AsSeenOnTV = () => {
                     src="/images/profiles/tv.jpeg"
                     alt="Renovation Bridge featured on NBC Bay Area with Spencer Christian"
                     fill
+                    sizes="(max-width: 768px) 100vw, 160px"
                     className="object-cover"
                   />
                   <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-xs px-1">2:45</div>

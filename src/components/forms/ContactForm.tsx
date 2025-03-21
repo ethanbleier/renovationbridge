@@ -8,7 +8,7 @@ type FormValues = {
   city: string
   email: string
   phone: string
-  description: string
+  message: string
 }
 
 const ContactForm = () => {
@@ -65,7 +65,12 @@ const ContactForm = () => {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to submit form');
+        console.error('Validation error details:', errorData);
+        if (errorData.details) {
+          throw new Error(`Validation failed: ${JSON.stringify(errorData.details)}`);
+        } else {
+          throw new Error(errorData.error || 'Failed to submit form');
+        }
       }
       
       setIsSuccess(true)
@@ -75,7 +80,13 @@ const ContactForm = () => {
       setTimeout(() => setIsSuccess(false), 15000)
     } catch (err) {
       console.error('Error submitting form:', err);
-      setError(err instanceof Error ? err.message : 'Failed to submit form');
+      // Check if the error response contains details
+      if (err instanceof Error && err.message === 'Validation failed' && 'details' in (err as any)) {
+        const details = JSON.stringify((err as any).details);
+        setError(`Validation failed: ${details}`);
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to submit form');
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -206,17 +217,17 @@ const ContactForm = () => {
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
           </svg>
           <textarea
-            placeholder="Description of work"
+            placeholder="Description of work (min. 10 characters)"
             rows={4}
-            className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.description ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
-            {...register('description', { required: true })}
+            className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
+            {...register('message', { required: true, minLength: 10 })}
           ></textarea>
-          {errors.description && (
+          {errors.message && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              Description is required
+              Message is required and must be at least 10 characters
             </p>
           )}
         </div>

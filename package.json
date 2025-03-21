@@ -10,25 +10,32 @@
     "deploy": "npm run build"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "framer-motion": "^12.5.0",
+    "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "mongoose": "^8.1.1",
     "next": "^14.2.24",
+    "nodemailer": "^6.9.8",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.50.0",
     "react-icons": "^5.0.1",
     "react-type-animation": "^3.2.0",
     "sharp": "^0.33.5",
-    "mongoose": "^8.1.1",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "zod": "^3.22.4",
-    "cors": "^2.8.5",
-    "nodemailer": "^6.9.8"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-typescript": "^7.26.0",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/bcryptjs": "^2.4.4",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -40,9 +47,6 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
     "webpack": "^5.98.0",
-    "webpack-cli": "^6.0.1",
-    "@types/bcryptjs": "^2.4.4",
-    "@types/jsonwebtoken": "^9.0.5",
-    "@types/cors": "^2.8.17"
+    "webpack-cli": "^6.0.1"
   }
 }
