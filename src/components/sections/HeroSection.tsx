@@ -58,7 +58,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative pt-16 md:pt-24 pb-20 md:pb-32">
+    <section className="relative min-h-[90vh] pt-16 md:pt-24 pb-20 md:pb-32">
       {/* Image Carousel Background */}
       <div className="absolute inset-0 w-full h-full">
         {slides.map((slide, index) => (
@@ -83,7 +83,7 @@ export default function HeroSection() {
       </div>
       
       <div className="container-custom relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-start">
           <div className="space-y-6 md:space-y-8">
             <div className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm backdrop-blur-sm">
               Welcome to Renovation Bridge
@@ -143,14 +143,14 @@ export default function HeroSection() {
             </div>
           </div>
           
-          <div className="relative mt-8 lg:mt-0">
+          <div className="relative mt-8 lg:mt-0 lg:max-h-[80vh] overflow-y-auto rounded-lg shadow-lg">
             <ContactForm />
           </div>
         </div>
       </div>
       
-      {/* Bobbing down arrow */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce">
+      {/* Bobbing down arrow - fixed position instead of absolute */}
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center animate-bounce z-20">
         <div 
           className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
           onClick={handleScrollDown}
