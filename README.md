@@ -98,4 +98,34 @@ The main `.env.local` file references these secret files instead of containing s
 2. Create the necessary secret files with your credentials
 3. Environment variables from these files are loaded at runtime
 
-**Note:** Never commit sensitive information to the repository. Each developer should maintain their own local secrets files. 
+**Note:** Never commit sensitive information to the repository. Each developer should maintain their own local secrets files.
+
+## WordPress Deployment
+
+This project can be deployed as a WordPress plugin using GitHub deployment:
+
+1. **Build for WordPress:**
+   ```bash
+   npm run export
+   ```
+   This creates a static export in the `out/` directory
+
+2. **WordPress Plugin Structure:**
+   - `wordpress-plugin.php`: Main plugin file with WordPress hooks
+   - `out/`: Contains the static Next.js build
+
+3. **Deployment to WordPress.com:**
+   - The GitHub Actions workflow in `.github/workflows/main.yml` handles deployment
+   - Triggered automatically on push to the `prod` branch
+   - Creates a WordPress-compatible artifact named `wpcom`
+   - Destination: `/wp-content/plugins/renovationbridge`
+   - Can also be manually triggered via GitHub Actions interface
+
+4. **Deployment Requirements:**
+   - The GitHub workflow must upload an artifact named 'wpcom'
+   - The workflow is configured to trigger on push to 'prod' branch
+   - WordPress.com connection is set up through the WordPress.com dashboard
+
+5. **Usage in WordPress:**
+   - After deployment, activate the plugin in WordPress admin
+   - Use the shortcode `[renovationbridge]` on any page or post 

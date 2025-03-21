@@ -1,12 +1,43 @@
-on: push
-name: Deploying WordPress Site
+name: WordPress.com Deployment
+
+on:
+  push:
+    branches:
+      - prod
+  workflow_dispatch:
+
 jobs:
-  deploy:
-    name: Deploy
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Deploy
-        uses: rtCamp/action-deploy-wordpress@v3
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js for export
+        run: npm run export
+
+      - name: Prepare WordPress plugin
+        run: |
+          mkdir -p deployment/renovationbridge
+          cp wordpress-plugin.php deployment/renovationbridge/
+          cp -r out deployment/renovationbridge/
+          cd deployment
+          find . -type f -name "*.map" -delete
+
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wpcom
+          path: |
+            deployment/renovationbridge
+            !deployment/renovationbridge/**/.git/**
