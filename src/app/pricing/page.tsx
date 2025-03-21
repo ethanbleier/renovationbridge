@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { jsPDF } from 'jspdf';
@@ -30,7 +31,6 @@ const formatCurrencyInput = (value: string): string => {
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: {
-      (options: any): jsPDF;
       previous: {
         finalY: number;
       };
@@ -72,7 +72,13 @@ export default function PricingCalculator() {
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   
-  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<FormData>();
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormData>({
+    defaultValues: {
+      homeValue: '',
+      yearlyIncome: '',
+      projectType: 'Kitchen Renovation'
+    }
+  });
 
   // Initialize form values
   useEffect(() => {
@@ -81,9 +87,11 @@ export default function PricingCalculator() {
   }, [setValue]);
 
   const projectTypes = [
-    "Bathroom",
-    "Kitchen",
-    "Roof Replacement",
+    "Kitchen Renovation",
+    "Bathroom Renovation",
+    "Deck or Patio Addition",
+    "Basement Finishing",
+    "Whole House Remodel",
     "Window Replacement",
     "Garage Door Replacement",
     "Deck Addition",
@@ -210,48 +218,54 @@ export default function PricingCalculator() {
   function getProjectCoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
     const coefficients = {
       low: {
-        "Bathroom": 0.025, 
-        "Kitchen": 0.05, 
-        "Roof Replacement": 0.02, 
-        "Window Replacement": 0.015, 
-        "Garage Door Replacement": 0.01, 
-        "Deck Addition": 0.02, 
-        "Attic Insulation": 0.005, 
-        "Siding Replacement": 0.02, 
-        "Room Addition": 0.1, 
-        "Accessory Dwelling Unit": 0.15, 
-        "ADU": 0.15, 
-        "Landscaping": 0.05, 
-        "Solar Panel Installation": 0.05
+        "Kitchen Renovation": 0.05,
+        "Bathroom Renovation": 0.025,
+        "Deck or Patio Addition": 0.02,
+        "Basement Finishing": 0.035,
+        "Whole House Remodel": 0.0625,
+        "Window Replacement": 0.0325,
+        "Garage Door Replacement": 0.015,
+        "Deck Addition": 0.02,
+        "Attic Insulation": 0.0075,
+        "Siding Replacement": 0.045,
+        "Room Addition": 0.15,
+        "Accessory Dwelling Unit": 0.225,
+        "ADU": 0.225,
+        "Landscaping": 0.075,
+        "Solar Panel Installation": 0.075
       },
       middle: {
-        "Bathroom": 0.0625, 
-        "Kitchen": 0.1, 
-        "Roof Replacement": 0.035, 
-        "Window Replacement": 0.0325, 
-        "Garage Door Replacement": 0.015, 
-        "Deck Addition": 0.04, 
-        "Attic Insulation": 0.0075, 
-        "Siding Replacement": 0.045, 
-        "Room Addition": 0.15, 
-        "Accessory Dwelling Unit": 0.225, 
-        "ADU": 0.225, 
-        "Landscaping": 0.075, 
+        "Kitchen Renovation": 0.1,
+        "Bathroom Renovation": 0.0625,
+        "Deck or Patio Addition": 0.04,
+        "Basement Finishing": 0.035,
+        "Whole House Remodel": 0.1,
+        "Window Replacement": 0.0325,
+        "Garage Door Replacement": 0.015,
+        "Deck Addition": 0.04,
+        "Attic Insulation": 0.0075,
+        "Siding Replacement": 0.045,
+        "Room Addition": 0.15,
+        "Accessory Dwelling Unit": 0.225,
+        "ADU": 0.225,
+        "Landscaping": 0.075,
         "Solar Panel Installation": 0.075
       },
       high: {
-        "Bathroom": 0.1, 
-        "Kitchen": 0.15, 
-        "Roof Replacement": 0.05, 
-        "Window Replacement": 0.05, 
-        "Garage Door Replacement": 0.02, 
-        "Deck Addition": 0.06, 
-        "Attic Insulation": 0.01, 
-        "Siding Replacement": 0.07, 
-        "Room Addition": 0.2, 
-        "Accessory Dwelling Unit": 0.3, 
-        "ADU": 0.3, 
-        "Landscaping": 0.1, 
+        "Kitchen Renovation": 0.15,
+        "Bathroom Renovation": 0.1,
+        "Deck or Patio Addition": 0.06,
+        "Basement Finishing": 0.05,
+        "Whole House Remodel": 0.15,
+        "Window Replacement": 0.05,
+        "Garage Door Replacement": 0.02,
+        "Deck Addition": 0.06,
+        "Attic Insulation": 0.01,
+        "Siding Replacement": 0.07,
+        "Room Addition": 0.2,
+        "Accessory Dwelling Unit": 0.3,
+        "ADU": 0.3,
+        "Landscaping": 0.1,
         "Solar Panel Installation": 0.1
       }
     } as const;
@@ -261,48 +275,54 @@ export default function PricingCalculator() {
   function getROICoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
     const coefficients = {
       low: {
-        "Kitchen": 0.9, 
-        "Bathroom": 0.8, 
-        "Roof Replacement": 0.75, 
-        "Window Replacement": 0.8, 
-        "Garage Door Replacement": 0.95, 
-        "Deck Addition": 0.8, 
-        "Attic Insulation": 0.85, 
-        "Siding Replacement": 0.8, 
-        "Room Addition": 0.65, 
-        "Accessory Dwelling Unit": 1.05, 
-        "ADU": 1.05, 
-        "Landscaping": 0.85, 
+        "Kitchen Renovation": 0.9,
+        "Bathroom Renovation": 0.8,
+        "Deck or Patio Addition": 0.95,
+        "Basement Finishing": 0.75,
+        "Whole House Remodel": 0.8,
+        "Window Replacement": 0.8,
+        "Garage Door Replacement": 0.95,
+        "Deck Addition": 0.8,
+        "Attic Insulation": 0.85,
+        "Siding Replacement": 0.8,
+        "Room Addition": 0.65,
+        "Accessory Dwelling Unit": 1.05,
+        "ADU": 1.05,
+        "Landscaping": 0.85,
         "Solar Panel Installation": 0.85
       },
       middle: {
-        "Kitchen": 1.05, 
-        "Bathroom": 0.9, 
-        "Roof Replacement": 0.83, 
-        "Window Replacement": 0.85, 
-        "Garage Door Replacement": 1.1, 
-        "Deck Addition": 0.87, 
-        "Attic Insulation": 0.92, 
-        "Siding Replacement": 0.9, 
-        "Room Addition": 0.75, 
-        "Accessory Dwelling Unit": 1.05, 
-        "ADU": 1.05, 
-        "Landscaping": 0.85, 
+        "Kitchen Renovation": 1.05,
+        "Bathroom Renovation": 0.9,
+        "Deck or Patio Addition": 1.1,
+        "Basement Finishing": 0.83,
+        "Whole House Remodel": 0.85,
+        "Window Replacement": 0.85,
+        "Garage Door Replacement": 1.1,
+        "Deck Addition": 0.87,
+        "Attic Insulation": 0.92,
+        "Siding Replacement": 0.9,
+        "Room Addition": 0.75,
+        "Accessory Dwelling Unit": 1.05,
+        "ADU": 1.05,
+        "Landscaping": 0.85,
         "Solar Panel Installation": 0.85
       },
       high: {
-        "Kitchen": 1.2, 
-        "Bathroom": 1, 
-        "Roof Replacement": 0.9, 
-        "Window Replacement": 0.95, 
-        "Garage Door Replacement": 1.2, 
-        "Deck Addition": 0.9, 
-        "Attic Insulation": 1, 
-        "Siding Replacement": 0.9, 
-        "Room Addition": 0.75, 
-        "Accessory Dwelling Unit": 1.05, 
-        "ADU": 1.05, 
-        "Landscaping": 0.85, 
+        "Kitchen Renovation": 1.2,
+        "Bathroom Renovation": 1,
+        "Deck or Patio Addition": 1.2,
+        "Basement Finishing": 0.9,
+        "Whole House Remodel": 0.95,
+        "Window Replacement": 0.95,
+        "Garage Door Replacement": 1.2,
+        "Deck Addition": 0.9,
+        "Attic Insulation": 1,
+        "Siding Replacement": 0.9,
+        "Room Addition": 0.75,
+        "Accessory Dwelling Unit": 1.05,
+        "ADU": 1.05,
+        "Landscaping": 0.85,
         "Solar Panel Installation": 0.85
       }
     } as const;
@@ -322,72 +342,23 @@ export default function PricingCalculator() {
     return Math.round(value) + " months";
   }
 
-  const downloadPDF = () => {
-    if (!results) return;
+  // Function for future use
+  // const downloadPDF = () => {
+  //   if (!results) return;
     
-    const doc = new jsPDF();
+  //   const doc = new jsPDF();
     
-    // Add title
-    doc.setFontSize(20);
-    doc.setTextColor(60, 60, 60);
-    doc.text("Renovation Budget Calculation Results", 20, 20);
+  //   // Add title
+  //   doc.setFontSize(20);
+  //   doc.setTextColor(60, 60, 60);
+  //   doc.text("Renovation Budget Calculation Results", 20, 20);
     
-    // Add project type
-    doc.setFontSize(14);
-    doc.text(`Project: ${results.low.projectType}`, 20, 30);
+  //   // Add project type
+  //   doc.setFontSize(14);
+  //   doc.text(`Project: ${results.low.projectType}`, 20, 30);
     
-    // Add date
-    const today = new Date();
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Generated on: ${today.toLocaleDateString()}`, 20, 40);
-    
-    // Add logo/branding
-    doc.setFontSize(10);
-    doc.setTextColor(150, 100, 200);
-    doc.text("Renovation Bridge", 170, 20);
-    
-    // Create table with results
-    const tableColumn = ["", "Low Tier", "Middle Tier", "High Tier"];
-    const tableRows = [
-      ["Initial Budget", formatCurrency(results.low.initialBudget), formatCurrency(results.middle.initialBudget), formatCurrency(results.high.initialBudget)],
-      ["Contingency Fund", formatCurrency(results.low.contingencyFund), formatCurrency(results.middle.contingencyFund), formatCurrency(results.high.contingencyFund)],
-      ["Time To Save", formatMonths(results.low.timeToSave), formatMonths(results.middle.timeToSave), formatMonths(results.high.timeToSave)],
-      ["Monthly Savings", formatCurrency(results.low.monthlySavings), formatCurrency(results.middle.monthlySavings), formatCurrency(results.high.monthlySavings)],
-      ["Estimated ROI", `${results.low.roi.toFixed(2)}%`, `${results.middle.roi.toFixed(2)}%`, `${results.high.roi.toFixed(2)}%`],
-      ["Value Increase", formatCurrency(results.low.valueIncrease), formatCurrency(results.middle.valueIncrease), formatCurrency(results.high.valueIncrease)],
-      ["Updated Home Value", formatCurrency(results.low.updatedHomeValue), formatCurrency(results.middle.updatedHomeValue), formatCurrency(results.high.updatedHomeValue)]
-    ];
-    
-    // @ts-ignore - jspdf-autotable typings
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 50,
-      theme: 'grid',
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [108, 99, 255], textColor: [255, 255, 255] },
-      alternateRowStyles: { fillColor: [240, 240, 255] },
-      columnStyles: { 0: { fontStyle: 'bold' } },
-    });
-    
-    // Add notes
-    doc.setFontSize(11);
-    doc.setTextColor(80, 80, 80);
-    doc.text("Notes:", 20, doc.autoTable.previous.finalY + 15);
-    doc.setFontSize(10);
-    doc.text("• The total budget includes both the initial budget and the contingency fund.", 25, doc.autoTable.previous.finalY + 25);
-    doc.text("• Contingency funds help cover unexpected expenses during your renovation.", 25, doc.autoTable.previous.finalY + 35);
-    doc.text("• ROI estimates are based on industry averages and local market conditions may vary.", 25, doc.autoTable.previous.finalY + 45);
-    
-    // Add footer
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Generated by Renovation Bridge Calculator • www.renovationbridge.com", 20, 280);
-    
-    // Save PDF
-    doc.save("renovation-budget-calculation.pdf");
-  };
+  //   // Add date
+  // }
 
   const captureLeadData = async () => {
     if (email && phone && results) {  // Only if user provided contact info

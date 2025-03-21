@@ -81,3 +81,21 @@ renovationbridge/
 - **SEO Optimization**: Contact form on landing page for lead generation
 - **Navigation**: Easy-to-use header with dropdown menus
 - **As Seen on TV**: Section showcasing NBC Bay Area features 
+
+## Secrets Management
+
+The project uses a dedicated `secrets/` directory for storing sensitive information:
+
+- `secrets/ghl.env`: Go High Level API credentials
+- `secrets/mongodb.env`: Database connection strings
+- `secrets/jwt.env`: JWT authentication secrets
+- `secrets/email.env`: Email service configuration
+
+The main `.env.local` file references these secret files instead of containing sensitive information directly.
+
+**Setup:**
+1. The `secrets/` directory is excluded from version control in `.gitignore`
+2. Create the necessary secret files with your credentials
+3. Environment variables from these files are loaded at runtime
+
+**Note:** Never commit sensitive information to the repository. Each developer should maintain their own local secrets files. 

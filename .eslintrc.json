@@ -4,8 +4,19 @@
     "es2021": true,
     "node": true
   },
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "next/core-web-vitals"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
   "rules": {
-    "no-unreachable": "error"
+    "no-unreachable": "error",
+    "react/no-unescaped-entities": "off",
+    "no-unused-vars": "warn",
+    "no-undef": "warn",
+    "@next/next/no-img-element": "warn"
   }
 }

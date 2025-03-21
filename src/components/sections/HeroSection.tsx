@@ -3,11 +3,12 @@
 import ContactForm from '@/components/forms/ContactForm'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { TypeAnimation } from 'react-type-animation'
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [pillVisible, setPillVisible] = useState(false);
   
   const slides = [
     '/images/projects/adu-1.jpg',
@@ -48,6 +49,12 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
+  // Animation for welcome pill
+  useEffect(() => {
+    // Delay the appearance slightly for a better effect
+    setTimeout(() => setPillVisible(true), 300);
+  }, []);
+
   // Function to handle scroll down on arrow click
   const handleScrollDown = () => {
     // Find the What We Offer section and scroll to it
@@ -85,9 +92,15 @@ export default function HeroSection() {
       <div className="container-custom relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-start">
           <div className="space-y-6 md:space-y-8">
-            <div className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm backdrop-blur-sm">
-              Welcome to Renovation Bridge
-            </div>
+              <div 
+                className={`inline-block px-4 py-1 rounded-full bg-green-400/30 text-green-500 font-medium text-sm backdrop-blur-sm transform transition-all duration-700 ease-out ${
+                  pillVisible 
+                    ? 'opacity-100 translate-y-0 scale-100' 
+                    : 'opacity-0 -translate-y-4 scale-95'
+                }`}
+              >
+                Welcome to Renovation Bridge
+              </div>
             
             <div className="text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
               {/* Main title with static prefix and animated keyword */}
@@ -149,8 +162,8 @@ export default function HeroSection() {
         </div>
       </div>
       
-      {/* Bobbing down arrow - fixed position instead of absolute */}
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center animate-bounce z-20">
+      {/* Bobbing down arrow - position adjusted for immediate visibility */}
+      <div className="absolute bottom-20 md:bottom-16 left-0 right-0 flex justify-center animate-bounce z-20">
         <div 
           className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
           onClick={handleScrollDown}

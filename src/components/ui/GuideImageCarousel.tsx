@@ -54,10 +54,13 @@ export default function GuideImageCarousel({
                 transform: `translateZ(${activeImage === index ? '10px' : '-10px'})` 
               }}
             >
-              <img
+              <Image
                 src={src}
                 alt={`Renovation Guide Preview ${index + 1}`}
+                width={500}
+                height={300}
                 className="w-full h-full object-cover"
+                priority
               />
               
               {/* Overlay with subtle gradient */}

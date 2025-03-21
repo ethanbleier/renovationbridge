@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 // Step components
-const ProjectTypeStep = ({ onNext }: { onNext: (data: any) => void }) => {
+const ProjectTypeStep = ({ onNext }: { onNext: (formData: any) => void }) => {
   const projectTypes = [
     { id: 'adu', label: 'Accessory Dwelling Unit (ADU)', image: '/images/projects/adu-1.jpg' },
     { id: 'kitchen', label: 'Kitchen Renovation', image: '/images/projects/kitchen-1.jpg' },
@@ -72,10 +72,11 @@ const ProjectTypeStep = ({ onNext }: { onNext: (data: any) => void }) => {
   )
 }
 
-const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onNext: (data: any) => void, formData: any }) => {
+const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onNext: (formData: any) => void, formData: any }) => {
   const [size, setSize] = useState(getDefaultSize(formData.projectTypes))
   
   // Determine if slider should be shown based on project type
+  // eslint-disable-next-line no-unused-vars
   const showSlider = formData.projectTypes.some((type: string) => 
     ['adu', 'addition', 'new-home'].includes(type)
   )
@@ -182,7 +183,7 @@ const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
   )
 }
 
-const ProjectProcessStep = ({ onBack, onNext }: { onBack: () => void, onNext: (data: any) => void }) => {
+const ProjectProcessStep = ({ onBack, onNext }: { onBack: () => void, onNext: (formData: any) => void }) => {
   const [processStage, setProcessStage] = useState<string | null>(null)
 
   return (

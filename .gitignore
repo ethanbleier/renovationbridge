@@ -36,3 +36,6 @@ coverage
 .vercel
 .turbo
 
+# Secrets directory
+/secrets/
+

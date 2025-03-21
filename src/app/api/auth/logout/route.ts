@@ -1,3 +1,5 @@
+'use server';
+
 import { NextResponse } from 'next/server';
 import { clearAuthCookie } from '@/lib/utils/auth';
 

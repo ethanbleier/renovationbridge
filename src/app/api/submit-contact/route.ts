@@ -1,3 +1,5 @@
+'use server';
+
 import { NextResponse } from 'next/server';
 import { submitToGHL } from '@/lib/utils/formSubmission';
 import { contactFormSchema } from '@/lib/utils/validation';

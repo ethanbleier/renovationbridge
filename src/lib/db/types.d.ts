@@ -1,3 +1,4 @@
+// mongoose import is required for the type declaration in the global object
 import mongoose from 'mongoose';
 
 declare global {

@@ -1,4 +1,5 @@
 import '@/styles/globals.css'
+import React from 'react'
 
 export const metadata = {
   title: 'Blog | Renovation Bridge',

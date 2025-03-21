@@ -1,5 +1,4 @@
 import React from 'react';
-import StepCard from '@/components/ui/StepCard';
 import Accordion, { AccordionItem } from '@/components/ui/Accordion';
 import Image from 'next/image';
 import Link from 'next/link';

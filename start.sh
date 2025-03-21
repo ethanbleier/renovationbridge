@@ -8,6 +8,45 @@ for arg in "$@"; do
   fi
 done
 
+# Load secrets from the secrets directory
+load_secrets() {
+  echo "🔒 Loading secrets from secrets directory..."
+  
+  # Check if secrets directory exists
+  if [ ! -d "secrets" ]; then
+    echo "⚠️  Secrets directory not found. Creating it..."
+    mkdir -p secrets
+  fi
+  
+  # Check if required secret files exist and create them if needed
+  local secret_files=("ghl.env" "mongodb.env" "jwt.env" "email.env")
+  for file in "${secret_files[@]}"; do
+    if [ ! -f "secrets/$file" ]; then
+      echo "⚠️  Secret file secrets/$file not found. Creating an empty template..."
+      touch "secrets/$file"
+    fi
+  done
+  
+  # Load environment variables from secret files
+  if [ -f "secrets/ghl.env" ]; then
+    export $(grep -v '^#' secrets/ghl.env | xargs)
+  fi
+  
+  if [ -f "secrets/mongodb.env" ]; then
+    export $(grep -v '^#' secrets/mongodb.env | xargs)
+  fi
+  
+  if [ -f "secrets/jwt.env" ]; then
+    export $(grep -v '^#' secrets/jwt.env | xargs)
+  fi
+  
+  if [ -f "secrets/email.env" ]; then
+    export $(grep -v '^#' secrets/email.env | xargs)
+  fi
+  
+  echo "✅ Secrets loaded successfully!"
+}
+
 # Trap cleanup function to ensure all background processes are terminated
 cleanup() {
   echo -e "\n🧹 Cleaning up processes..."
@@ -189,13 +228,14 @@ echo
 time (npm run build) 2>&1
 
 echo "🚀 Starting the application in development mode..."
+# Load secrets before starting the application
+load_secrets
+
 # Start the dev server in the background
 (npm run dev) & DEV_PID=$!
 
 # Start listening for keyboard input in the background with proper process management
 handle_input & INPUT_PID=$!
-
-echo "📝 Press 'r' to rebuild or 'q' to quit"
 
 # Wait for the dev server process
 wait $DEV_PID 

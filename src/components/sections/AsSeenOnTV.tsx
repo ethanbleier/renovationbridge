@@ -45,7 +45,7 @@ const AsSeenOnTV = () => {
               <div className="relative aspect-video w-full">
                 <iframe 
                   className="absolute inset-0 w-full h-full"
-                  src="https://www.youtube.com/embed/956oI-dZcKQ?enablejsapi=0"
+                  src="https://www.youtube.com/embed/956oI-dZcKQ?enablejsapi=1&origin=https://renovationbridge.com"
                   title="Renovation Bridge on NBC Bay Area"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

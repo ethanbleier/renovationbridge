@@ -79,7 +79,7 @@ const projects: Project[] = [
 ];
 
 // Filter categories for the filter bar
-const categories = Array.from(new Set(['All', ...projects.map(project => project.category)]));
+// const categories = Array.from(new Set(['All', ...projects.map(project => project.category)]));
 
 export default function GalleryPage() {
   return (

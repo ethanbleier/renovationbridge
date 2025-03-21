@@ -49,6 +49,7 @@ UserSchema.pre('save', async function (next) {
 });
 
 // Method to compare password for login
+// eslint-disable-next-line no-unused-vars
 UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
 };

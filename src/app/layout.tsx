@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import React from 'react'
 import '@/styles/globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import Script from 'next/script'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
   title: 'Renovation Bridge',
   description: 'Renovation Bridge helps Bay Area homeowners renovate smarter by connecting them with vetted contractors for their renovation projects.',
   icons: {
-    icon: '/favicon.ico',
-    apple: '/favicon.ico',
-    shortcut: '/favicon.ico',
+    icon: '/images/logos/favicon.ico',
+    apple: '/images/logos/favicon.ico',
+    shortcut: '/images/logos/favicon.ico',
   },
   other: {
     'Permissions-Policy': 'accelerometer=(), autoplay=(), clipboard-write=(), encrypted-media=(), gyroscope=(), picture-in-picture=()'
