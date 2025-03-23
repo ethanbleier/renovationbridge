@@ -1,101 +1,197 @@
-# Renovation Bridge Website
+# 🏠 Renovation Bridge
 
-A modern redesign of the Renovation Bridge website using Next.js and Tailwind CSS. This website connects homeowners with quality contractors for renovation projects.
-![Renovation Bridge Website Screenshot](screenshot.png)
+> **Connecting homeowners with quality contractors for seamless renovation experiences**
 
-## Color Scheme
+<div align="center">
+  <img src="screenshot.png" alt="Renovation Bridge Homepage" width="100%" />
+  <p><em>Modern, responsive homepage designed to convert visitors into leads</em></p>
+  
+  <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+    <img src="screenshot-2.png" alt="Project Gallery" width="48%" />
+    <img src="screenshot-3.png" alt="Contractor Dashboard" width="48%" />
+  </div>
+  <p><em>Project showcase and contractor management interface</em></p>
+</div>
 
-- Primary Blue: #313bc0
-- Secondary Dark Blue: #002c66
-- Gray: #717171
-- Black: #000000
-- Cream: #f2f0e9
-- Lavender: #e5e4f0
+## 🎨 Design System
 
-## Project Structure
+Our carefully crafted color palette ensures a professional and trustworthy appearance:
+
+- **Primary Blue** `#313bc0` - Trust and professionalism
+- **Secondary Dark Blue** `#002c66` - Depth and stability
+- **Gray** `#717171` - Balance and readability
+- **Black** `#000000` - Contrast and emphasis
+- **Cream** `#f2f0e9` - Warmth and approachability
+- **Lavender** `#e5e4f0` - Softness and sophistication
+
+## 🚀 Tech Stack
+
+- **Framework:** Next.js 14.2+
+- **UI Library:** React 18
+- **Styling:** Tailwind CSS 3.4+
+- **Animations:** Framer Motion 12.5+
+- **Forms:** React Hook Form 7.50+
+- **Icons:** React Icons 5.0+
+- **Image Processing:** Sharp 0.33+
+- **Deployment:** Vercel
+- **GraphQL Client:** GraphQL Request
+
+## 📁 Project Structure
 
 ```
 renovationbridge/
-├── public/           # Static assets (images, favicons)
+├── public/                 # Static assets
 ├── src/
-│   ├── app/          # Next.js App Router pages
-│   ├── components/   # Reusable UI components
-│   │   ├── forms/    # Form components
-│   │   ├── layout/   # Layout components (Header, Footer)
-│   │   ├── sections/ # Page section components
-│   │   └── ui/       # UI elements (buttons, cards)
-│   ├── lib/          # Utility functions, API clients
-│   ├── styles/       # Global styles
-│   └── utils/        # Helper functions
-├── .gitignore        # Git ignore configuration
-├── .vscode/          # VS Code configuration
-├── next.config.js    # Next.js configuration
-├── package.json      # Project dependencies
-├── postcss.config.js # PostCSS configuration
-├── start.sh          # Development startup script
-├── tailwind.config.ts # Tailwind CSS configuration
-└── tsconfig.json     # TypeScript configuration
+│   ├── app/               # Next.js App Router pages
+│   │   ├── api/          # API routes including revalidation
+│   │   ├── blog/         # Blog posts and articles
+│   │   ├── contractors/  # Contractor-specific pages
+│   │   └── resources/    # Resource and guide pages
+│   ├── components/       # Reusable UI components
+│   │   ├── forms/       # Form components
+│   │   ├── layout/      # Layout components
+│   │   ├── sections/    # Page sections
+│   │   └── ui/          # UI elements
+│   ├── lib/             # Core functionality
+│   │   ├── db/         # Database connections
+│   │   ├── models/     # Data models
+│   │   └── utils/      # Utility functions
+│   ├── styles/         # Global styles
+│   └── utils/          # Helper functions
+├── scripts/            # Deployment and utility scripts
+├── secrets/            # Environment secrets
+├── .github/           # GitHub Actions workflows
+└── config files       # Various configuration files
 ```
 
-## Dependencies
+## 🛠️ Getting Started
 
-- Next.js 14.2+
-- React 18
-- Tailwind CSS 3.4+
-- Framer Motion 12.5+
-- React Hook Form 7.50+
-- React Icons 5.0+
-- Sharp 0.33+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/renovationbridge.git
+   cd renovationbridge
+   ```
 
-## Getting Started
-
-1. Clone the repository
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
-3. Run the development server:
+
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your configuration settings
+   ```
+
+4. **Start development server**
    ```bash
    npm run dev
-   ```
-   Or use the start script:
-   ```bash
+   # or
    ./start.sh
    ```
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Pages
+5. **Open [http://localhost:3000](http://localhost:3000)**
 
-- **Home**: Landing page with hero, project types, and contact form
-- **How It Works**: Process explanation
-- **Project Types**: Various renovation project categories
-- **Gallery**: Portfolio of completed projects
-- **Resources**: Blog and referral program
-- **For Contractors**: Information for contractors
-- **Get Started**: Lead capture page
+## 🌟 Key Features
 
-## Key Features
+- **Smart Lead Generation** - Optimized contact forms and CTAs
+- **Contractor Management** - Dedicated dashboard for contractors
+- **Project Showcase** - Beautiful gallery of completed renovations
+- **Resource Library** - Valuable guides and articles
+- **Mobile-First Design** - Perfect experience on all devices
+- **SEO Optimization** - Built for search engine visibility
+- **Incremental Static Regeneration** - Fast page loads with dynamic content
 
-- **Responsive Design**: Mobile-first approach with responsive layouts
-- **Modern UI**: Fresh and expensive-looking design
-- **SEO Optimization**: Contact form on landing page for lead generation
-- **Navigation**: Easy-to-use header with dropdown menus
-- **As Seen on TV**: Section showcasing NBC Bay Area features 
+## 🔒 Security & Configuration
 
-## Secrets Management
+The project uses a secure secrets management system:
 
-The project uses a dedicated `secrets/` directory for storing sensitive information:
+```
+secrets/
+├── ghl.env      # Go High Level API credentials
+├── mongodb.env  # Database connection strings
+├── jwt.env      # JWT authentication secrets
+├── email.env    # Email service configuration
+```
 
-- `secrets/ghl.env`: Go High Level API credentials
-- `secrets/mongodb.env`: Database connection strings
-- `secrets/jwt.env`: JWT authentication secrets
-- `secrets/email.env`: Email service configuration
+## 🚀 Deployment
 
-The main `.env.local` file references these secret files instead of containing sensitive information directly.
+### Vercel Deployment
 
-**Setup:**
-1. The `secrets/` directory is excluded from version control in `.gitignore`
-2. Create the necessary secret files with your credentials
-3. Environment variables from these files are loaded at runtime
+Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
-**Note:** Never commit sensitive information to the repository. Each developer should maintain their own local secrets files. 
+1. **Prerequisites**
+   - A [Vercel account](https://vercel.com/signup)
+   - Vercel CLI (optional, for command-line deployment)
+     ```bash
+     npm install -g vercel
+     ```
+
+2. **Connect Repository to Vercel**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New" > "Project"
+   - Select your GitHub repository
+   - Configure the project:
+     - Framework Preset: Next.js
+     - Root Directory: ./
+     - Build Command: `npm run build`
+     - Output Directory: .next
+
+3. **Set Environment Variables**
+   - In Vercel dashboard, navigate to your project
+   - Go to Settings > Environment Variables
+   - Add all required environment variables from `.env.production.local`
+   - Key variables to include:
+     ```
+     MONGODB_URI
+     JWT_SECRET
+     REVALIDATION_SECRET
+     API_URL
+     API_TOKEN
+     ```
+
+4. **Deploy Using the Script**
+   ```bash
+   # Run the deployment script
+   ./scripts/test-deploy.sh
+   # Select option 3 for production deployment
+   ```
+
+5. **Manual Deployment Using Vercel CLI**
+   ```bash
+   # Login to Vercel
+   vercel login
+   
+   # Deploy to development environment
+   vercel
+   
+   # Deploy to production
+   vercel --prod
+   ```
+
+6. **Automatic Deployments**
+   - Every push to the `main` branch will trigger an automatic deployment
+   - Preview deployments are created for pull requests
+   - Configure branch deployments in the Vercel dashboard under Settings > Git
+
+7. **Revalidation API**
+   - Content revalidation is configured at `/api/revalidate`
+   - Use this endpoint with the appropriate secret token to refresh content
+   - Example:
+     ```bash
+     curl -X POST https://your-domain.vercel.app/api/revalidate \
+       -H "Authorization: Bearer YOUR_REVALIDATION_SECRET" \
+       -H "Content-Type: application/json" \
+       -d '{"contentType":"post","slug":"example-post"}'
+     ```
+
+8. **Monitoring**
+   - Monitor your deployment through the Vercel dashboard
+   - View logs, analytics, and performance metrics
+   - Set up status alerts for your production deployment
+
+---
+
+<div align="center">
+  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
+</div> 

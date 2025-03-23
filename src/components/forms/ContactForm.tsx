@@ -126,7 +126,7 @@ const ContactForm = () => {
   
   return (
     <div className="w-full rounded-lg bg-white p-6 md:p-8 shadow-lg transition-all hover:shadow-xl">
-      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-blue-500 after:left-0 after:-bottom-2">Get Started Today</h3>
+      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-primary after:left-0 after:-bottom-2">Get Started Today</h3>
       
       {isSuccess ? (
         <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center animate-fadeIn">

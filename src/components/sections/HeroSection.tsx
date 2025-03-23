@@ -93,7 +93,7 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-start">
           <div className="space-y-6 md:space-y-8">
               <div 
-                className={`inline-block px-4 py-1 rounded-full bg-green-400/30 text-green-500 font-medium text-sm backdrop-blur-sm transform transition-all duration-700 ease-out ${
+                className={`inline-block px-4 py-1 rounded-full bg-primary/30 text-primary font-medium text-sm backdrop-blur-sm transform transition-all duration-700 ease-out ${
                   pillVisible 
                     ? 'opacity-100 translate-y-0 scale-100' 
                     : 'opacity-0 -translate-y-4 scale-95'
@@ -142,16 +142,16 @@ export default function HeroSection() {
             
             <div className="grid grid-cols-3 gap-6 md:gap-8 pt-8 md:pt-10">
               <div className="text-center p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-3xl md:text-4xl font-bold text-primary">100+</div>
+                <div className="text-3xl md:text-4xl font-bold text-primary">60+</div>
                 <p className="text-sm md:text-base text-gray-600">Vetted Contractors</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-3xl md:text-4xl font-bold text-primary">500+</div>
-                <p className="text-sm md:text-base text-gray-600">Projects Completed</p>
+                <div className="text-3xl md:text-4xl font-bold text-primary">2,000+</div>
+                <p className="text-sm md:text-base text-gray-600">Homeowners Helped</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-3xl md:text-4xl font-bold text-primary">95%</div>
-                <p className="text-sm md:text-base text-gray-600">Customer Satisfaction</p>
+                <div className="text-3xl md:text-4xl font-bold text-primary">100%</div>
+                <p className="text-sm md:text-base text-gray-600">Matchmaking Success</p>
               </div>
             </div>
           </div>

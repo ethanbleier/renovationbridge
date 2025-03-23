@@ -1,12 +1,28 @@
-on: push
-name: Deploying WordPress Site
+name: Build Next.js Application
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
 jobs:
-  deploy:
-    name: Deploy
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Deploy
-        uses: rtCamp/action-deploy-wordpress@v3
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build Next.js
+        run: npm run build
+      
+      # Vercel deployment will be implemented in a future update
+      # The deployment will happen automatically through Vercel's GitHub integration

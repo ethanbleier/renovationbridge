@@ -101,7 +101,7 @@ export default function GuideDownloadForm({
   }
 
   return (
-    <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+    <div className="bg-amber-50 p-5 rounded-lg">
       <h3 className="text-lg font-medium mb-2">Get instant access</h3>
       <p className="text-gray-600 mb-4">Enter your details to download the free guide</p>
       

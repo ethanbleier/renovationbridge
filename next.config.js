@@ -11,6 +11,12 @@ const nextConfig = {
       },
     ],
   },
+  // Configuration for Vercel deployment
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // No output: 'export' needed for Vercel
 }
 
 module.exports = nextConfig 
