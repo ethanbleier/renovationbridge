@@ -33,15 +33,27 @@ export function formatGHLData(formData: any, formType: FormType) {
     ? formData.name.split(' ').slice(1).join(' ') 
     : '');
   
+  // Extract description/message content from various field names
+  let description = '';
+  if (formData.projectDescription) {
+    description = formData.projectDescription;
+  } else if (formData.message) {
+    description = formData.message;
+  } else if (formData.description) {
+    description = formData.description;
+  }
+  
   // Base data structure for GHL
   const ghlData = {
     email: formData.email,
     phone: formData.phone,
     firstName,
     lastName,
+    // Add the description to a note field that GHL will display in the dashboard
+    note: description,
     customField: {
       ...Object.entries(formData)
-        .filter(([key]) => !['email', 'phone', 'firstName', 'lastName', 'name'].includes(key))
+        .filter(([key]) => !['email', 'phone', 'firstName', 'lastName', 'name', 'message', 'projectDescription', 'description'].includes(key))
         .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
     },
     tags: getFormTags(formType)

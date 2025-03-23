@@ -1,43 +1,28 @@
-name: WordPress.com Deployment
+name: Build Next.js Application
 
 on:
   push:
-    branches:
-      - prod
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Setup Node.js
+      
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-
+          
       - name: Install dependencies
         run: npm ci
-
-      - name: Build Next.js for export
-        run: npm run export
-
-      - name: Prepare WordPress plugin
-        run: |
-          mkdir -p deployment/renovationbridge
-          cp wordpress-plugin.php deployment/renovationbridge/
-          cp -r out deployment/renovationbridge/
-          cd deployment
-          find . -type f -name "*.map" -delete
-
-      - name: Upload the artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: wpcom
-          path: |
-            deployment/renovationbridge
-            !deployment/renovationbridge/**/.git/**
+        
+      - name: Build Next.js
+        run: npm run build
+      
+      # Vercel deployment will be implemented in a future update
+      # The deployment will happen automatically through Vercel's GitHub integration

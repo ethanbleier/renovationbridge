@@ -8,20 +8,36 @@ export default function GuideImageCarousel({
     "/images/guide/ajar.png",
     "/images/guide/double.png",
     "/images/guide/open.png",
-  ]
+    "/images/guide/guide.png",
+  ],
+  currentIndex,
+  setCurrentIndex
+}: {
+  images?: string[];
+  currentIndex?: number;
+  setCurrentIndex?: ((index: number) => void) | React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const [activeImage, setActiveImage] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  
+  // Use internal state if external control is not provided
+  const [internalActiveImage, setInternalActiveImage] = useState(0);
+  
+  // Determine which state to use
+  const activeImage = currentIndex !== undefined ? currentIndex : internalActiveImage;
+  const setActiveImage = setCurrentIndex || setInternalActiveImage;
 
   useEffect(() => {
     if (isHovering) return; // Pause rotation when hovering
     
     const interval = setInterval(() => {
-      setActiveImage((current) => (current + 1) % images.length);
+      // Calculate the next index
+      const nextIndex = (activeImage + 1) % images.length;
+      // Call setActiveImage with the direct value
+      setActiveImage(nextIndex);
     }, 5000); // Slightly faster rotation
     
     return () => clearInterval(interval);
-  }, [images.length, isHovering]);
+  }, [images.length, isHovering, setActiveImage, activeImage]);
 
   return (
     <div 
@@ -80,21 +96,6 @@ export default function GuideImageCarousel({
       <div className="absolute -top-8 -left-8 w-28 h-28 bg-lavender rounded-full opacity-40 blur-sm animate-float"></div>
       <div className="absolute -bottom-10 -right-10 w-36 h-36 bg-primary rounded-full opacity-20 blur-sm animate-float-delay"></div>
       <div className="absolute bottom-12 -left-6 w-20 h-20 bg-amber-300 rounded-full opacity-20 blur-md animate-float-slow"></div>
-      
-      {/* Navigation dots */}
-      <div className="absolute -bottom-10 left-0 right-0 flex justify-center space-x-3 z-20">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveImage(index)}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 
-              ${activeImage === index 
-                ? 'bg-amber-400 w-6 shadow-md shadow-amber-300/50' 
-                : 'bg-gray-300 hover:bg-amber-200'}`}
-            aria-label={`View image ${index + 1}`}
-          />
-        ))}
-      </div>
     </div>
   );
 } 
