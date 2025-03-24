@@ -1,0 +1,6 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://renovationbridge.com/sitemap.xml 

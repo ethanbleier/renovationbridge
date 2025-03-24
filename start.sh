@@ -156,7 +156,7 @@ EOF
     exit 0
 fi
 
-echo "🏗️  Building the application..."
+echo "🏗️  Building the application and generating sitemap..."
 TIMEFORMAT='%3R seconds'
 
 # Function for loading animation
@@ -218,10 +218,9 @@ handle_input() {
     done
 }
 
-echo "🏗️  Building the application..."
-TIMEFORMAT='%3R seconds'
-
 # Run build with timeout protection
+echo "🏗️  Building the application and generating sitemap..."
+TIMEFORMAT='%3R seconds'
 (npm run build) & BUILD_PID=$!
 spinner $BUILD_PID
 echo

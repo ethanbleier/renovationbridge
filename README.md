@@ -33,6 +33,8 @@ Our carefully crafted color palette ensures a professional and trustworthy appea
 - **Forms:** React Hook Form 7.50+
 - **Icons:** React Icons 5.0+
 - **Image Processing:** Sharp 0.33+
+- **SEO:** next-sitemap, JSON-LD structured data
+- **HTML Parsing:** jsdom
 - **Deployment:** Vercel
 - **GraphQL Client:** GraphQL Request
 
@@ -41,6 +43,8 @@ Our carefully crafted color palette ensures a professional and trustworthy appea
 ```
 renovationbridge/
 ├── public/                 # Static assets
+│   ├── robots.txt        # Search engine crawling rules
+│   └── sitemap.xml       # Auto-generated sitemap
 ├── src/
 │   ├── app/               # Next.js App Router pages
 │   │   ├── api/          # API routes including revalidation
@@ -51,16 +55,20 @@ renovationbridge/
 │   │   ├── forms/       # Form components
 │   │   ├── layout/      # Layout components
 │   │   ├── sections/    # Page sections
+│   │   ├── seo/         # SEO components (JsonLd, PageSeo)
 │   │   └── ui/          # UI elements
 │   ├── lib/             # Core functionality
 │   │   ├── db/         # Database connections
 │   │   ├── models/     # Data models
+│   │   ├── structured-data.ts  # JSON-LD schema generators
+│   │   ├── seo-utils.ts        # SEO utility functions
 │   │   └── utils/      # Utility functions
 │   ├── styles/         # Global styles
 │   └── utils/          # Helper functions
 ├── scripts/            # Deployment and utility scripts
 ├── secrets/            # Environment secrets
 ├── .github/           # GitHub Actions workflows
+├── next-sitemap.config.js  # Sitemap configuration
 └── config files       # Various configuration files
 ```
 
@@ -99,7 +107,13 @@ renovationbridge/
 - **Project Showcase** - Beautiful gallery of completed renovations
 - **Resource Library** - Valuable guides and articles
 - **Mobile-First Design** - Perfect experience on all devices
-- **SEO Optimization** - Built for search engine visibility
+- **Advanced SEO** - Complete with:
+  - Automatic sitemap generation
+  - Robots.txt configuration
+  - JSON-LD structured data (Organization, LocalBusiness, Services)
+  - Comprehensive OpenGraph and Twitter card metadata
+  - Canonical URLs
+  - Dynamic meta descriptions
 - **Incremental Static Regeneration** - Fast page loads with dynamic content
 
 ## 🔒 Security & Configuration
@@ -194,4 +208,51 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 <div align="center">
   <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
-</div> 
+</div>
+
+## 📈 SEO Implementation
+
+The project includes comprehensive SEO features:
+
+1. **Sitemap Generation**
+   - Automatic sitemap.xml generation using next-sitemap
+   - Custom priority configurations for different page types
+   - Custom change frequency settings
+
+2. **Robots.txt**
+   - Properly configured robots.txt file in public directory
+   - Controls search engine crawling behavior
+
+3. **Structured Data**
+   - JSON-LD implementation for rich search results
+   - Schemas for Organization, LocalBusiness, Service, FAQ, and BreadcrumbList
+   - Reusable structured data components
+
+4. **Meta Tags**
+   - Enhanced metadata in layout.tsx
+   - OpenGraph and Twitter card meta tags
+   - Canonical URL implementation
+   - Dynamic meta descriptions
+
+5. **Usage Example**
+   ```tsx
+   // In your page file
+   import { generateMetadata } from '@/components/seo/PageSeo';
+   import { generateServiceSchema } from '@/lib/structured-data';
+   
+   // Generate metadata for the page
+   export const metadata = generateMetadata({
+     title: 'Page Title',
+     description: 'Page description',
+     canonical: '/page-path',
+     keywords: ['keyword1', 'keyword2']
+   });
+   
+   // In your component
+   return (
+     <>
+       <PageSeo structuredData={generateServiceSchema(...)} />
+       {/* Page content */}
+     </>
+   );
+   ``` 
