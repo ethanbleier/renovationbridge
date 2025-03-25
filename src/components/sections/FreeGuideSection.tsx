@@ -3,6 +3,7 @@
 import GuideImageCarousel from '@/components/ui/GuideImageCarousel'
 import GuideDownloadForm from '@/components/forms/GuideDownloadForm'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function FreeGuideSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -12,10 +13,6 @@ export default function FreeGuideSection() {
     "/images/guide/open.png",
     "/images/guide/guide.png",
   ]
-  
-  const handleTabClick = (index: number) => {
-    setCurrentImageIndex(index)
-  }
   
   return (
     <section className="py-20 bg-white">
@@ -59,10 +56,12 @@ export default function FreeGuideSection() {
                                 : 'ring-1 ring-gray-200 opacity-70 hover:opacity-100'
                             }`}
                           >
-                            <img
+                            <Image
                               src={src}
                               alt={`Guide preview ${index + 1}`}
                               className="w-full h-full object-cover"
+                              width={64}
+                              height={64}
                             />
                           </div>
                         ))}

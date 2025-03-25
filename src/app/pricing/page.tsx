@@ -3,8 +3,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 
 // Format currency input with $ and commas
 const formatCurrencyInput = (value: string): string => {
@@ -27,16 +25,6 @@ const formatCurrencyInput = (value: string): string => {
   
   return formatted;
 };
-
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: {
-      previous: {
-        finalY: number;
-      };
-    };
-  }
-}
 
 type FormData = {
   homeValue: string;
@@ -72,7 +60,7 @@ export default function PricingCalculator() {
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       homeValue: '',
       yearlyIncome: '',
@@ -320,24 +308,6 @@ export default function PricingCalculator() {
   function formatMonths(value: number) {
     return Math.round(value) + " months";
   }
-
-  // Function for future use
-  // const downloadPDF = () => {
-  //   if (!results) return;
-    
-  //   const doc = new jsPDF();
-    
-  //   // Add title
-  //   doc.setFontSize(20);
-  //   doc.setTextColor(60, 60, 60);
-  //   doc.text("Renovation Budget Calculation Results", 20, 20);
-    
-  //   // Add project type
-  //   doc.setFontSize(14);
-  //   doc.text(`Project: ${results.low.projectType}`, 20, 30);
-    
-  //   // Add date
-  // }
 
   const captureLeadData = async () => {
     if (email && phone && results) {  // Only if user provided contact info

@@ -200,6 +200,30 @@ rebuild_project() {
     time (npm run build) 2>&1
 }
 
+# Function to run tests
+run_tests() {
+    local test_type=$1
+    
+    case $test_type in
+        "unit")
+            echo -e "\n🧪 Running unit tests..."
+            npm test
+            ;;
+        "e2e")
+            echo -e "\n🧪 Running end-to-end tests..."
+            npm run test:e2e
+            ;;
+        "coverage")
+            echo -e "\n🧪 Running test coverage..."
+            npm run test:coverage
+            ;;
+        *)
+            echo -e "\n🧪 Running all tests..."
+            npm test && npm run test:e2e
+            ;;
+    esac
+}
+
 # Function to handle keyboard input - with timeout and better resource management
 handle_input() {
     local timeout=1  # 1 second timeout for read
@@ -211,6 +235,12 @@ handle_input() {
             elif [ "$input" = "q" ]; then
                 echo "User requested exit"
                 cleanup
+            elif [ "$input" = "t" ]; then
+                run_tests "unit"
+            elif [ "$input" = "e" ]; then
+                run_tests "e2e"
+            elif [ "$input" = "c" ]; then
+                run_tests "coverage"
             fi
         fi
         # Small sleep to prevent tight loop
@@ -229,6 +259,14 @@ time (npm run build) 2>&1
 echo "🚀 Starting the application in development mode..."
 # Load secrets before starting the application
 load_secrets
+
+echo -e "\n📋 Available commands:"
+echo "  • Press 'r' to rebuild the project"
+echo "  • Press 't' to run unit tests"
+echo "  • Press 'e' to run end-to-end tests"
+echo "  • Press 'c' to run test coverage"
+echo "  • Press 'q' to quit"
+echo -e "\n"
 
 # Start the dev server in the background
 (npm run dev) & DEV_PID=$!

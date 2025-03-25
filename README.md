@@ -35,6 +35,7 @@ Our carefully crafted color palette ensures a professional and trustworthy appea
 - **Image Processing:** Sharp 0.33+
 - **SEO:** next-sitemap, JSON-LD structured data
 - **HTML Parsing:** jsdom
+- **Testing:** Jest, React Testing Library, Playwright for E2E
 - **Deployment:** Vercel
 - **GraphQL Client:** GraphQL Request
 
@@ -100,11 +101,76 @@ renovationbridge/
 
 5. **Open [http://localhost:3000](http://localhost:3000)**
 
+## 🧪 Local Testing
+
+Renovation Bridge includes a comprehensive suite of testing tools to ensure code quality and functionality.
+
+### Using the Testing Script
+
+A convenient testing script is provided to run various testing operations:
+
+```bash
+# Make the script executable (first time only)
+chmod +x scripts/testing.sh
+
+# Run the testing script
+./scripts/testing.sh
+```
+
+The script provides the following options:
+1. Start development server
+2. Run linting
+3. Run unit tests
+4. Run end-to-end tests
+5. Run all tests
+
+### Manual Testing Commands
+
+You can also run these commands directly:
+
+```bash
+# Lint the codebase
+npm run lint
+
+# Run unit tests
+npm test
+
+# Run unit tests with watch mode
+npm test -- --watch
+
+# Run end-to-end tests
+npm run test:e2e
+
+# Check TypeScript types
+npm run type-check
+```
+
+### Testing Strategies
+
+- **Unit Tests**: Located in `__tests__` directories alongside the components they test
+- **Integration Tests**: Found in the `tests/integration` directory
+- **End-to-End Tests**: Uses Cypress located in the `cypress` directory
+
+### Mock Data for Testing
+
+For testing with mock data:
+
+```bash
+# Start the development server with mock data
+npm run dev:mock
+```
+
+This uses mock API responses from the `mocks` directory, allowing you to test the application without connecting to actual APIs.
+
 ## 🌟 Key Features
 
 - **Smart Lead Generation** - Optimized contact forms and CTAs
 - **Contractor Management** - Dedicated dashboard for contractors
-- **Project Showcase** - Beautiful gallery of completed renovations
+- **Project Showcase** - Beautiful gallery of completed renovations including:
+  - Interactive image galleries with lightbox functionality
+  - Detailed project information and specifications
+  - Organized by project type (kitchen, bathroom, full home)
+  - Responsive design for optimal viewing on all devices
 - **Resource Library** - Valuable guides and articles
 - **Mobile-First Design** - Perfect experience on all devices
 - **Advanced SEO** - Complete with:
@@ -206,9 +272,6 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ---
 
-<div align="center">
-  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
-</div>
 
 ## 📈 SEO Implementation
 
@@ -234,25 +297,107 @@ The project includes comprehensive SEO features:
    - Canonical URL implementation
    - Dynamic meta descriptions
 
-5. **Usage Example**
-   ```tsx
-   // In your page file
-   import { generateMetadata } from '@/components/seo/PageSeo';
-   import { generateServiceSchema } from '@/lib/structured-data';
-   
-   // Generate metadata for the page
-   export const metadata = generateMetadata({
-     title: 'Page Title',
-     description: 'Page description',
-     canonical: '/page-path',
-     keywords: ['keyword1', 'keyword2']
-   });
-   
-   // In your component
-   return (
-     <>
-       <PageSeo structuredData={generateServiceSchema(...)} />
-       {/* Page content */}
-     </>
-   );
-   ``` 
+## 🖼️ Project Gallery
+
+The project showcase gallery features:
+
+- Grid-based showcase of completed projects
+- Filtering by project category
+- Detailed project pages with image galleries
+- Responsive design optimized for all devices
+- Lightbox image gallery with navigation
+- Project metadata including:
+  - Services provided
+  - Project duration
+  - Completion date
+  - Category/type of project
+- Automatic image gallery generation based on available images
+- Image paths follow a consistent pattern:
+  - `public/images/gallery/Project-[ProjectName]/[projectname]-[n].jpg`
+
+### Feature Module Organization
+
+Gallery code is now organized into a feature module structure:
+
+```
+src/features/gallery/
+├── components/    # UI components specific to gallery
+│   ├── ImageGallery.tsx       # Reusable gallery grid with lightbox
+│   └── ProjectGalleryTemplate.tsx  # Project detail layout
+├── hooks/         # Custom hooks for gallery functionality
+│   ├── useGalleryProjects.ts  # Hook for project listing/filtering 
+│   └── useProjectDetails.ts   # Hook for getting project details
+├── services/      # Data services for gallery
+│   ├── galleryDataService.ts  # Project data and metadata
+│   └── galleryImageService.ts # Image path handling
+├── types/         # Type definitions
+│   └── index.ts               # Shared gallery types
+└── index.ts       # Barrel file exporting public API
+```
+
+This modular approach provides:
+- Clear separation of concerns
+- Well-defined interfaces between components
+- Improved maintainability
+- Easier testing
+- Reusable components and hooks
+
+To use gallery components and services, import from the feature module:
+
+```typescript
+import { 
+  ImageGallery,
+  ProjectGalleryTemplate,
+  useGalleryProjects,
+  useProjectDetails
+} from '@/features/gallery';
+```
+
+<div align="center">
+  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
+</div>
+
+## 🧪 Testing
+
+The project uses a comprehensive testing strategy:
+
+1. **Unit and Component Testing**
+   - Jest for test runner and assertions
+   - React Testing Library for component testing
+   - Run tests with:
+     ```bash
+     # Run all tests
+     npm test
+     
+     # Watch mode for development
+     npm run test:watch
+     
+     # Generate test coverage report
+     npm run test:coverage
+     ```
+
+2. **End-to-End Testing**
+   - Playwright for browser-based end-to-end testing
+   - Tests run against multiple browsers (Chrome, Firefox, Safari)
+   - Mobile device simulation for responsive testing
+   - Enhanced timeout configuration for reliable mobile testing
+   - Run E2E tests with:
+     ```bash
+     # Run all E2E tests
+     npm run test:e2e
+     
+     # Run tests in a specific browser
+     npx playwright test --project=chromium
+     
+     # Run only mobile tests
+     npx playwright test --project="Mobile Chrome" --project="Mobile Safari"
+     
+     # Run tests in UI mode for debugging
+     npx playwright test --ui
+     ```
+
+3. **Test Structure**
+   - Unit/component tests in `src/__tests__/`
+   - E2E tests in `e2e/`
+   - Component tests paired with their respective components
+   - Integration tests for key user flows

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 export default function GuideImageCarousel({ 
@@ -59,20 +59,20 @@ export default function GuideImageCarousel({
         
         {/* Main content with shadow */}
         <div className="relative z-10 rounded-lg shadow-2xl overflow-hidden w-full h-full bg-white">
-          {images.map((src, index) => (
+          {images.map((src, imgIndex) => (
             <div
-              key={index}
+              key={imgIndex}
               className={`absolute top-0 left-0 w-full h-full transition-all duration-1000
-                ${activeImage === index 
+                ${activeImage === imgIndex 
                   ? 'opacity-100 scale-100 z-10' 
                   : 'opacity-0 scale-95 z-0'}`}
               style={{ 
-                transform: `translateZ(${activeImage === index ? '10px' : '-10px'})` 
+                transform: `translateZ(${activeImage === imgIndex ? '10px' : '-10px'})` 
               }}
             >
               <Image
                 src={src}
-                alt={`Renovation Guide Preview ${index + 1}`}
+                alt={`Renovation Guide Preview ${imgIndex + 1}`}
                 width={500}
                 height={300}
                 className="w-full h-full object-cover"

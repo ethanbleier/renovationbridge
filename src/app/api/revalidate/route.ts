@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Get content type and ID from the webhook payload
-    const { contentType, id, slug, path } = body;
+    const { contentType, slug, path } = body;
 
     if (!contentType) {
       return NextResponse.json(

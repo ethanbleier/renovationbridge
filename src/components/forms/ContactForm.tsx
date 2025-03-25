@@ -11,7 +11,11 @@ type FormValues = {
   message: string
 }
 
-const ContactForm = () => {
+interface ContactFormProps {
+  onSubmit?: (data: FormValues) => void;
+}
+
+const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -74,11 +78,21 @@ const ContactForm = () => {
     }
   }, [watch, isDirty, getValues])
   
-  const onSubmit = async (data: FormValues) => {
+  const onSubmitHandler = async (data: FormValues) => {
     setIsSubmitting(true)
     setError(null)
     
     try {
+      // If external onSubmit is provided, call it
+      if (onSubmit) {
+        onSubmit(data);
+        setIsSuccess(true);
+        reset();
+        localStorage.removeItem('contactFormData');
+        setTimeout(() => setIsSuccess(false), 15000);
+        return;
+      }
+      
       // Send data to our API route that connects to GoHighLevel
       const response = await fetch('/api/submit-contact', {
         method: 'POST',
@@ -146,7 +160,7 @@ const ContactForm = () => {
         </div>
       ) : null}
       
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" aria-label="Contact form">
+      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-5" aria-label="Contact form">
         <p className="text-sm text-gray-600 mb-4">
           <span className="text-red-500">*</span> indicates required fields
         </p>

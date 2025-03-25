@@ -2,7 +2,8 @@
   "env": {
     "browser": true,
     "es2021": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "extends": [
     "eslint:recommended",
@@ -15,7 +16,7 @@
   "rules": {
     "no-unreachable": "error",
     "react/no-unescaped-entities": "off",
-    "no-unused-vars": "warn",
+    "no-unused-vars": ["warn", { "varsIgnorePattern": ".*", "args": "none" }],
     "no-undef": "warn",
     "@next/next/no-img-element": "warn"
   }
