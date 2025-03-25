@@ -14,12 +14,20 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [validImages, setValidImages] = useState<GalleryImage[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
   // Filter out any invalid image paths when the component mounts
   useEffect(() => {
+    // At minimum, set the images we have
     setValidImages(images);
     setImagesLoaded(true);
   }, [images]);
+
+  // Handle image loading errors
+  const handleImageError = (index: number) => {
+    console.warn(`Failed to load image at index ${index}`);
+    setImageErrors(prev => ({...prev, [index]: true}));
+  };
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
@@ -58,6 +66,15 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
     return <div className="py-8 text-center">No gallery images available</div>;
   }
 
+  // Filter out images with loading errors
+  const displayImages = imageErrors && Object.keys(imageErrors).length > 0 
+    ? validImages.filter((_, index) => !imageErrors[index])
+    : validImages;
+
+  if (displayImages.length === 0) {
+    return <div className="py-8 text-center">Unable to load gallery images</div>;
+  }
+
   return (
     <div className="py-8">
       <h2 className="text-2xl md:text-3xl font-bold mb-6 text-secondary">{title}</h2>
@@ -68,7 +85,8 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
           <div
             key={index}
             className="relative aspect-[4/3] bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-[1.02]"
-            onClick={() => openLightbox(index)}
+            onClick={() => !imageErrors[index] && openLightbox(index)}
+            style={{ display: imageErrors[index] ? 'none' : 'block' }}
           >
             <Image
               src={image.src}
@@ -76,6 +94,8 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover"
+              onError={() => handleImageError(index)}
+              priority={index < 6} // Prioritize loading first 6 images
             />
             <div className="absolute inset-0 bg-black opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
           </div>
@@ -131,6 +151,10 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
               sizes="90vw"
               className="object-contain"
               priority
+              onError={() => {
+                handleImageError(currentImageIndex);
+                navigateNext();
+              }}
             />
           </div>
           
@@ -138,28 +162,35 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
           {validImages.length > 1 && (
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 overflow-x-auto max-w-[90%] p-2">
               {validImages.map((image, index) => (
-                <div
-                  key={index}
-                  className={`relative w-16 h-12 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
-                    currentImageIndex === index ? 'border-primary' : 'border-transparent'
-                  }`}
-                  onClick={(e) => { e.stopPropagation(); navigateToImage(index); }}
-                >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                  />
-                </div>
+                !imageErrors[index] && (
+                  <div
+                    key={index}
+                    className={`relative w-16 h-12 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                      currentImageIndex === index ? 'border-primary' : 'border-transparent'
+                    }`}
+                    onClick={(e) => { e.stopPropagation(); navigateToImage(index); }}
+                  >
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                      onError={() => handleImageError(index)}
+                    />
+                  </div>
+                )
               ))}
             </div>
           )}
           
           {/* Image Counter */}
           <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-            {currentImageIndex + 1} / {validImages.length}
+            {currentImageIndex + 1} / {
+              imageErrors && Object.keys(imageErrors).length > 0
+                ? validImages.length - Object.keys(imageErrors).length
+                : validImages.length
+            }
           </div>
         </div>
       )}

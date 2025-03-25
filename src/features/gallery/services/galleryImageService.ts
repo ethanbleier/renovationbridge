@@ -1,68 +1,54 @@
+'use client';
+
 import { GalleryImage } from '../types';
 import { projectInfo } from './galleryDataService';
 
+// List of all project names - ensure these match keys in projectInfo
+const PROJECT_NAMES = Object.keys(projectInfo);
+
 // Mapping of project names to their actual image counts
 const projectImageCounts: Record<string, number> = {
-  'alamo': 7,
-  'oakland': 9,
+  'Alamo': 7,
+  'Oakland': 9,
   'Tice': 8,
   'Berkeley': 9,
-  'CastroValley': 7,
-  'Danville': 8,
-  'Fremont': 7,
+  'CastroValley': 11,
+  'Danville': 6,
+  'Fremont': 6,
   'Lafayette': 6,
-  'Moraga': 5,
+  'Moraga': 6,
   'Orinda': 8,
   'RedwoodCity': 7,
-  'SanFrancisco': 9,
-  'SanJose': 6,
-  'Saratoga': 8,
-  'WalnutCreek': 7
-};
-
-// Specific naming exceptions for some projects
-const filenameExceptions: Record<string, string> = {
-  'alamo': 'alamo',
-  'oakland': 'oakland'
+  'SF': 6,
+  'SJ': 7,
+  'Saratoga': 7,
+  'WC': 6
 };
 
 // Function to get directory path for a project
 function getDirectoryPath(projectName: string): string {
-  // Handle inconsistent casing in directory paths
-  if (projectName === 'alamo') {
-    return `/images/gallery/Project-alamo`;
-  } else if (projectName === 'oakland') {
-    return `/images/gallery/project-oakland`;
-  } else {
+  try {
+    return `/images/gallery/Project-${projectName}`;
+  } catch (error) {
+    console.error(`Error generating directory path for ${projectName}:`, error);
     return `/images/gallery/Project-${projectName}`;
   }
 }
 
 // Function to get the correct file prefix for image filenames
 function getFilenamePrefix(projectName: string): string {
-  return filenameExceptions[projectName] || projectName;
+  try {
+    return projectName;
+  } catch (error) {
+    console.error(`Error getting filename prefix for ${projectName}:`, error);
+    return projectName;
+  }
 }
 
-// Function to get all project images with the right path pattern
-export function getProjectImages(projectName: string): GalleryImage[] {
-  const info = projectInfo[projectName];
-  if (!info) return [];
-
-  const imageCount = projectImageCounts[projectName] || 0;
-  const directoryPath = getDirectoryPath(projectName);
-  const filenamePrefix = getFilenamePrefix(projectName);
-  const images: GalleryImage[] = [];
-
-  for (let i = 1; i <= imageCount; i++) {
-    const imagePath = `${directoryPath}/${filenamePrefix}-${i}.jpg`;
-    
-    images.push({
-      src: imagePath,
-      alt: `${info.title} - ${generateImageDescription(info.category, i)}`
-    });
-  }
-
-  return images;
+// Function to generate image paths with proper format
+function getImagePath(directoryPath: string, prefix: string, index: number, projectName: string): string {
+  // Standard format with dash
+  return `${directoryPath}/${prefix}-${index}.jpg`;
 }
 
 // Generate more descriptive alt text for images
@@ -125,15 +111,81 @@ function generateImageDescription(category: string, imageIndex: number): string 
     : `Project image ${imageIndex}`;
 }
 
-// Get a list of all project directory names
-export function getAllProjectNames(): string[] {
-  return Object.keys(projectImageCounts);
-}
+// Define all exports at the bottom
+const getAllProjectNames = () => PROJECT_NAMES;
 
-// Get a featured project image
-export function getProjectFeaturedImage(projectName: string): string {
-  const directoryPath = getDirectoryPath(projectName);
-  const filenamePrefix = getFilenamePrefix(projectName);
+const getProjectImages = (projectName: string): GalleryImage[] => {
+  if (!projectName) {
+    console.error('Project name is undefined or null');
+    return [];
+  }
   
-  return `${directoryPath}/${filenamePrefix}-1.jpg`;
-} 
+  try {
+    // Find the correct casing of the project name
+    const actualName = PROJECT_NAMES.find(name => 
+      name.toLowerCase() === projectName.toLowerCase()
+    ) || projectName;
+    
+    const info = projectInfo[actualName];
+    if (!info) {
+      console.error(`Project info not found for "${actualName}"`);
+      return [];
+    }
+
+    const imageCount = projectImageCounts[actualName] || 0;
+    if (imageCount === 0) {
+      console.warn(`No images defined for project "${actualName}"`);
+      return [];
+    }
+    
+    const directoryPath = getDirectoryPath(actualName);
+    const filenamePrefix = getFilenamePrefix(actualName);
+    const images: GalleryImage[] = [];
+
+    for (let i = 1; i <= imageCount; i++) {
+      // Get the appropriate image path based on project naming conventions
+      const imagePath = getImagePath(directoryPath, filenamePrefix, i, actualName);
+      
+      images.push({
+        src: imagePath,
+        alt: `${info.title} - ${generateImageDescription(info.category, i)}`
+      });
+    }
+
+    console.log(`Generated ${images.length} image paths for ${actualName}`);
+    return images;
+  } catch (error) {
+    console.error(`Error getting project images for "${projectName}":`, error);
+    return [];
+  }
+};
+
+const getProjectFeaturedImage = (projectName: string): string => {
+  if (!projectName) {
+    console.error('Project name is undefined or null');
+    return '/images/gallery/placeholder.jpg'; // Fallback image
+  }
+  
+  try {
+    // Find the correct casing of the project name
+    const actualName = PROJECT_NAMES.find(name => 
+      name.toLowerCase() === projectName.toLowerCase()
+    ) || projectName;
+    
+    const directoryPath = getDirectoryPath(actualName);
+    const filenamePrefix = getFilenamePrefix(actualName);
+    
+    // Always use index 1 for featured image, with standard dash format
+    return `${directoryPath}/${filenamePrefix}-1.jpg`;
+  } catch (error) {
+    console.error(`Error getting featured image for "${projectName}":`, error);
+    return '/images/gallery/placeholder.jpg'; // Fallback image
+  }
+};
+
+// Export functions in a clear, explicit way
+export {
+  getAllProjectNames,
+  getProjectImages,
+  getProjectFeaturedImage
+}; 

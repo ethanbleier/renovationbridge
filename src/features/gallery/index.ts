@@ -22,8 +22,5 @@ export {
   generateProjectDetails
 } from './services/galleryDataService';
 
-export {
-  getProjectImages,
-  getAllProjectNames,
-  getProjectFeaturedImage
-} from './services/galleryImageService'; 
+// Gallery image services are exported as a namespace
+export * as galleryImageService from './services/galleryImageService'; 

@@ -2,13 +2,13 @@ import { ProjectDetails, ProjectMap, GalleryImage } from '../types';
 
 // Map of project slugs to their display information
 export const projectInfo: ProjectMap = {
-  'alamo': {
+  'Alamo': {
     title: 'Alamo Home Renovation',
     location: 'Alamo, CA',
     category: 'Full Home',
     description: 'This comprehensive home renovation in Alamo, California transformed an outdated residence into a modern, luxurious home. The project included extensive interior and exterior renovations, with a focus on creating open-concept living spaces, upgrading all fixtures and finishes, and enhancing the overall functionality and aesthetic appeal of the home.'
   },
-  'oakland': {
+  'Oakland': {
     title: 'Oakland Kitchen Remodel',
     location: 'Oakland, CA',
     category: 'Kitchen',
@@ -68,13 +68,13 @@ export const projectInfo: ProjectMap = {
     category: 'Full Home',
     description: 'This comprehensive renovation in Redwood City transformed a traditional home into a modern living space with clean lines, open spaces, and contemporary finishes throughout.'
   },
-  'SanFrancisco': {
+  'SF': {
     title: 'San Francisco Victorian Update',
     location: 'San Francisco, CA',
     category: 'Historic',
     description: 'This San Francisco Victorian was carefully updated to preserve its historic charm while integrating modern amenities and functionality for contemporary living.'
   },
-  'SanJose': {
+  'SJ': {
     title: 'San Jose ADU Addition',
     location: 'San Jose, CA',
     category: 'ADU',
@@ -86,7 +86,7 @@ export const projectInfo: ProjectMap = {
     category: 'Luxury',
     description: 'This luxury renovation in Saratoga elevated every aspect of the home with premium materials, custom details, and sophisticated design elements throughout.'
   },
-  'WalnutCreek': {
+  'WC': {
     title: 'Walnut Creek Entertainment Space',
     location: 'Walnut Creek, CA',
     category: 'Entertainment',

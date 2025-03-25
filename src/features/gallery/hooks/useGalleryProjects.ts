@@ -1,12 +1,15 @@
+'use client';
+
 import { useState, useMemo } from 'react';
 import { Project } from '../types';
 import { projectInfo } from '../services/galleryDataService';
-import { getAllProjectNames, getProjectFeaturedImage } from '../services/galleryImageService';
+import * as GalleryService from '../services/galleryImageService';
 
 export function useGalleryProjects() {
   // Generate all projects from the project info
   const allProjects = useMemo<Project[]>(() => {
-    const projectNames = getAllProjectNames();
+    // Use Object.keys instead of getAllProjectNames
+    const projectNames = Object.keys(projectInfo);
     
     return projectNames
       .map(name => {
@@ -19,7 +22,7 @@ export function useGalleryProjects() {
           category: info.category,
           location: info.location,
           description: info.description,
-          imageSrc: getProjectFeaturedImage(name),
+          imageSrc: GalleryService.getProjectFeaturedImage(name),
           slug: name.toLowerCase(),
           available: true
         };

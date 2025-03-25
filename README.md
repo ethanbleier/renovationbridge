@@ -182,18 +182,6 @@ This uses mock API responses from the `mocks` directory, allowing you to test th
   - Dynamic meta descriptions
 - **Incremental Static Regeneration** - Fast page loads with dynamic content
 
-## 🔒 Security & Configuration
-
-The project uses a secure secrets management system:
-
-```
-secrets/
-├── ghl.env      # Go High Level API credentials
-├── mongodb.env  # Database connection strings
-├── jwt.env      # JWT authentication secrets
-├── email.env    # Email service configuration
-```
-
 ## 🚀 Deployment
 
 ### Vercel Deployment
@@ -270,8 +258,24 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
    - View logs, analytics, and performance metrics
    - Set up status alerts for your production deployment
 
----
+## 🔄 Recent Updates
 
+### Case-Sensitivity Fix for Gallery URLs (June 2023)
+
+Fixed an issue where gallery project pages were generating 404 errors when accessed with different letter casing in URLs:
+
+- **What Changed**: Updated the URL slug matching logic to be case-insensitive, normalizing all gallery URLs
+- **Files Modified**:
+  - `src/app/gallery/[slug]/page.tsx` - Improved slug matching with case normalization
+  - `src/features/gallery/services/galleryImageService.ts` - Enhanced project name lookup to handle case variations
+
+**Usage Example**: 
+The following URLs now all correctly display the same project page:
+- `/gallery/alamo`
+- `/gallery/Alamo`
+- `/gallery/ALAMO`
+
+This ensures consistent user experience regardless of how the URL is typed or linked.
 
 ## 📈 SEO Implementation
 
