@@ -75,31 +75,35 @@ renovationbridge/
 
 ## 🛠️ Getting Started
 
-1. **Clone the repository**
+1. **Prerequisites**
+   - Node.js 20.0.0 or higher
+   - npm 10.0.0 or higher (comes with Node.js 20)
+
+2. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/renovationbridge.git
    cd renovationbridge
    ```
 
-2. **Install dependencies**
+3. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Configure environment variables**
+4. **Configure environment variables**
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration settings
    ```
 
-4. **Start development server**
+5. **Start development server**
    ```bash
    npm run dev
    # or
    ./start.sh
    ```
 
-5. **Open [http://localhost:3000](http://localhost:3000)**
+6. **Open [http://localhost:3000](http://localhost:3000)**
 
 ## 🧪 Local Testing
 
@@ -259,6 +263,22 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
    - Set up status alerts for your production deployment
 
 ## 🔄 Recent Updates
+
+### Node.js 20 Requirement (Update)
+
+Updated development environment to require Node.js 20.0.0 or higher:
+
+- **What Changed**: Added Node.js engine requirement in package.json to ensure compatibility with the latest dependencies
+- **Files Modified**:
+  - `package.json` - Added engines field requiring Node.js >=20.0.0
+  - `README.md` - Updated prerequisites in Getting Started section
+- **Implementation Details**:
+  - Ensures compatibility with latest Next.js 14.2.0 features
+  - Provides performance improvements from Node.js 20
+  - Leverages security updates available in newer Node.js versions
+  - Required for several dependencies that now expect Node.js 20+
+
+**Benefits**: This update brings improved performance, better security, and ensures compatibility with the latest versions of all project dependencies.
 
 ### Vercel SpeedInsights Integration (Added)
 

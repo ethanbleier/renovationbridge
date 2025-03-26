@@ -74,6 +74,15 @@ if ! command -v node >/dev/null 2>&1; then
     exit 1
 fi
 
+# Check Node.js version - require 20.0.0 or higher
+NODE_VERSION=$(node -v | sed 's/v//')
+NODE_MAJOR_VERSION=$(echo $NODE_VERSION | cut -d. -f1)
+if [ "$NODE_MAJOR_VERSION" -lt 20 ]; then
+    echo "❌ Node.js version $NODE_VERSION is not supported."
+    echo "Please upgrade to Node.js 20.0.0 or higher to continue."
+    exit 1
+fi
+
 # Print Node.js and npm version
 echo "🔍 Using Node.js $(node -v) and npm $(npm -v)"
 
