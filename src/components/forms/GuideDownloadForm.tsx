@@ -33,20 +33,24 @@ export default function GuideDownloadForm({
     setError('')
     
     try {
+      // Add guide title as projectDescription
+      const formData = {
+        name,
+        email,
+        phone,
+        guideTitle,
+        guideType,
+        downloadUrl,
+        projectDescription: `Guide Download Request: ${guideTitle || 'Ultimate 2023 Home Renovation Guide'}`
+      };
+      
       // Submit to our dedicated guide download API endpoint
       const response = await fetch('/api/guides/download', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          guideTitle,
-          guideType,
-          downloadUrl
-        }),
+        body: JSON.stringify(formData),
       })
 
       const data = await response.json()

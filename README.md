@@ -260,6 +260,22 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
+### Vercel SpeedInsights Integration (Added)
+
+Added Vercel SpeedInsights to monitor and improve web performance:
+
+- **What Changed**: Integrated the `@vercel/speed-insights` package with a custom DSN for self-hosting
+- **Files Modified**:
+  - `src/app/layout.tsx` - Added the SpeedInsights component with custom DSN
+- **Implementation Details**:
+  - Self-hosted with custom DSN: `ZNga99anB7eSaJjchi9phAZv6n7`
+  - Automatically collects Web Vitals metrics
+  - Provides insights on real-user performance
+  - Zero impact on page loading performance
+  - Privacy-focused analytics with no cookie requirements
+
+**Benefits**: This integration enables real-time monitoring of site performance metrics, helping identify and address performance bottlenecks to improve user experience.
+
 ### Case-Sensitivity Fix for Gallery URLs (June 2023)
 
 Fixed an issue where gallery project pages were generating 404 errors when accessed with different letter casing in URLs:
@@ -405,3 +421,23 @@ The project uses a comprehensive testing strategy:
    - E2E tests in `e2e/`
    - Component tests paired with their respective components
    - Integration tests for key user flows
+
+## Deployment Notes
+
+### GitHub Actions Build Issues
+
+If you encounter errors like `Field 'browser' doesn't contain a valid alias configuration` or `src/index.json doesn't exist` during GitHub Actions builds, this is likely due to webpack resolution issues. We've added specific webpack configuration in `next.config.js` to address this:
+
+```js
+webpack: (config, { isServer }) => {
+  // Ensures webpack resolves modules correctly
+  config.resolve.modules = ['node_modules', '.']
+  
+  // Explicitly tell webpack how to resolve
+  config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
+  
+  return config
+},
+```
+
+This configuration helps webpack properly resolve module paths in the GitHub Actions environment.

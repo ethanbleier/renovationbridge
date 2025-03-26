@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 type FormValues = {
   name: string
@@ -10,6 +11,15 @@ type FormValues = {
   phone: string
   message: string
 }
+
+// JSON schema for validation
+const formSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  city: z.string().min(1, { message: "City is required" }),
+  email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" }),
+  phone: z.string().min(1, { message: "Phone number is required" }),
+  message: z.string().optional()
+})
 
 interface ContactFormProps {
   onSubmit?: (data: FormValues) => void;
@@ -83,7 +93,6 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
     setError(null)
     
     try {
-      // If external onSubmit is provided, call it
       if (onSubmit) {
         onSubmit(data);
         setIsSuccess(true);
@@ -93,13 +102,19 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         return;
       }
       
+      // Rename message to projectDescription for GHL
+      const formData = {
+        ...data,
+        projectDescription: data.message
+      };
+      
       // Send data to our API route that connects to GoHighLevel
       const response = await fetch('/api/submit-contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       })
       
       if (!response.ok) {

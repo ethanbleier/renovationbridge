@@ -346,7 +346,8 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
     email: '',
     phone: '',
     address: '',
-    zipCode: '',
+    city: '',
+    state: '',
     comments: ''
   })
   const [submitted, setSubmitted] = useState(false)
@@ -356,10 +357,34 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setContactData({
-      ...contactData,
-      [name]: value
-    })
+    
+    // Add special handling for phone number formatting
+    if (name === 'phone') {
+      // Strip all non-digit characters
+      const digitsOnly = value.replace(/\D/g, '')
+      
+      // Format the phone number as user types
+      let formattedPhone = ''
+      if (digitsOnly.length === 0) {
+        formattedPhone = ''
+      } else if (digitsOnly.length <= 3) {
+        formattedPhone = `(${digitsOnly}`
+      } else if (digitsOnly.length <= 6) {
+        formattedPhone = `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3)}`
+      } else {
+        formattedPhone = `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`
+      }
+      
+      setContactData({
+        ...contactData,
+        [name]: formattedPhone
+      })
+    } else {
+      setContactData({
+        ...contactData,
+        [name]: value
+      })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -373,20 +398,44 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
       setError(null)
       
       try {
+        // Map project types to their full labels
+        const projectTypeLabels = formData.projectTypes.map((type: string) => {
+          const labels: Record<string, string> = {
+            'adu': 'Accessory Dwelling Unit (ADU)',
+            'kitchen': 'Kitchen Renovation',
+            'bathroom': 'Bathroom Renovation',
+            'addition': 'Addition',
+            'full-home': 'Full Home Renovation',
+            'new-home': 'New Custom Home',
+          };
+          return labels[type] || type;
+        }).join(', ');
+
+        // Map process stage to its full label
+        const processStageLabel = {
+          'need-plans': 'Need architectural plans or designs',
+          'have-plans': 'Have architectural plans, need contractor'
+        }[formData.processStage as keyof typeof processStageLabels] || formData.processStage;
+
+        // Create a project summary string
+        const projectSummary = `Project Type: ${projectTypeLabels}
+        Size: ${formData.size ? `${formData.size} sq ft` : 'N/A'}
+        Stage: ${processStageLabel}`;
+
         // Prepare data for GHL submission - mapping fields to match validation schema
         const ghlData = {
           name: contactData.name,
           email: contactData.email,
           phone: contactData.phone,
           propertyAddress: contactData.address,
-          propertyZip: contactData.zipCode,
+          propertyCity: contactData.city,
+          propertyState: contactData.state,
           projectType: formData.projectTypes.join(', '),
-          projectDescription: `
-            Project Types: ${formData.projectTypes.join(', ')}
-            Size: ${formData.size || 'N/A'} sq ft
-            Process Stage: ${formData.processStage}
-            Additional Comments: ${contactData.comments || 'None'}
-          `.trim()
+          projectDescription: projectSummary, // Use the project summary instead of template variable
+          project_size: formData.size ? `${formData.size} sq ft` : 'N/A',
+          project_stage: processStageLabel,
+          project_types_full: projectTypeLabels,
+          additional_comments: contactData.comments || 'None provided'
         }
         
         // Send data to our API route that connects to GoHighLevel
@@ -539,25 +588,9 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
             )}
           </div>
           
-          <div>
-            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
-              Zip Code
-            </label>
-            <input
-              type="text"
-              id="zipCode"
-              name="zipCode"
-              value={contactData.zipCode}
-              onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('zipCode') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
-              placeholder="12345"
-              required
-            />
-          </div>
-          
           <div className="md:col-span-2">
             <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-              Project Address
+              Street Address
             </label>
             <input
               type="text"
@@ -566,11 +599,43 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               value={contactData.address}
               onChange={handleChange}
               className={`w-full p-3 border ${shouldShowError('address') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
-              placeholder="123 Main St, City, State"
+              placeholder="Enter your street address"
               required
             />
           </div>
           
+          <div>
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+              City
+            </label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              value={contactData.city}
+              onChange={handleChange}
+              className={`w-full p-3 border ${shouldShowError('city') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              placeholder="San Francisco"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+              State
+            </label>
+            <input
+              type="text"
+              id="state"
+              name="state"
+              value={contactData.state}
+              onChange={handleChange}
+              className={`w-full p-3 border ${shouldShowError('state') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              placeholder="CA"
+              required
+            />
+          </div>
+
           <div className="md:col-span-2">
             <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">
               Additional Comments (Optional)
@@ -581,7 +646,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               value={contactData.comments}
               onChange={handleChange}
               className={`w-full p-3 border ${shouldShowError('comments') ? 'border-red-500' : 'border-gray/30'} rounded-md h-24`}
-              placeholder="Tell us more about your project..."
+              placeholder="Tell us more about your project requirements, timeline, or any specific details not covered in the previous steps..."
             />
           </div>
         </div>

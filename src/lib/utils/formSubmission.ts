@@ -51,6 +51,10 @@ export function formatGHLData(formData: any, formType: FormType) {
     lastName,
     // Add the description to a note field that GHL will display in the dashboard
     note: description,
+    // Add the project description to the dedicated contact.project_description field
+    contact: {
+      project_description: description
+    },
     customField: {
       ...Object.entries(formData)
         .filter(([key]) => !['email', 'phone', 'firstName', 'lastName', 'name', 'message', 'projectDescription', 'description'].includes(key))
