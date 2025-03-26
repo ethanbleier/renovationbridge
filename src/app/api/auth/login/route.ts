@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/connection';
 import User from '@/lib/models/User';
 import { loginSchema } from '@/lib/utils/validation';
-import { generateToken, setAuthCookie } from '@/lib/utils/auth';
+import { generateToken } from '@/lib/utils/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     // Generate JWT token
     const token = generateToken(user);
     
-    // Create response
+    // Create response with cookie
     const response = NextResponse.json({ 
       message: 'Login successful', 
       user: {
@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
     });
     
     // Set the cookie in the response
+    // Using the cookies API on the response object directly
     response.cookies.set({
       name: 'auth_token',
       value: token,
