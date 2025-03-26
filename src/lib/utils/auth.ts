@@ -14,7 +14,7 @@ export type TokenPayload = {
 
 export function generateToken(user: IUser): string {
   const payload: TokenPayload = {
-    userId: (user as any)._id.toString(),
+    userId: user.id,
     email: user.email,
     role: user.role,
   };

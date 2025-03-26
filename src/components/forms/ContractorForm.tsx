@@ -56,13 +56,19 @@ const ContractorForm = () => {
     setError(null)
     
     try {
+      // Add contractor application details as projectDescription
+      const formData = {
+        ...data,
+        projectDescription: `Contractor Application - ${data.firstName} ${data.lastName} - License: ${data.licenseNumber} - Location: ${data.location}${data.hearAboutUs ? ` - Heard About Us: ${data.hearAboutUs}` : ''}`
+      };
+      
       // Send data to our API route that connects to GoHighLevel
       const response = await fetch('/api/submit-contractor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       })
       
       if (!response.ok) {

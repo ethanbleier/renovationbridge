@@ -17,6 +17,17 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   // No output: 'export' needed for Vercel
+  
+  // Fix webpack resolution issues
+  webpack: (config, { isServer }) => {
+    // Ensures webpack resolves modules correctly
+    config.resolve.modules = ['node_modules', '.']
+    
+    // Explicitly tell webpack how to resolve
+    config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
+    
+    return config
+  },
 }
 
 module.exports = nextConfig 

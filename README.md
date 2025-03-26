@@ -32,6 +32,8 @@ Our carefully crafted color palette ensures a professional and trustworthy appea
 - **Animations:** Framer Motion 12.5+
 - **Forms:** React Hook Form 7.50+
 - **Icons:** React Icons 5.0+
+- **Authentication:** JWT, bcrypt.js
+- **Data Storage:** In-memory data storage with UUID
 - **Image Processing:** Sharp 0.33+
 - **SEO:** next-sitemap, JSON-LD structured data
 - **HTML Parsing:** jsdom
@@ -75,31 +77,36 @@ renovationbridge/
 
 ## 🛠️ Getting Started
 
-1. **Clone the repository**
+1. **Prerequisites**
+   - Node.js 20.0.0 or higher
+   - npm 10.0.0 or higher (comes with Node.js 20)
+
+2. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/renovationbridge.git
    cd renovationbridge
    ```
 
-2. **Install dependencies**
+3. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Configure environment variables**
+4. **Configure environment variables**
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration settings
+   # Note: MONGODB_URI is no longer required as we use in-memory storage
    ```
 
-4. **Start development server**
+5. **Start development server**
    ```bash
    npm run dev
    # or
    ./start.sh
    ```
 
-5. **Open [http://localhost:3000](http://localhost:3000)**
+6. **Open [http://localhost:3000](http://localhost:3000)**
 
 ## 🧪 Local Testing
 
@@ -166,6 +173,7 @@ This uses mock API responses from the `mocks` directory, allowing you to test th
 
 - **Smart Lead Generation** - Optimized contact forms and CTAs
 - **Contractor Management** - Dedicated dashboard for contractors
+- **In-Memory Data Storage** - No database setup required
 - **Project Showcase** - Beautiful gallery of completed renovations including:
   - Interactive image galleries with lightbox functionality
   - Detailed project information and specifications
@@ -211,7 +219,6 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
    - Add all required environment variables from `.env.production.local`
    - Key variables to include:
      ```
-     MONGODB_URI
      JWT_SECRET
      REVALIDATION_SECRET
      API_URL
@@ -260,7 +267,61 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
-### Case-Sensitivity Fix for Gallery URLs (June 2023)
+### In-Memory Data Storage Implementation (April 2024)
+
+Replaced MongoDB with an in-memory data storage system for simplified deployment:
+
+- **What Changed**: Removed MongoDB dependency in favor of a simple in-memory data storage solution
+- **Files Modified**:
+  - `src/lib/db/connection.ts` - Replaced MongoDB connection with a dummy function
+  - `src/lib/models/User.ts` - Implemented in-memory user storage with UUID
+  - `src/lib/models/Project.ts` - Implemented in-memory project storage
+  - `src/app/api/*` - Updated all API routes to work with the new storage system
+  - `package.json` - Removed mongoose dependency and added uuid
+  - `.env.example` - Removed MongoDB-related environment variables
+  - `README.md` - Updated documentation to reflect the changes
+- **Implementation Details**:
+  - Uses `uuid` package for generating unique IDs
+  - Maintains CRUD operations with similar interface to previous MongoDB implementation
+  - Stores data in memory, which means data is lost on server restart
+  - No database setup required, simplifying deployment
+  - JWT authentication still works the same way
+
+**Benefits**: This update simplifies deployment by eliminating the need for a MongoDB database, making the application more portable and easier to set up for development and testing. Note that for production use with persistent data, you might want to implement a file-based storage solution or reintegrate a database.
+
+### Node.js 20 Requirement (Update)
+
+Updated development environment to require Node.js 20.0.0 or higher:
+
+- **What Changed**: Added Node.js engine requirement in package.json to ensure compatibility with the latest dependencies
+- **Files Modified**:
+  - `package.json` - Added engines field requiring Node.js >=20.0.0
+  - `README.md` - Updated prerequisites in Getting Started section
+- **Implementation Details**:
+  - Ensures compatibility with latest Next.js 14.2.0 features
+  - Provides performance improvements from Node.js 20
+  - Leverages security updates available in newer Node.js versions
+  - Required for several dependencies that now expect Node.js 20+
+
+**Benefits**: This update brings improved performance, better security, and ensures compatibility with the latest versions of all project dependencies.
+
+### Vercel SpeedInsights Integration (Added)
+
+Added Vercel SpeedInsights to monitor and improve web performance:
+
+- **What Changed**: Integrated the `@vercel/speed-insights` package with a custom DSN for self-hosting
+- **Files Modified**:
+  - `src/app/layout.tsx` - Added the SpeedInsights component with custom DSN
+- **Implementation Details**:
+  - Self-hosted with custom DSN: `ZNga99anB7eSaJjchi9phAZv6n7`
+  - Automatically collects Web Vitals metrics
+  - Provides insights on real-user performance
+  - Zero impact on page loading performance
+  - Privacy-focused analytics with no cookie requirements
+
+**Benefits**: This integration enables real-time monitoring of site performance metrics, helping identify and address performance bottlenecks to improve user experience.
+
+### Case-Sensitivity Fix for Gallery URLs
 
 Fixed an issue where gallery project pages were generating 404 errors when accessed with different letter casing in URLs:
 
@@ -276,6 +337,26 @@ The following URLs now all correctly display the same project page:
 - `/gallery/ALAMO`
 
 This ensures consistent user experience regardless of how the URL is typed or linked.
+
+### CI/CD Workflow Fix (March 26, 2025)
+
+- Fixed GitHub Actions build errors related to webpack configuration
+- Updated the webpack.yml workflow to use Next.js build command instead of direct webpack execution
+- Streamlined CI/CD by standardizing on Node.js 18.x for GitHub Actions workflows
+- Improved build performance by using `npm ci` instead of `npm install` in CI/CD pipelines
+
+### API Routes Cleanup (March 26, 2025)
+
+- Resolved conflicting API route definitions by removing legacy Pages Router routes
+- Standardized on App Router API routes for authentication endpoints (`/api/auth/me`)
+- This change ensures compatibility with Next.js 14.2.0 which doesn't support mixing Pages and App routers for the same routes
+
+### API Routes Authentication Fix (March 26, 2025)
+
+- Fixed compatibility issues with authentication API routes in App Router
+- Removed `'use server'` directives from Next.js API route handlers that were causing build failures
+- Updated cookie handling in auth routes to use direct response methods instead of server actions
+- Standardized authentication flow implementation across login, logout, register, and user endpoints
 
 ## 📈 SEO Implementation
 
@@ -357,10 +438,6 @@ import {
 } from '@/features/gallery';
 ```
 
-<div align="center">
-  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
-</div>
-
 ## 🧪 Testing
 
 The project uses a comprehensive testing strategy:
@@ -405,3 +482,29 @@ The project uses a comprehensive testing strategy:
    - E2E tests in `e2e/`
    - Component tests paired with their respective components
    - Integration tests for key user flows
+
+## Deployment Notes
+
+### GitHub Actions Build Issues
+
+If you encounter errors like `Field 'browser' doesn't contain a valid alias configuration` or `src/index.json doesn't exist` during GitHub Actions builds, this is likely due to webpack resolution issues. We've added specific webpack configuration in `next.config.js` to address this:
+
+```js
+webpack: (config, { isServer }) => {
+  // Ensures webpack resolves modules correctly
+  config.resolve.modules = ['node_modules', '.']
+  
+  // Explicitly tell webpack how to resolve
+  config.resolve.extensions = ['.js', '.jsx', '.ts', '.tsx']
+  
+  return config
+},
+```
+
+This configuration helps webpack properly resolve module paths in the GitHub Actions environment.
+
+
+<!-- Always leave this at the bottom of the README -->
+<div align="center">
+  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
+</div>

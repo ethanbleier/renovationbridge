@@ -5,6 +5,7 @@ import '@/styles/globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import JsonLd from '@/components/seo/JsonLd'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/structured-data'
 
 const inter = Inter({ 
@@ -83,6 +84,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <SpeedInsights dsn="ZNga99anB7eSaJjchi9phAZv6n7" />
         </div>
       </body>
     </html>

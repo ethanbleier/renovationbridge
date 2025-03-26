@@ -1,57 +1,56 @@
-import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 
-export interface IUser extends Document {
+export interface IUser {
+  id: string;
   email: string;
   password: string;
   name: string;
   role: 'user' | 'admin' | 'contractor';
   createdAt: Date;
   updatedAt: Date;
-  comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
-const UserSchema = new Schema<IUser>(
-  {
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      trim: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      minlength: [8, 'Password must be at least 8 characters long'],
-    },
-    name: {
-      type: String,
-      required: [true, 'Name is required'],
-      trim: true,
-    },
-    role: {
-      type: String,
-      enum: ['user', 'admin', 'contractor'],
-      default: 'user',
-    },
-  },
-  { timestamps: true }
-);
+// In-memory user storage
+const users: Record<string, IUser> = {};
 
-// Hash password before saving
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+// Class to handle user operations
+class UserService {
+  // Find user by email
+  static async findOne({ email }: { email: string }): Promise<IUser | null> {
+    return Object.values(users).find(user => user.email === email) || null;
+  }
 
-// Method to compare password for login
-// eslint-disable-next-line no-unused-vars
-UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
-  return bcrypt.compare(candidatePassword, this.password);
-};
+  // Find user by ID
+  static async findById(id: string): Promise<IUser | null> {
+    return users[id] || null;
+  }
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema); 
+  // Create a new user
+  static async create(userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<IUser> {
+    const id = uuidv4();
+    const now = new Date();
+    
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
+    
+    const newUser: IUser = {
+      id,
+      ...userData,
+      password: hashedPassword,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    users[id] = newUser;
+    return newUser;
+  }
+
+  // Compare password for login
+  static async comparePassword(user: IUser, candidatePassword: string): Promise<boolean> {
+    return bcrypt.compare(candidatePassword, user.password);
+  }
+}
+
+export default UserService; 

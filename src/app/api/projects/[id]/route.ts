@@ -1,8 +1,8 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db/connection';
 import Project from '@/lib/models/Project';
+import User from '@/lib/models/User';
 import { updateProjectSchema } from '@/lib/utils/validation';
 import { authMiddleware, TokenPayload } from '@/lib/utils/auth';
 
@@ -12,15 +12,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     const { id } = params;
     
     // Find the project
-    const project = await Project.findById(id)
-      .populate('owner', 'name email')
-      .populate('contractor', 'name email');
+    const project = await Project.findById(id);
     
     if (!project) {
       return NextResponse.json(
@@ -29,8 +24,26 @@ export async function GET(
       );
     }
     
-    // Return the project
-    return NextResponse.json({ project });
+    // Get owner and contractor information if available
+    let owner = null;
+    let contractor = null;
+    
+    if (project.owner) {
+      owner = await User.findById(project.owner);
+    }
+    
+    if (project.contractor) {
+      contractor = await User.findById(project.contractor);
+    }
+    
+    // Return the project with populated owner and contractor
+    return NextResponse.json({ 
+      project: {
+        ...project,
+        owner: owner ? { id: owner.id, name: owner.name, email: owner.email } : null,
+        contractor: contractor ? { id: contractor.id, name: contractor.name, email: contractor.email } : null
+      } 
+    });
   } catch (error) {
     console.error('Get project error:', error);
     return NextResponse.json(
@@ -47,9 +60,6 @@ async function updateProject(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     const { id } = params;
     
     // Parse the request body
@@ -75,7 +85,7 @@ async function updateProject(
     }
     
     // Check if the user is the owner of the project or an admin
-    if (project.owner.toString() !== user.userId && user.role !== 'admin') {
+    if (project.owner !== user.userId && user.role !== 'admin') {
       return NextResponse.json(
         { error: 'You are not authorized to update this project' },
         { status: 403 }
@@ -85,8 +95,7 @@ async function updateProject(
     // Update the project
     const updatedProject = await Project.findByIdAndUpdate(
       id,
-      { $set: validationResult.data },
-      { new: true, runValidators: true }
+      validationResult.data
     );
     
     // Return the updated project
@@ -110,9 +119,6 @@ async function deleteProject(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     const { id } = params;
     
     // Find the project
@@ -126,7 +132,7 @@ async function deleteProject(
     }
     
     // Check if the user is the owner of the project or an admin
-    if (project.owner.toString() !== user.userId && user.role !== 'admin') {
+    if (project.owner !== user.userId && user.role !== 'admin') {
       return NextResponse.json(
         { error: 'You are not authorized to delete this project' },
         { status: 403 }
