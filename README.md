@@ -300,6 +300,12 @@ This ensures consistent user experience regardless of how the URL is typed or li
 - Streamlined CI/CD by standardizing on Node.js 18.x for GitHub Actions workflows
 - Improved build performance by using `npm ci` instead of `npm install` in CI/CD pipelines
 
+### API Routes Cleanup (March 26, 2025)
+
+- Resolved conflicting API route definitions by removing legacy Pages Router routes
+- Standardized on App Router API routes for authentication endpoints (`/api/auth/me`)
+- This change ensures compatibility with Next.js 14.2.0 which doesn't support mixing Pages and App routers for the same routes
+
 ## 📈 SEO Implementation
 
 The project includes comprehensive SEO features:
