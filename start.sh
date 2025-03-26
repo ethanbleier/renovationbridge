@@ -27,6 +27,9 @@ load_secrets() {
     fi
   done
   
+  # Add a signal file to help browser extensions know when server is shutting down
+  touch .server_running
+  
   # Load environment variables from secret files
   if [ -f "secrets/ghl.env" ]; then
     export $(grep -v '^#' secrets/ghl.env | xargs)
@@ -50,6 +53,50 @@ load_secrets() {
 # Trap cleanup function to ensure all background processes are terminated
 cleanup() {
   echo -e "\n🧹 Cleaning up processes..."
+  
+  # Remove the server running signal file
+  rm -f .server_running
+  
+  # Create a gentle shutdown page
+  if [ -d "public" ]; then
+    mkdir -p public/shutdown
+    cat > public/shutdown/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Stopped</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    .message { margin: 30px 0; }
+  </style>
+  <script>
+    // Close only this tab after 2 seconds
+    setTimeout(function() {
+      window.close();
+      // If tab doesn't close (some browsers prevent this), show message
+      setTimeout(function() {
+        document.getElementById('manual-close').style.display = 'block';
+      }, 500);
+    }, 2000);
+  </script>
+</head>
+<body>
+  <h2>Development Server Stopped</h2>
+  <div class="message">The local development server has been shut down.</div>
+  <div id="manual-close" style="display:none">
+    <p>Please close this tab manually.</p>
+  </div>
+</body>
+</html>
+EOF
+
+    # If a browser is connected, try to redirect to shutdown page before killing server
+    if command -v curl >/dev/null 2>&1; then
+      curl -s "http://localhost:3000/shutdown/" >/dev/null 2>&1 || true
+      sleep 1
+    fi
+  fi
+  
   # Kill any background processes we started
   if [[ ! -z "$DEV_PID" ]]; then
     kill $DEV_PID 2>/dev/null || true
@@ -57,10 +104,19 @@ cleanup() {
   if [[ ! -z "$INPUT_PID" ]]; then
     kill $INPUT_PID 2>/dev/null || true
   fi
-  # Kill any processes on port 3000
+  
+  # Kill any processes on port 3000 more gently
   if lsof -ti:3000 >/dev/null; then
-    lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    echo "📲 Gracefully shutting down server..."
+    # Try SIGTERM first (more gentle)
+    lsof -ti:3000 | xargs kill 2>/dev/null || true
+    sleep 1
+    # Then force kill if still running
+    if lsof -ti:3000 >/dev/null; then
+      lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    fi
   fi
+  
   echo "👋 Goodbye!"
   exit 0
 }

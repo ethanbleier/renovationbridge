@@ -267,7 +267,23 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
-### In-Memory Data Storage Implementation (April 2024)
+### GoHighLevel Form Integration Fix (March 27, 2025)
+
+Improved the GoHighLevel (GHL) form submission to ensure all fields are properly populated in GHL:
+
+- **What Changed**: Fixed custom field formatting to match GHL API requirements
+- **Files Modified**:
+  - `src/lib/utils/formSubmission.ts` - Corrected the formatting of data for GHL API
+- **Implementation Details**:
+  - Updated custom field format to use GHL's required array structure with name/value pairs
+  - Added explicit mapping for common custom fields (project_types_full, project_size, project_stage, etc.)
+  - Improved field name normalization to handle variations in field names
+  - Added debug logging to help troubleshoot GHL submissions
+  - Skips empty or null values to keep data clean
+
+**Benefits**: This update ensures that all form fields submitted through the website are correctly mapped to their corresponding fields in GoHighLevel, improving lead quality and tracking. The proper custom field formatting ensures that fields like project description and project types appear correctly in the GHL contact record.
+
+### In-Memory Data Storage Implementation (March 27, 2025)
 
 Replaced MongoDB with an in-memory data storage system for simplified deployment:
 

@@ -43,6 +43,58 @@ export function formatGHLData(formData: any, formType: FormType) {
     description = formData.description;
   }
   
+  // Standard contact fields
+  const standardFields = ['email', 'phone', 'firstName', 'lastName', 'name', 'message', 'projectDescription', 'description'];
+  
+  // Create custom fields array for GHL in the required format
+  const customFieldsArray = [];
+  
+  // Add project description to customFields
+  if (description) {
+    customFieldsArray.push({
+      name: 'project_description',
+      value: description
+    });
+    
+    // Add to the new description_of_work field as well
+    customFieldsArray.push({
+      name: 'description_of_work',
+      value: description
+    });
+  }
+  
+  // Map common fields with support for variations in field names
+  const fieldMappings = {
+    'projectTypes': 'project_types_full',
+    'project_types': 'project_types_full',
+    'projectSize': 'project_size',
+    'project_size': 'project_size',
+    'projectStage': 'project_stage',
+    'project_stage': 'project_stage',
+    'comment': 'comment',
+    'additionalComments': 'additional_comments',
+    'projectTimeline': 'project_time_line',
+    'project_time_line': 'project_time_line',
+    'projectBudget': 'project_budget',
+    'project_budget': 'project_budget'
+  };
+  
+  // Add all custom fields to the array
+  Object.entries(formData)
+    .filter(([key]) => !standardFields.includes(key))
+    .forEach(([key, value]) => {
+      // Skip empty values
+      if (value === undefined || value === null || value === '') return;
+      
+      // Use mapped field name if available
+      const fieldName = fieldMappings[key as keyof typeof fieldMappings] || key;
+      
+      customFieldsArray.push({
+        name: fieldName,
+        value: value
+      });
+    });
+  
   // Base data structure for GHL
   const ghlData = {
     email: formData.email,
@@ -51,15 +103,8 @@ export function formatGHLData(formData: any, formType: FormType) {
     lastName,
     // Add the description to a note field that GHL will display in the dashboard
     note: description,
-    // Add the project description to the dedicated contact.project_description field
-    contact: {
-      project_description: description
-    },
-    customField: {
-      ...Object.entries(formData)
-        .filter(([key]) => !['email', 'phone', 'firstName', 'lastName', 'name', 'message', 'projectDescription', 'description'].includes(key))
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-    },
+    // Use the proper format for customFields (plural) as an array of objects with name/value pairs
+    customFields: customFieldsArray,
     tags: getFormTags(formType)
   };
   
@@ -80,6 +125,14 @@ export async function submitToGHL(formData: any, formType: FormType) {
     // Format the data
     const ghlData = formatGHLData(formData, formType);
     
+    // Log the data being sent to GHL for debugging
+    console.log('Submitting to GHL:', {
+      formType,
+      originalData: formData,
+      formattedData: ghlData,
+      customFieldsCount: ghlData.customFields.length
+    });
+    
     // Send the data to GoHighLevel's contact API
     const ghlResponse = await fetch(`https://rest.gohighlevel.com/v1/contacts/`, {
       method: 'POST',
@@ -92,6 +145,10 @@ export async function submitToGHL(formData: any, formType: FormType) {
     
     // Handle the response
     const responseData = await ghlResponse.json();
+    
+    // Log the GHL response for debugging
+    console.log('GHL response:', responseData);
+    console.log('Custom fields sent:', ghlData.customFields);
     
     if (!ghlResponse.ok) {
       console.error('GoHighLevel API error:', responseData);

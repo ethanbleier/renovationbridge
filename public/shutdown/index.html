@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Stopped</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    .message { margin: 30px 0; }
+  </style>
+  <script>
+    // Close only this tab after 2 seconds
+    setTimeout(function() {
+      window.close();
+      // If tab doesn't close (some browsers prevent this), show message
+      setTimeout(function() {
+        document.getElementById('manual-close').style.display = 'block';
+      }, 500);
+    }, 2000);
+  </script>
+</head>
+<body>
+  <h2>Development Server Stopped</h2>
+  <div class="message">The local development server has been shut down.</div>
+  <div id="manual-close" style="display:none">
+    <p>Please close this tab manually.</p>
+  </div>
+</body>
+</html>
