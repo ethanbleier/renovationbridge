@@ -39,3 +39,6 @@ coverage
 # Secrets directory
 /secrets/
 
+
+# Cursor files
+.cursor
