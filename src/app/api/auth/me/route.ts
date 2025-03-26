@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db/connection';
 import User from '@/lib/models/User';
 import { getCurrentUser } from '@/lib/utils/auth';
 
@@ -15,11 +14,8 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Connect to the database
-    await dbConnect();
-    
     // Find the user
-    const user = await User.findById(userToken.userId).select('-password');
+    const user = await User.findById(userToken.userId);
     
     if (!user) {
       return NextResponse.json(
@@ -28,10 +24,10 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Return the user
+    // Return the user (excluding password)
     return NextResponse.json({ 
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,

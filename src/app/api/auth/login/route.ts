@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db/connection';
 import User from '@/lib/models/User';
 import { loginSchema } from '@/lib/utils/validation';
 import { generateToken } from '@/lib/utils/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     // Parse the request body
     const body = await request.json();
     
@@ -33,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Verify password
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await User.comparePassword(user, password);
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
@@ -48,7 +44,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({ 
       message: 'Login successful', 
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,

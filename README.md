@@ -32,6 +32,8 @@ Our carefully crafted color palette ensures a professional and trustworthy appea
 - **Animations:** Framer Motion 12.5+
 - **Forms:** React Hook Form 7.50+
 - **Icons:** React Icons 5.0+
+- **Authentication:** JWT, bcrypt.js
+- **Data Storage:** In-memory data storage with UUID
 - **Image Processing:** Sharp 0.33+
 - **SEO:** next-sitemap, JSON-LD structured data
 - **HTML Parsing:** jsdom
@@ -94,6 +96,7 @@ renovationbridge/
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration settings
+   # Note: MONGODB_URI is no longer required as we use in-memory storage
    ```
 
 5. **Start development server**
@@ -170,6 +173,7 @@ This uses mock API responses from the `mocks` directory, allowing you to test th
 
 - **Smart Lead Generation** - Optimized contact forms and CTAs
 - **Contractor Management** - Dedicated dashboard for contractors
+- **In-Memory Data Storage** - No database setup required
 - **Project Showcase** - Beautiful gallery of completed renovations including:
   - Interactive image galleries with lightbox functionality
   - Detailed project information and specifications
@@ -215,7 +219,6 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
    - Add all required environment variables from `.env.production.local`
    - Key variables to include:
      ```
-     MONGODB_URI
      JWT_SECRET
      REVALIDATION_SECRET
      API_URL
@@ -264,6 +267,28 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
+### In-Memory Data Storage Implementation (April 2024)
+
+Replaced MongoDB with an in-memory data storage system for simplified deployment:
+
+- **What Changed**: Removed MongoDB dependency in favor of a simple in-memory data storage solution
+- **Files Modified**:
+  - `src/lib/db/connection.ts` - Replaced MongoDB connection with a dummy function
+  - `src/lib/models/User.ts` - Implemented in-memory user storage with UUID
+  - `src/lib/models/Project.ts` - Implemented in-memory project storage
+  - `src/app/api/*` - Updated all API routes to work with the new storage system
+  - `package.json` - Removed mongoose dependency and added uuid
+  - `.env.example` - Removed MongoDB-related environment variables
+  - `README.md` - Updated documentation to reflect the changes
+- **Implementation Details**:
+  - Uses `uuid` package for generating unique IDs
+  - Maintains CRUD operations with similar interface to previous MongoDB implementation
+  - Stores data in memory, which means data is lost on server restart
+  - No database setup required, simplifying deployment
+  - JWT authentication still works the same way
+
+**Benefits**: This update simplifies deployment by eliminating the need for a MongoDB database, making the application more portable and easier to set up for development and testing. Note that for production use with persistent data, you might want to implement a file-based storage solution or reintegrate a database.
+
 ### Node.js 20 Requirement (Update)
 
 Updated development environment to require Node.js 20.0.0 or higher:
@@ -296,7 +321,7 @@ Added Vercel SpeedInsights to monitor and improve web performance:
 
 **Benefits**: This integration enables real-time monitoring of site performance metrics, helping identify and address performance bottlenecks to improve user experience.
 
-### Case-Sensitivity Fix for Gallery URLs (June 2025)
+### Case-Sensitivity Fix for Gallery URLs
 
 Fixed an issue where gallery project pages were generating 404 errors when accessed with different letter casing in URLs:
 
@@ -413,10 +438,6 @@ import {
 } from '@/features/gallery';
 ```
 
-<div align="center">
-  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
-</div>
-
 ## 🧪 Testing
 
 The project uses a comprehensive testing strategy:
@@ -481,3 +502,9 @@ webpack: (config, { isServer }) => {
 ```
 
 This configuration helps webpack properly resolve module paths in the GitHub Actions environment.
+
+
+<!-- Always leave this at the bottom of the README -->
+<div align="center">
+  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
+</div>

@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db/connection';
 import User from '@/lib/models/User';
 import { registerSchema } from '@/lib/utils/validation';
 import { generateToken } from '@/lib/utils/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     // Parse the request body
     const body = await request.json();
     
@@ -47,7 +43,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({ 
       message: 'User registered successfully', 
       user: {
-        id: newUser._id,
+        id: newUser.id,
         email: newUser.email,
         name: newUser.name,
         role: newUser.role,

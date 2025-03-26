@@ -1,7 +1,6 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db/connection';
 import Project from '@/lib/models/Project';
 import { projectSchema } from '@/lib/utils/validation';
 import { authMiddleware } from '@/lib/utils/auth';
@@ -10,9 +9,6 @@ import { TokenPayload } from '@/lib/utils/auth';
 // GET handler for fetching projects
 export async function GET(request: NextRequest) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     // Extract query parameters
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
@@ -27,19 +23,17 @@ export async function GET(request: NextRequest) {
     }
     
     // Execute the query
-    const projects = await Project.find(query)
-      .populate('owner', 'name email')
-      .populate('contractor', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const projects = await Project.find(query);
     
-    // Count all documents matching the query
+    // Apply pagination manually
+    const paginatedProjects = projects.slice(skip, skip + limit);
+    
+    // Count all projects matching the query
     const total = await Project.countDocuments(query);
     
     // Return the projects
     return NextResponse.json({
-      projects,
+      projects: paginatedProjects,
       pagination: {
         total,
         page,
@@ -59,9 +53,6 @@ export async function GET(request: NextRequest) {
 // Create a new project (authenticated users only)
 async function createProject(req: NextRequest, user: TokenPayload) {
   try {
-    // Connect to the database
-    await dbConnect();
-    
     // Parse the request body
     const body = await req.json();
     
@@ -78,6 +69,7 @@ async function createProject(req: NextRequest, user: TokenPayload) {
     const project = await Project.create({
       ...validationResult.data,
       owner: user.userId,
+      status: 'pending', // Default status
     });
     
     // Return the project
