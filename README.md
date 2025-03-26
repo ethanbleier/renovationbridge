@@ -276,7 +276,7 @@ Added Vercel SpeedInsights to monitor and improve web performance:
 
 **Benefits**: This integration enables real-time monitoring of site performance metrics, helping identify and address performance bottlenecks to improve user experience.
 
-### Case-Sensitivity Fix for Gallery URLs (June 2023)
+### Case-Sensitivity Fix for Gallery URLs (June 2025)
 
 Fixed an issue where gallery project pages were generating 404 errors when accessed with different letter casing in URLs:
 
