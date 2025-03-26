@@ -306,6 +306,13 @@ This ensures consistent user experience regardless of how the URL is typed or li
 - Standardized on App Router API routes for authentication endpoints (`/api/auth/me`)
 - This change ensures compatibility with Next.js 14.2.0 which doesn't support mixing Pages and App routers for the same routes
 
+### API Routes Authentication Fix (March 26, 2025)
+
+- Fixed compatibility issues with authentication API routes in App Router
+- Removed `'use server'` directives from Next.js API route handlers that were causing build failures
+- Updated cookie handling in auth routes to use direct response methods instead of server actions
+- Standardized authentication flow implementation across login, logout, register, and user endpoints
+
 ## 📈 SEO Implementation
 
 The project includes comprehensive SEO features:

@@ -1,5 +1,3 @@
-'use server';
-
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/connection';
 import User from '@/lib/models/User';
@@ -46,21 +44,29 @@ export async function POST(request: NextRequest) {
     // Generate JWT token
     const token = generateToken(user);
     
-    // Set auth cookie
-    setAuthCookie(token);
-    
-    // Return the user (excluding password)
-    const userResponse = {
-      id: user._id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    };
-    
-    return NextResponse.json({ 
+    // Create response
+    const response = NextResponse.json({ 
       message: 'Login successful', 
-      user: userResponse 
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      }
     });
+    
+    // Set the cookie in the response
+    response.cookies.set({
+      name: 'auth_token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+    
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
