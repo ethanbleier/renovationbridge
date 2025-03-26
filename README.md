@@ -293,6 +293,13 @@ The following URLs now all correctly display the same project page:
 
 This ensures consistent user experience regardless of how the URL is typed or linked.
 
+### CI/CD Workflow Fix (March 26, 2025)
+
+- Fixed GitHub Actions build errors related to webpack configuration
+- Updated the webpack.yml workflow to use Next.js build command instead of direct webpack execution
+- Streamlined CI/CD by standardizing on Node.js 18.x for GitHub Actions workflows
+- Improved build performance by using `npm ci` instead of `npm install` in CI/CD pipelines
+
 ## 📈 SEO Implementation
 
 The project includes comprehensive SEO features:
