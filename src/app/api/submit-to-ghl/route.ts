@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     // Validate the form data
     const validationResult = genericFormSchema.safeParse(formData);
     if (!validationResult.success) {
+      console.error('GHL Form Validation Error:', validationResult.error.format());
       return NextResponse.json(
         { error: 'Validation failed', details: validationResult.error.format() },
         { status: 400 }
@@ -28,12 +29,29 @@ export async function POST(request: Request) {
     // Extract the form type and remove it from the data to submit
     const { formType, ...dataToSubmit } = validationResult.data;
     
-    // Submit to GoHighLevel with the specified form type
-    await submitToGHL(dataToSubmit, formType);
+    // Submit to GoHighLevel with the specified form type and capture response
+    const ghlResponse = await submitToGHL(dataToSubmit, formType);
     
-    return NextResponse.json({ success: true });
+    // Log successful submission with response data
+    console.log('GHL Submission Success:', {
+      formType,
+      data: dataToSubmit,
+      response: ghlResponse,
+      timestamp: new Date().toISOString()
+    });
+    
+    return NextResponse.json({ 
+      success: true,
+      ghlResponse // Include GHL response in API response
+    });
   } catch (error) {
-    console.error('Error in generic form submission:', error);
+    // Enhanced error logging
+    console.error('GHL Submission Error:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
     return NextResponse.json(
       { error: 'Failed to process submission' },
       { status: 500 }

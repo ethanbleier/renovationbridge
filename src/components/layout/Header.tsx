@@ -11,23 +11,24 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container-custom py-4">
-        <div className="flex items-center justify-between">
+      <div className="container-custom py-4 pr-3 md:pr-5 lg:pr-8">
+        <div className="flex items-center justify-between gap-4 lg:gap-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center flex-shrink-0">
             <Image 
               src="/images/logos/logo.png" 
               alt="Renovation Bridge Logo" 
               width={180} 
-              height={40} 
+              height={40}
+              className="w-[150px] sm:w-[170px] lg:w-[220px]"
               style={{ height: "auto" }}
               priority
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/how-it-works" className="text-gray-800 hover:text-primary transition-colors">
+          <nav className="hidden md:flex items-center space-x-4 lg:space-x-8 flex-grow justify-center">
+            <Link href="/how-it-works" className="text-gray-800 hover:text-primary transition-colors whitespace-nowrap">
               How it Works
             </Link>
             
@@ -63,11 +64,11 @@ const Header = () => {
           </nav>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link href="/for-contractors" className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105">
+          <div className="hidden md:flex items-center space-x-3 lg:space-x-4 flex-shrink-0">
+            <Link href="/for-contractors" className="px-3 py-2 lg:px-4 lg:py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 whitespace-nowrap text-sm lg:text-base">
               For Contractors
             </Link>
-            <Link href="/get-started" className="contractor-btn transform hover:scale-105 transition-transform duration-200">
+            <Link href="/get-started" className="contractor-btn transform hover:scale-105 transition-transform duration-200 whitespace-nowrap text-sm lg:text-base px-3 py-2 lg:px-5 lg:py-2">
               GET STARTED
             </Link>
           </div>
@@ -154,7 +155,7 @@ const Header = () => {
               </Link>
               <Link 
                 href="/get-started" 
-                className="contractor-btn text-center transform hover:scale-105 transition-transform duration-200"
+                className="contractor-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 GET STARTED

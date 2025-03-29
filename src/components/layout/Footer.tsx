@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaYoutube, FaXTwitter } from 'react-icons/fa6'
-import ContactForm from '../forms/ContactForm'
+import FooterContactForm from '../forms/FooterContactForm'
 
 const Footer = () => {
   return (
@@ -105,7 +105,7 @@ const Footer = () => {
           
           {/* Contact Form Column (Spans 2 columns on lg screens) */}
           <div className="lg:col-span-2">
-            <ContactForm />
+            <FooterContactForm />
           </div>
         </div>
         

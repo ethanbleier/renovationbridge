@@ -65,7 +65,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[90vh] pt-16 md:pt-24 pb-20 md:pb-32">
+    <section className="relative min-h-[90vh] pt-12 sm:pt-16 md:pt-24 pb-16 md:pb-32">
       {/* Image Carousel Background */}
       <div className="absolute inset-0 w-full h-full">
         {slides.map((slide, index) => (
@@ -79,21 +79,21 @@ export default function HeroSection() {
               src={slide}
               alt="Renovation project"
               fill
-              sizes="100vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
               className="object-cover"
               priority={index === 0}
             />
             {/* Overlay to ensure text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-lavender/65 to-white/50"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-lavender/75 to-white/50 sm:from-lavender/65 sm:to-white/50"></div>
           </div>
         ))}
       </div>
       
       <div className="container-custom relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-start">
-          <div className="space-y-6 md:space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-16 items-start">
+          <div className="space-y-4 sm:space-y-6 md:space-y-8">
               <div 
-                className={`inline-block px-4 py-1 rounded-full bg-primary/30 text-primary font-medium text-sm backdrop-blur-sm transform transition-all duration-700 ease-out ${
+                className={`inline-block px-3 sm:px-4 py-1 rounded-full bg-primary/30 text-primary font-medium text-xs sm:text-sm backdrop-blur-sm transform transition-all duration-700 ease-out ${
                   pillVisible 
                     ? 'opacity-100 translate-y-0 scale-100' 
                     : 'opacity-0 -translate-y-4 scale-95'
@@ -102,9 +102,9 @@ export default function HeroSection() {
                 Welcome to Renovation Bridge
               </div>
             
-            <div className="text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
+            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
               {/* Main title with static prefix and animated keyword */}
-              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-2xl md:text-3xl lg:text-4xl">
+              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-xl sm:text-2xl md:text-3xl lg:text-4xl">
                 <span>{titles[currentSlide].prefix} </span>
                 <TypeAnimation
                   sequence={[
@@ -124,46 +124,46 @@ export default function HeroSection() {
               </h1>
               
               {/* "with Confidence" remains unchanged */}
-              <div className="text-primary h-[1.5em] overflow-hidden text-2xl md:text-3xl lg:text-4xl">{titles[currentSlide].highlight}</div>
+              <div className="text-primary h-[1.5em] overflow-hidden text-xl sm:text-2xl md:text-3xl lg:text-4xl">{titles[currentSlide].highlight}</div>
             </div>
             
-            <p className="text-lg md:text-xl text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-3 rounded-lg">
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">
               Renovation Bridge connects homeowners with vetted contractors for a seamless renovation experience. Our rigorous vetting process ensures quality workmanship for your project.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all">
+            <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
+              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-sm sm:text-base w-full xs:w-auto">
                 Get Started
               </Link>
-              <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all">
+              <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all text-sm sm:text-base w-full xs:w-auto">
                 How It Works
               </Link>
             </div>
             
-            <div className="grid grid-cols-3 gap-6 md:gap-8 pt-8 md:pt-10">
-              <div className="text-center p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-3xl md:text-4xl font-bold text-primary">60+</div>
-                <p className="text-sm md:text-base text-gray-600">Vetted Contractors</p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 lg:gap-8 pt-6 sm:pt-8 md:pt-10">
+              <div className="text-center p-2 md:p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary">60+</div>
+                <p className="text-xxs xs:text-xs sm:text-sm lg:text-base text-gray-600">Vetted Contractors</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-3xl md:text-4xl font-bold text-primary">2,000+</div>
-                <p className="text-sm md:text-base text-gray-600">Homeowners Helped</p>
+              <div className="text-center p-2 md:p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary">2,000+</div>
+                <p className="text-xxs xs:text-xs sm:text-sm lg:text-base text-gray-600">Homeowners Helped</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-3xl md:text-4xl font-bold text-primary">100%</div>
-                <p className="text-sm md:text-base text-gray-600">Matchmaking Success</p>
+              <div className="text-center p-2 md:p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary">100%</div>
+                <p className="text-xxs xs:text-xs sm:text-sm lg:text-base text-gray-600">Matchmaking Success</p>
               </div>
             </div>
           </div>
           
-          <div className="relative mt-8 lg:mt-0 lg:max-h-[80vh] overflow-y-auto rounded-lg shadow-lg">
+          <div className="relative mt-6 sm:mt-8 lg:mt-0 rounded-lg shadow-lg">
             <ContactForm />
           </div>
         </div>
       </div>
       
       {/* Bobbing down arrow - position adjusted for immediate visibility */}
-      <div className="absolute bottom-20 md:bottom-16 left-0 right-0 flex justify-center animate-bounce z-20">
+      <div className="absolute bottom-12 sm:bottom-16 md:bottom-20 left-0 right-0 flex justify-center animate-bounce z-20">
         <div 
           className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
           onClick={handleScrollDown}
@@ -173,15 +173,15 @@ export default function HeroSection() {
         >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
+            width="20" 
+            height="20" 
             viewBox="0 0 24 24" 
             fill="none" 
             stroke="currentColor" 
             strokeWidth="2" 
             strokeLinecap="round" 
             strokeLinejoin="round" 
-            className="text-primary"
+            className="text-primary sm:h-6 sm:w-6"
           >
             <path d="M12 5v14M19 12l-7 7-7-7"/>
           </svg>
