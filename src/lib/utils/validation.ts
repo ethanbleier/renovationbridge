@@ -44,9 +44,13 @@ export const getStartedFormSchema = z.object({
   propertyAddress: z.string().min(5, { message: 'Address must be at least 5 characters long' }),
   propertyCity: z.string().min(2, { message: 'City must be at least 2 characters long' }),
   propertyState: z.string().min(2, { message: 'State must be at least 2 characters long' }),
-  propertyZip: z.string().min(5, { message: 'Zip code must be at least 5 characters long' }),
+  propertyZip: z.string().min(5, { message: 'Zip code must be at least 5 characters long' }).optional(),
   budget: z.string().or(z.number()).optional(),
   timeline: z.string().optional(),
+  project_size: z.string().optional(),
+  project_stage: z.string().optional(),
+  project_types_full: z.string().optional(),
+  additional_comments: z.string().optional(),
 });
 
 // Contractor form validation schema

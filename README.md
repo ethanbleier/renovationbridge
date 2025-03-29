@@ -158,22 +158,10 @@ npm run type-check
 - **Integration Tests**: Found in the `tests/integration` directory
 - **End-to-End Tests**: Uses Cypress located in the `cypress` directory
 
-### Mock Data for Testing
-
-For testing with mock data:
-
-```bash
-# Start the development server with mock data
-npm run dev:mock
-```
-
-This uses mock API responses from the `mocks` directory, allowing you to test the application without connecting to actual APIs.
-
 ## 🌟 Key Features
 
 - **Smart Lead Generation** - Optimized contact forms and CTAs
-- **Contractor Management** - Dedicated dashboard for contractors
-- **In-Memory Data Storage** - No database setup required
+- **In-Memory Data Storage** - No database setup
 - **Project Showcase** - Beautiful gallery of completed renovations including:
   - Interactive image galleries with lightbox functionality
   - Detailed project information and specifications

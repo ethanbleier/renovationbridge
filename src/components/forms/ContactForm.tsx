@@ -102,7 +102,6 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         return;
       }
       
-      // Rename message to projectDescription for GHL
       const formData = {
         ...data,
         projectDescription: data.message
@@ -155,14 +154,13 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
   
   return (
     <div className="w-full rounded-lg bg-white p-6 md:p-8 shadow-lg transition-all hover:shadow-xl">
-      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-primary after:left-0 after:-bottom-2">Get Started Today</h3>
-      
+      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-lavender after:left-0 after:-bottom-2">Get Started Today</h3>
       {isSuccess ? (
         <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center animate-fadeIn">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
-          Thank you! We'll be in touch with you soon.
+          Thank you! Our team will reach out soon
         </div>
       ) : null}
       
@@ -176,14 +174,10 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       ) : null}
       
       <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-5" aria-label="Contact form">
-        <p className="text-sm text-gray-600 mb-4">
-          <span className="text-red-500">*</span> indicates required fields
-        </p>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-1">
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Name <span className="text-red-500">*</span>
+              Name <span className="text-red-500"></span>
             </label>
             <div className="relative group">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -213,7 +207,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
           
           <div className="space-y-1">
             <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-              City <span className="text-red-500">*</span>
+              City <span className="text-red-500"></span>
             </label>
             <div className="relative group">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -243,7 +237,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         
         <div className="space-y-1">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email <span className="text-red-500">*</span>
+            Email <span className="text-red-500"></span>
           </label>
           <div className="relative group">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -279,7 +273,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         
         <div className="space-y-1">
           <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-            Phone Number <span className="text-red-500">*</span>
+            Phone Number <span className="text-red-500"></span>
           </label>
           <div className="relative group">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -312,12 +306,11 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               {errors.phone.message || 'Phone number is required'}
             </p>
           )}
-          <p className="text-xs text-gray-500 mt-1">Format: (123) 456-7890</p>
         </div>
         
         <div className="space-y-1">
           <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-            Description of work <span className="text-red-500">*</span>
+            Description of work
           </label>
           <div className="relative group">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-4 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -330,7 +323,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
               aria-required="true"
               aria-invalid={errors.message ? "true" : "false"}
-              {...register('message', { required: true, minLength: 10 })}
+              {...register('message', { required: true })}
             ></textarea>
           </div>
           {errors.message && (
@@ -338,14 +331,9 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              Message is required and must be at least 10 characters
+              Message is required
             </p>
           )}
-          <div className="text-right">
-            <span className={`text-xs ${watch('message')?.length < 10 ? 'text-red-500' : 'text-green-600'}`}>
-              {watch('message')?.length || 0}/10 characters minimum
-            </span>
-          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 pt-3">

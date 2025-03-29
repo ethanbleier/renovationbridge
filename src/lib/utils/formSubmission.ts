@@ -80,6 +80,10 @@ export async function submitToGHL(formData: any, formType: FormType) {
     // Format the data
     const ghlData = formatGHLData(formData, formType);
     
+    // Log the formatted data being sent to GHL
+    console.log('GHL Request - Form Type:', formType);
+    console.log('GHL Request - Formatted Data:', JSON.stringify(ghlData, null, 2));
+    
     // Send the data to GoHighLevel's contact API
     const ghlResponse = await fetch(`https://rest.gohighlevel.com/v1/contacts/`, {
       method: 'POST',
@@ -92,6 +96,10 @@ export async function submitToGHL(formData: any, formType: FormType) {
     
     // Handle the response
     const responseData = await ghlResponse.json();
+    
+    // Log the complete response from GHL
+    console.log('GHL Response - Status:', ghlResponse.status);
+    console.log('GHL Response - Data:', JSON.stringify(responseData, null, 2));
     
     if (!ghlResponse.ok) {
       console.error('GoHighLevel API error:', responseData);

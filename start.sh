@@ -50,16 +50,16 @@ load_secrets() {
 # Trap cleanup function to ensure all background processes are terminated
 cleanup() {
   echo -e "\n🧹 Cleaning up processes..."
-  # Kill any background processes we started
+  # Kill only our specific background processes
   if [[ ! -z "$DEV_PID" ]]; then
     kill $DEV_PID 2>/dev/null || true
   fi
   if [[ ! -z "$INPUT_PID" ]]; then
     kill $INPUT_PID 2>/dev/null || true
   fi
-  # Kill any processes on port 3000
+  # Only kill Node.js processes on port 3000, not everything
   if lsof -ti:3000 >/dev/null; then
-    lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    lsof -ti:3000 | grep "node" | xargs kill -9 2>/dev/null || true
   fi
   echo "👋 Goodbye!"
   exit 0
@@ -85,7 +85,8 @@ fi
 
 # Print Node.js and npm version
 echo "🔍 Using Node.js $(node -v) and npm $(npm -v)"
-
+echo "📊 Repository Statistics:"
+echo "   Total lines of code: $(git ls-files | xargs wc -l | tail -n 1)" 
 echo "📦 Installing dependencies..."
 npm install
 
@@ -107,7 +108,6 @@ fi
 # Check if there are uncommitted changes
 if git status --porcelain | grep -q .; then
     echo "⚠️  You have uncommitted changes in your repository."
-    echo "   Consider committing them before proceeding."
 fi
 
 # Function for linting animation
@@ -194,68 +194,6 @@ spinner() {
   printf "\r\033[K"  # Clear the line
 }
 
-# Function to rebuild the project
-rebuild_project() {
-    echo -e "\n🔍 Running ESLint..."
-    if ! npx eslint . --ext .js,.jsx,.ts,.tsx; then
-        echo "❌ ESLint found issues. Please fix them before rebuilding."
-        return 1
-    fi
-    
-    echo -e "\n🏗️  Rebuilding the application..."
-    (npm run build) & BUILD_PID=$!
-    spinner $BUILD_PID
-    echo
-    time (npm run build) 2>&1
-}
-
-# Function to run tests
-run_tests() {
-    local test_type=$1
-    
-    case $test_type in
-        "unit")
-            echo -e "\n🧪 Running unit tests..."
-            npm test
-            ;;
-        "e2e")
-            echo -e "\n🧪 Running end-to-end tests..."
-            npm run test:e2e
-            ;;
-        "coverage")
-            echo -e "\n🧪 Running test coverage..."
-            npm run test:coverage
-            ;;
-        *)
-            echo -e "\n🧪 Running all tests..."
-            npm test && npm run test:e2e
-            ;;
-    esac
-}
-
-# Function to handle keyboard input - with timeout and better resource management
-handle_input() {
-    local timeout=1  # 1 second timeout for read
-    while true; do
-        # Use timeout to avoid high CPU usage when idle
-        if read -t $timeout -rsn1 input; then
-            if [ "$input" = "r" ]; then
-                rebuild_project
-            elif [ "$input" = "q" ]; then
-                echo "User requested exit"
-                cleanup
-            elif [ "$input" = "t" ]; then
-                run_tests "unit"
-            elif [ "$input" = "e" ]; then
-                run_tests "e2e"
-            elif [ "$input" = "c" ]; then
-                run_tests "coverage"
-            fi
-        fi
-        # Small sleep to prevent tight loop
-        sleep 0.1
-    done
-}
 
 # Run build with timeout protection
 echo "🏗️  Building the application and generating sitemap..."
@@ -269,19 +207,8 @@ echo "🚀 Starting the application in development mode..."
 # Load secrets before starting the application
 load_secrets
 
-echo -e "\n📋 Available commands:"
-echo "  • Press 'r' to rebuild the project"
-echo "  • Press 't' to run unit tests"
-echo "  • Press 'e' to run end-to-end tests"
-echo "  • Press 'c' to run test coverage"
-echo "  • Press 'q' to quit"
-echo -e "\n"
-
 # Start the dev server in the background
 (npm run dev) & DEV_PID=$!
-
-# Start listening for keyboard input in the background with proper process management
-handle_input & INPUT_PID=$!
 
 # Wait for the dev server process
 wait $DEV_PID 

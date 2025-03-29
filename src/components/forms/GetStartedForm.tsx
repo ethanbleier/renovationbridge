@@ -27,43 +27,44 @@ const ProjectTypeStep = ({ onNext }: { onNext: (formData: any) => void }) => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-secondary mb-4">What type of project are you planning?</h1>
-      <p className="text-gray mb-6">Select one or more</p>
+      <h1 className="text-2xl md:text-3xl font-bold text-secondary mb-2">What type of project are you planning?</h1>
+      <p className="text-sm text-gray mb-3">Select one or more</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-4">
         {projectTypes.map((type) => (
           <div 
             key={type.id}
-            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+            className={`border rounded-lg p-2 cursor-pointer transition-all ${
               selectedTypes.includes(type.id) 
-                ? 'border-primary ring-2 ring-primary/20' 
+                ? 'border-primary ring-1 ring-primary/20' 
                 : 'border-gray/20 hover:border-gray/30'
             }`}
             onClick={() => toggleSelection(type.id)}
           >
-            <div className="relative h-48 w-full mb-4">
+            <div className="relative h-24 md:h-40 w-full mb-2">
               <Image 
                 src={type.image} 
                 alt={type.label} 
                 fill={true}
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes="(max-width: 768px) 50vw, 33vw"
                 className="rounded-md object-cover"
               />
             </div>
-            <div className="text-center font-medium">{type.label}</div>
+            <div className="text-center text-xs md:text-sm font-medium">{type.label}</div>
           </div>
         ))}
       </div>
       
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between items-center mt-4">
         <div>
-          <p className="text-sm text-gray">
-            Don't see your project type? Chat with our team <a href="tel:+19256937590" className="text-primary underline">(925) 693-7590</a>
+          <p className="text-xs md:text-sm text-gray">
+            <a href="tel:+19256937590" className="text-primary underline">(925) 693-7590</a>
           </p>
         </div>
         <button
           onClick={() => onNext({ projectTypes: selectedTypes })}
-          className="btn btn-primary"
+          className="btn btn-primary text-sm"
+          disabled={selectedTypes.length === 0}
         >
           Next <span className="ml-1">→</span>
         </button>
@@ -107,25 +108,25 @@ const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-secondary mb-4">What size are you looking to build?</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-secondary mb-2">What size are you looking to build?</h1>
       
       {showSlider ? (
         <>
-          <p className="text-gray mb-6">
+          <p className="text-xs md:text-sm text-gray mb-3">
             {formData.projectTypes.includes('new-home') 
-              ? 'Custom homes typically range from 1,000 to 5,000+ sq. ft. depending on your needs.'
+              ? 'Custom homes typically range from 1,000 to 5,000+ sq. ft.'
               : 'ADUs and additions typically range from 115 to 1,200 sq. ft.'}
           </p>
           
-          <div className="bg-lavender rounded-lg p-8 mb-8">
-            <div className="text-center mb-8">
-              <div className="inline-block bg-white py-4 px-12 rounded-lg shadow-sm">
-                <div className="text-5xl font-bold text-secondary">{size}</div>
-                <div className="text-primary">sq. ft.</div>
+          <div className="bg-lavender rounded-lg p-4 mb-4">
+            <div className="text-center mb-4">
+              <div className="inline-block bg-white py-2 px-6 md:py-4 md:px-12 rounded-lg shadow-sm">
+                <div className="text-3xl md:text-5xl font-bold text-secondary">{size}</div>
+                <div className="text-xs md:text-sm text-primary">sq. ft.</div>
               </div>
             </div>
             
-            <div className="relative mb-4">
+            <div className="relative mb-2">
               <input 
                 type="range" 
                 min={min} 
@@ -135,13 +136,13 @@ const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
                 onChange={(e) => setSize(parseInt(e.target.value))}
                 className="w-full h-2 bg-gray/20 rounded-lg appearance-none cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-gray mt-2">
+              <div className="flex justify-between text-xs text-gray mt-1">
                 <span>{min} sq. ft.</span>
                 <span>{max}+ sq. ft.</span>
               </div>
-              <div className="text-center text-sm text-gray mt-4">
+              <div className="text-center text-xs text-gray mt-2">
                 <span className="flex items-center justify-center gap-1">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   Drag the slider
@@ -151,8 +152,8 @@ const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
           </div>
         </>
       ) : (
-        <div className="bg-lavender rounded-lg p-8 mb-8 text-center">
-          <p className="mb-4 text-gray-700">
+        <div className="bg-lavender rounded-lg p-4 mb-4 text-center">
+          <p className="mb-2 text-xs md:text-sm text-gray-700">
             For {formData.projectTypes.map((type: string) => {
               const labels: Record<string, string> = {
                 'kitchen': 'Kitchen Renovations',
@@ -165,16 +166,16 @@ const ProjectSizeStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
         </div>
       )}
       
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between mt-4">
         <button
           onClick={onBack}
-          className="border border-gray/30 px-6 py-2 rounded-md hover:bg-gray/10 flex items-center"
+          className="border border-gray/30 px-4 py-2 rounded-md hover:bg-gray/10 flex items-center text-sm"
         >
           <span className="mr-1">←</span> Back
         </button>
         <button
           onClick={() => onNext({ size: showSlider ? size : null })}
-          className="btn btn-primary"
+          className="btn btn-primary text-sm"
         >
           Next <span className="ml-1">→</span>
         </button>
@@ -188,52 +189,51 @@ const ProjectProcessStep = ({ onBack, onNext }: { onBack: () => void, onNext: (f
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-secondary mb-4">Where are you in the process?</h1>
-      <p className="text-gray mb-6">
-        To provide accurate estimates, general contractors require complete
-        architectural plans or designs.
+      <h1 className="text-2xl md:text-3xl font-bold text-secondary mb-2">Where are you in the process?</h1>
+      <p className="text-xs md:text-sm text-gray mb-3">
+        To provide accurate estimates, contractors require architectural plans.
       </p>
       
-      <div className="space-y-4 mb-8">
+      <div className="space-y-3 mb-4">
         <div 
-          className={`border rounded-lg p-4 flex items-center cursor-pointer ${
+          className={`border rounded-lg p-3 flex items-center cursor-pointer ${
             processStage === 'need-plans' ? 'border-primary bg-lavender/50' : 'border-gray/20'
           }`}
           onClick={() => setProcessStage('need-plans')}
         >
-          <div className="h-6 w-6 rounded-full border border-gray/30 mr-3 flex items-center justify-center">
+          <div className="h-5 w-5 rounded-full border border-gray/30 mr-2 flex items-center justify-center">
             {processStage === 'need-plans' && (
-              <div className="h-4 w-4 rounded-full bg-primary"></div>
+              <div className="h-3 w-3 rounded-full bg-primary"></div>
             )}
           </div>
-          <span className="font-medium">Getting started and need architectural plans or designs</span>
+          <span className="text-xs md:text-sm font-medium">Getting started and need architectural plans</span>
         </div>
         
         <div 
-          className={`border rounded-lg p-4 flex items-center cursor-pointer ${
+          className={`border rounded-lg p-3 flex items-center cursor-pointer ${
             processStage === 'have-plans' ? 'border-primary bg-lavender/50' : 'border-gray/20'
           }`}
           onClick={() => setProcessStage('have-plans')}
         >
-          <div className="h-6 w-6 rounded-full border border-gray/30 mr-3 flex items-center justify-center">
+          <div className="h-5 w-5 rounded-full border border-gray/30 mr-2 flex items-center justify-center">
             {processStage === 'have-plans' && (
-              <div className="h-4 w-4 rounded-full bg-primary"></div>
+              <div className="h-3 w-3 rounded-full bg-primary"></div>
             )}
           </div>
-          <span className="font-medium">Already have architectural plans and need a general contractor</span>
+          <span className="text-xs md:text-sm font-medium">Already have plans and need a contractor</span>
         </div>
       </div>
       
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-between mt-4">
         <button
           onClick={onBack}
-          className="border border-gray/30 px-6 py-2 rounded-md hover:bg-gray/10 flex items-center"
+          className="border border-gray/30 px-4 py-2 rounded-md hover:bg-gray/10 flex items-center text-sm"
         >
           <span className="mr-1">←</span> Back
         </button>
         <button
           onClick={() => onNext({ processStage })}
-          className="btn btn-primary flex items-center"
+          className="btn btn-primary text-sm flex items-center"
           disabled={!processStage}
         >
           Next <span className="ml-1">→</span>
@@ -246,92 +246,92 @@ const ProjectProcessStep = ({ onBack, onNext }: { onBack: () => void, onNext: (f
 const SuccessStep = ({ onBack, onNext }: { onBack: () => void, onNext: () => void }) => {
   return (
     <div className="flex flex-col md:flex-row">
-      <div className="w-full md:w-1/2 md:pr-8 mb-8 md:mb-0">
+      <div className="w-full md:w-1/2 md:pr-8 mb-4 md:mb-0">
         {/* Success checkmark card */}
-        <div className="mb-6 bg-green-50 rounded-lg p-6 shadow-sm border border-green-100">
+        <div className="mb-3 bg-green-50 rounded-lg p-3 shadow-sm border border-green-100">
           <div className="flex justify-center">
-            <div className="bg-green-100 rounded-full p-4 mb-4">
-              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className="bg-green-100 rounded-full p-2 mb-2">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
           </div>
-          <p className="text-center text-green-800 font-medium">Great! Your project is a perfect match for our services.</p>
+          <p className="text-center text-xs md:text-sm text-green-800 font-medium">Great! Your project is a perfect match.</p>
         </div>
         
-        <h1 className="text-3xl font-bold text-secondary mb-2">You're in the right place! Renovation Bridge finds the <span className="text-primary">best pros near you.</span></h1>
+        <h1 className="text-xl md:text-3xl font-bold text-secondary mb-2">You're in the right place!</h1>
         
-        <p className="text-gray mb-6">
-          We've vetted thousands of pros and have onboarded only the <strong>top 5%</strong>.
+        <p className="text-xs md:text-sm text-gray mb-3">
+          We've vetted thousands of pros and onboarded only the <strong>top 5%</strong>.
         </p>
         
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-4">
           <button
             onClick={onBack}
-            className="border border-gray/30 px-6 py-2 rounded-md hover:bg-gray/10 flex items-center"
+            className="border border-gray/30 px-4 py-2 rounded-md hover:bg-gray/10 flex items-center text-sm"
           >
             <span className="mr-1">←</span> Back
           </button>
           <button
             onClick={onNext}
-            className="btn btn-primary flex items-center"
+            className="btn btn-primary text-sm flex items-center"
           >
             Next <span className="ml-1">→</span>
           </button>
         </div>
       </div>
       
-      <div className="w-full md:w-1/2 bg-lavender/50 rounded-lg p-6">
-        <div className="text-center mb-8">
-          <div className="bg-white p-4 rounded-lg shadow-sm inline-block">
-            <div className="text-4xl font-bold text-primary mb-2">500+</div>
-            <div className="text-secondary font-medium">Vetted Professionals</div>
+      <div className="w-full md:w-1/2 bg-lavender/50 rounded-lg p-3 md:p-6">
+        <div className="text-center mb-4">
+          <div className="bg-white p-2 md:p-4 rounded-lg shadow-sm inline-block">
+            <div className="text-2xl md:text-4xl font-bold text-primary mb-1">500+</div>
+            <div className="text-xs md:text-sm text-secondary font-medium">Vetted Professionals</div>
           </div>
         </div>
         
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className="grid grid-cols-2 gap-2 text-xs md:text-sm">
+          <div className="flex items-center gap-1">
+            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span className="text-lg text-gray-700">Interview</span>
+            <span className="text-gray-700">Interview</span>
           </div>
           
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="flex items-center gap-1">
+            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span className="text-lg text-gray-700">Site Walk</span>
+            <span className="text-gray-700">Site Walk</span>
           </div>
           
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="flex items-center gap-1">
+            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span className="text-lg text-gray-700">Reference Checks</span>
+            <span className="text-gray-700">Reference Checks</span>
           </div>
           
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="flex items-center gap-1">
+            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span className="text-lg text-gray-700">Bid Review</span>
+            <span className="text-gray-700">Bid Review</span>
           </div>
         </div>
         
-        <div className="flex justify-center mt-8">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white p-3 rounded-lg shadow-sm text-center">
-              <div className="text-2xl font-bold text-primary">96%</div>
-              <div className="text-xs text-gray-700">Satisfaction Rate</div>
+        <div className="flex justify-center mt-4">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white p-2 rounded-lg shadow-sm text-center">
+              <div className="text-xl font-bold text-primary">96%</div>
+              <div className="text-[10px] md:text-xs text-gray-700">Satisfaction</div>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm text-center">
-              <div className="text-2xl font-bold text-primary">5%</div>
-              <div className="text-xs text-gray-700">Top Talent</div>
+            <div className="bg-white p-2 rounded-lg shadow-sm text-center">
+              <div className="text-xl font-bold text-primary">5%</div>
+              <div className="text-[10px] md:text-xs text-gray-700">Top Talent</div>
             </div>
-            <div className="bg-white p-3 rounded-lg shadow-sm text-center">
-              <div className="text-2xl font-bold text-primary">10+</div>
-              <div className="text-xs text-gray-700">Years Experience</div>
+            <div className="bg-white p-2 rounded-lg shadow-sm text-center">
+              <div className="text-xl font-bold text-primary">10+</div>
+              <div className="text-[10px] md:text-xs text-gray-700">Years Exp</div>
             </div>
           </div>
         </div>
@@ -430,8 +430,9 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
           propertyAddress: contactData.address,
           propertyCity: contactData.city,
           propertyState: contactData.state,
+          propertyZip: "00000", // skip zip code validation
           projectType: formData.projectTypes.join(', '),
-          projectDescription: projectSummary, // Use the project summary instead of template variable
+          projectDescription: projectSummary,
           project_size: formData.size ? `${formData.size} sq ft` : 'N/A',
           project_stage: processStageLabel,
           project_types_full: projectTypeLabels,
@@ -492,14 +493,14 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-secondary mb-4">Almost there! Let's get your contact details</h1>
-      <p className="text-gray mb-6">
-        Please provide your contact information so we can connect you with our vetted professionals.
+      <h1 className="text-xl md:text-3xl font-bold text-secondary mb-2 md:mb-4">Almost there!</h1>
+      <p className="text-xs md:text-sm text-gray mb-3 md:mb-6">
+        Please provide your contact information to connect with our vetted professionals.
       </p>
 
       {isSuccess && (
-        <div className="mb-6 bg-green-50 text-green-800 p-4 rounded-md border-l-4 border-green-500 flex items-center">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className="mb-3 md:mb-6 bg-green-50 text-green-800 p-3 rounded-md border-l-4 border-green-500 flex items-center text-xs md:text-sm">
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
           </svg>
           Thank you! We'll be in touch with you soon.
@@ -507,38 +508,38 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
       )}
       
       {error && (
-        <div className="mb-6 bg-red-50 text-red-800 p-4 rounded-md border-l-4 border-red-500 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <div className="mb-3 md:mb-6 bg-red-50 text-red-800 p-3 rounded-md border-l-4 border-red-500 flex items-center text-xs md:text-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
           {error}
         </div>
       )}
 
-      <div className="mb-6 p-4 bg-lavender/20 rounded-lg">
-        <h3 className="font-semibold text-secondary mb-2">Your Project Summary</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="mb-3 md:mb-6 p-3 bg-lavender/20 rounded-lg">
+        <h3 className="font-semibold text-secondary mb-2 text-sm">Project Summary</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
           <div>
-            <p className="text-sm text-gray">Project Type</p>
-            <p className="font-medium">
+            <p className="text-xs text-gray">Project Type</p>
+            <p className="font-medium text-xs md:text-sm">
               {formData.projectTypes.map((type: string) => projectTypeLabels[type]).join(', ')}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray">Project Size</p>
-            <p className="font-medium">{formData.size} sq. ft.</p>
+            <p className="text-xs text-gray">Project Size</p>
+            <p className="font-medium text-xs md:text-sm">{formData.size} sq. ft.</p>
           </div>
           <div>
-            <p className="text-sm text-gray">Process Stage</p>
-            <p className="font-medium">{processStageLabels[formData.processStage]}</p>
+            <p className="text-xs text-gray">Process Stage</p>
+            <p className="font-medium text-xs md:text-sm">{processStageLabels[formData.processStage]}</p>
           </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} noValidate>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1">
               Full Name
             </label>
             <input
@@ -547,14 +548,14 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="name"
               value={contactData.name}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('name') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('name') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="Your full name"
               required
             />
           </div>
           
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1">
               Email Address
             </label>
             <input
@@ -563,14 +564,14 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="email"
               value={contactData.email}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('email') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('email') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="you@example.com"
               required
             />
           </div>
           
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="phone" className="block text-xs font-medium text-gray-700 mb-1">
               Phone Number
             </label>
             <input
@@ -579,17 +580,17 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="phone"
               value={contactData.phone}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('phone') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('phone') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="(123) 456-7890"
               required
             />
             {shouldShowError('phone') && (
-              <p className="text-red-500 text-sm mt-1">Please enter a valid phone number</p>
+              <p className="text-red-500 text-xs mt-1">Please enter a valid phone number</p>
             )}
           </div>
           
           <div className="md:col-span-2">
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="address" className="block text-xs font-medium text-gray-700 mb-1">
               Street Address
             </label>
             <input
@@ -598,14 +599,14 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="address"
               value={contactData.address}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('address') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('address') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="Enter your street address"
               required
             />
           </div>
           
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="city" className="block text-xs font-medium text-gray-700 mb-1">
               City
             </label>
             <input
@@ -614,14 +615,14 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="city"
               value={contactData.city}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('city') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('city') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="San Francisco"
               required
             />
           </div>
           
           <div>
-            <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="state" className="block text-xs font-medium text-gray-700 mb-1">
               State
             </label>
             <input
@@ -630,14 +631,14 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="state"
               value={contactData.state}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('state') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('state') ? 'border-red-500' : 'border-gray/30'} rounded-md`}
               placeholder="CA"
               required
             />
           </div>
 
           <div className="md:col-span-2">
-            <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="comments" className="block text-xs font-medium text-gray-700 mb-1">
               Additional Comments (Optional)
             </label>
             <textarea
@@ -645,23 +646,23 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
               name="comments"
               value={contactData.comments}
               onChange={handleChange}
-              className={`w-full p-3 border ${shouldShowError('comments') ? 'border-red-500' : 'border-gray/30'} rounded-md h-24`}
-              placeholder="Tell us more about your project requirements, timeline, or any specific details not covered in the previous steps..."
+              className={`w-full p-2 md:p-3 text-sm border ${shouldShowError('comments') ? 'border-red-500' : 'border-gray/30'} rounded-md h-16 md:h-24`}
+              placeholder="Tell us more about your project requirements..."
             />
           </div>
         </div>
         
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-4 md:mt-8">
           <button
             type="button"
             onClick={onBack}
-            className="border border-gray/30 px-6 py-2 rounded-md hover:bg-gray/10 flex items-center"
+            className="border border-gray/30 px-4 py-2 rounded-md hover:bg-gray/10 flex items-center text-sm"
           >
             <span className="mr-1">←</span> Back
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary text-sm"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -722,23 +723,29 @@ export default function GetStartedForm() {
   }
 
   return (
-    <div className="bg-white shadow-sm rounded-lg p-6">
+    <div className="bg-white shadow-sm rounded-lg p-4 md:p-6 max-h-[calc(100vh-4rem)] overflow-y-auto">
       {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="w-full bg-gray/20 h-1 mb-2 rounded-full overflow-hidden">
+      <div className="mb-4 md:mb-8">
+        <div className="w-full bg-gray/20 h-1 mb-1 md:mb-2 rounded-full overflow-hidden">
           <div 
             className="bg-primary h-full transition-all duration-300 ease-in-out" 
             style={{ width: `${(step / 5) * 100}%` }}
           ></div>
         </div>
+        <div className="flex justify-between text-[10px] md:text-xs text-gray">
+          <span>Start</span>
+          <span>Complete</span>
+        </div>
       </div>
 
       {/* Form steps */}
-      {step === 1 && <ProjectTypeStep onNext={handleNext} />}
-      {step === 2 && <ProjectSizeStep onBack={handleBack} onNext={handleNext} formData={formData} />}
-      {step === 3 && <ProjectProcessStep onBack={handleBack} onNext={handleNext} />}
-      {step === 4 && <SuccessStep onBack={handleBack} onNext={() => setStep(step + 1)} />}
-      {step === 5 && <ContactFormStep onBack={handleBack} onFinish={handleFinish} formData={formData} />}
+      <div className="min-h-[50vh] md:min-h-[60vh] flex flex-col">
+        {step === 1 && <ProjectTypeStep onNext={handleNext} />}
+        {step === 2 && <ProjectSizeStep onBack={handleBack} onNext={handleNext} formData={formData} />}
+        {step === 3 && <ProjectProcessStep onBack={handleBack} onNext={handleNext} />}
+        {step === 4 && <SuccessStep onBack={handleBack} onNext={() => setStep(step + 1)} />}
+        {step === 5 && <ContactFormStep onBack={handleBack} onFinish={handleFinish} formData={formData} />}
+      </div>
     </div>
   )
 } 

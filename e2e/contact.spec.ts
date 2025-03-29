@@ -19,10 +19,8 @@ test.describe('Contact form', () => {
   });
   
   test('should submit the form with valid data', async ({ page }) => {
-    // Set a longer timeout for this specific test case
     test.slow();
     
-    // Mock the API response with a more reliable approach
     await page.route('**/api/submit-contact', async route => {
       // Increase simulated delay to better handle mobile device timing
       await new Promise(resolve => setTimeout(resolve, 500));

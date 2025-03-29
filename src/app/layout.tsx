@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer'
 import JsonLd from '@/components/seo/JsonLd'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/structured-data'
+import { sarabun } from '@/lib/fonts'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -77,7 +78,7 @@ export default function RootLayout({
       <head>
         <JsonLd data={[generateOrganizationSchema(), generateLocalBusinessSchema()]} />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${sarabun.variable} font-sans antialiased`}>
         <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-grow">
