@@ -68,7 +68,7 @@ const Header = () => {
             <Link href="/for-contractors" className="px-3 py-2 lg:px-4 lg:py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 whitespace-nowrap text-sm lg:text-base">
               For Contractors
             </Link>
-            <Link href="/get-started" className="contractor-btn transform hover:scale-105 transition-transform duration-200 whitespace-nowrap text-sm lg:text-base px-3 py-2 lg:px-5 lg:py-2">
+            <Link href="/get-started" className="cta-btn transform hover:scale-105 transition-transform duration-200 whitespace-nowrap text-sm lg:text-base px-3 py-2 lg:px-5 lg:py-2">
               GET STARTED
             </Link>
           </div>
@@ -155,7 +155,7 @@ const Header = () => {
               </Link>
               <Link 
                 href="/get-started" 
-                className="contractor-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2"
+                className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 GET STARTED
