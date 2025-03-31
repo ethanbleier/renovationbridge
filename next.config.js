@@ -28,6 +28,23 @@ const nextConfig = {
     
     return config
   },
+  
+  // Redirect www to non-www domain
+  async redirects() {
+    return [
+      {
+        source: '/',
+        has: [
+          {
+            type: 'host',
+            value: 'www.renovationbridge.com',
+          },
+        ],
+        destination: 'https://renovationbridge.com',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig 
