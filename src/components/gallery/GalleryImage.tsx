@@ -75,7 +75,6 @@ export default function GalleryImage({
         onLoad={handleImageLoad}
         onError={handleImageError}
         loading={priority ? 'eager' : 'lazy'}
-        unoptimized={true}
         className={cn(
           'object-cover transition-all duration-300',
           isLoading ? 'scale-110 blur-2xl opacity-0' : 'scale-100 blur-0 opacity-100',

@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { galleryProjects, getProjectBySlug, getProjectImages } from '@/lib/gallery-data';
+import { getProjectBySlug, getProjectImages } from '@/lib/gallery-data';
+import { galleryDataService } from '@/features/gallery/services/galleryDataService';
 import ProjectGallery from '@/components/gallery/ProjectGallery';
 import { CalendarIcon, HomeIcon, TagIcon } from '@heroicons/react/24/outline';
 
@@ -44,7 +45,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 // Generate all valid paths for static generation
 export async function generateStaticParams() {
-  return galleryProjects.map(project => ({
+  // Generate paths only for visible projects
+  return galleryDataService.getVisibleProjects().map(project => ({
     slug: project.slug,
   }));
 }
@@ -52,13 +54,16 @@ export async function generateStaticParams() {
 export default function ProjectPage({ params }: { params: { slug: string } }) {
   const project = getProjectBySlug(params.slug);
   
-  // Return 404 if project not found
-  if (!project) {
+  // Return 404 if project not found or is under maintenance
+  if (!project || project.underMaintenance) {
     notFound();
   }
   
   // Get project images
   const projectImages = getProjectImages(project);
+
+  // Get visible projects for related projects section
+  const visibleProjects = galleryDataService.getVisibleProjects();
 
   return (
     <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -137,11 +142,11 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
             heroImageIndex={0} 
           />
           
-          {/* Related Projects Section */}
+          {/* Related Projects Section - Only show visible projects */}
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Explore More Projects</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {galleryProjects
+              {visibleProjects
                 .filter(p => p.slug !== project.slug)
                 .slice(0, 2)
                 .map(relatedProject => (
@@ -151,7 +156,6 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
                     className="group"
                   >
                     <div className="aspect-video relative rounded-lg overflow-hidden bg-gray-100">
-                      {/* Add preloded image with priority flag */}
                       <Image 
                         src={`/images/gallery/${relatedProject.folder}/${relatedProject.id}-1.jpg`}
                         alt={`${relatedProject.name} Renovation`}
