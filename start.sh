@@ -86,7 +86,7 @@ fi
 # Print Node.js and npm version
 echo "🔍 Using Node.js $(node -v) and npm $(npm -v)"
 echo "📊 Repository Statistics:"
-echo "   Total lines of code: $(git ls-files | xargs wc -l | tail -n 1)" 
+echo "   Total lines of code: $(git ls-files | grep -v -e '^$' | xargs ls -1 2>/dev/null | xargs wc -l 2>/dev/null | tail -n 1 || echo 'N/A')" 
 echo "📦 Installing dependencies..."
 npm install
 

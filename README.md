@@ -41,6 +41,42 @@ Our carefully crafted color palette ensures a professional and trustworthy appea
 - **Deployment:** Vercel
 - **GraphQL Client:** GraphQL Request
 
+## 📸 Gallery Feature (Updated April 2025)
+
+The project gallery showcases completed renovation projects with the following features:
+
+- **Organized Project Structure**: Each project has its own folder (e.g., `Project-CastroValley`) containing sequential images
+- **Filename Format**: Images follow the naming pattern `[LocationName]-[Number].jpg` (e.g., `CastroValley-1.jpg`)
+- **Responsive Gallery Component**: The `ImageGallery` component displays project images with customizable settings
+- **Lightbox Integration**: Full-screen image viewing capabilities with navigation controls
+
+### Recent Gallery Updates
+
+- Fixed image path construction to correctly reference image filenames without spaces
+- Created a comprehensive feature directory structure in `src/features/gallery/`
+- Updated Redwood City project to include 6 images previously missing from the data
+- Improved start.sh script to gracefully handle missing files
+
+### Gallery Component Usage
+
+```tsx
+import { ImageGallery } from '@/features/gallery/components/ImageGallery';
+import { galleryDataService } from '@/features/gallery/services/galleryDataService';
+
+// Get a project by slug
+const project = galleryDataService.getProjectBySlug('castro-valley');
+
+// Render the gallery
+<ImageGallery 
+  project={project}
+  settings={{
+    thumbnailSize: 'medium',
+    showCaptions: true,
+    lightboxEnabled: true
+  }}
+/>
+```
+
 ## 📁 Project Structure
 
 ```
@@ -255,7 +291,175 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
-### Google Tag Integration for Conversion Tracking (August 2025)
+### Interactive Gallery Showcase Implementation (October 2025)
+
+Implemented a comprehensive gallery showcase with dynamic project pages and interactive features:
+
+- **What Changed**: Created a new gallery system with dynamic routing, lightbox functionality, and optimized image loading
+- **Files Created/Modified**:
+  - `src/app/gallery/page.tsx` - Main gallery page with project grid
+  - `src/app/gallery/[slug]/page.tsx` - Dynamic project pages for each location
+  - `src/lib/gallery-data.ts` - Centralized gallery data management
+  - `src/components/gallery/GalleryImage.tsx` - Responsive image component with loading states
+  - `src/components/gallery/GalleryLightbox.tsx` - Interactive lightbox for image viewing
+  - `src/components/gallery/ProjectGallery.tsx` - Client component for gallery with lightbox integration
+  - `src/lib/utils.ts` - Added utility functions for class name handling
+- **Implementation Details**:
+  - Created dynamic routing for 15 project locations across the Bay Area
+  - Implemented responsive image grid with optimized loading
+  - Added interactive lightbox with keyboard navigation and touch support
+  - Optimized image loading with placeholder fallbacks
+  - Created SEO-friendly metadata for each project
+  - Implemented proper error handling for missing images
+  - Used static generation with dynamic paths for optimal performance
+  - Maintained consistent design language throughout the gallery
+  - Added graceful loading states with skeleton placeholders
+
+**Benefits**: The new gallery showcase provides an immersive way for potential clients to browse completed renovation projects with high-quality images. The implementation is performant, SEO-friendly, and offers an excellent user experience with features like lightbox viewing and keyboard navigation. The centralized data management makes it easy to add new projects in the future.
+
+### Gallery Pages Restructured for Static Routing (September 2025)
+
+Completely redesigned the gallery project pages to use static routing instead of dynamic routes:
+
+- **What Changed**: Replaced dynamic slug-based routing with hardcoded static pages for each project
+- **Files Modified**:
+  - `src/features/gallery/services/galleryImageService.ts` - Simplified for direct project name access
+  - Created individual project pages:
+    - `src/app/gallery/alamo/page.tsx`
+    - `src/app/gallery/berkeley/page.tsx`
+    - `src/app/gallery/castrovalley/page.tsx`
+    - `src/app/gallery/danville/page.tsx`
+    - `src/app/gallery/fremont/page.tsx`
+    - `src/app/gallery/lafayette/page.tsx`
+    - `src/app/gallery/moraga/page.tsx`
+    - `src/app/gallery/oakland/page.tsx`
+    - `src/app/gallery/orinda/page.tsx`
+    - `src/app/gallery/redwoodcity/page.tsx`
+    - `src/app/gallery/saratoga/page.tsx`
+    - `src/app/gallery/sf/page.tsx`
+    - `src/app/gallery/sj/page.tsx`
+    - `src/app/gallery/tice/page.tsx`
+    - `src/app/gallery/wc/page.tsx`
+  - `src/app/gallery/page.tsx` - Updated to link to static project pages
+- **Implementation Details**:
+  - Removed complex case-insensitive slug matching logic
+  - Eliminated dynamic route handling
+  - Each page now directly uses its hardcoded project name
+  - Simplified image service to work with direct project names
+  - Enhanced reliability by eliminating URL parameter parsing
+  - Removed all slug transformation code
+  - Created unique React components for each project page
+  - Each page handles its own metadata generation
+  - Created consistent error handling across all project pages
+
+**Benefits**: This change significantly improves reliability by eliminating dynamic route handling and case-sensitive slug matching. Each project now has its own dedicated page component, making debugging easier and ensuring consistent rendering. The hardcoded approach eliminates URL parsing errors and provides more predictable behavior.
+
+### Gallery Image Service Robustness Improvements (September 2025)
+
+Enhanced the gallery image service to provide more reliable image loading:
+
+- **What Changed**: Improved the gallery image service with robust error handling and better case-insensitive matching
+- **Files Modified**:
+  - `src/features/gallery/services/galleryImageService.ts` - Completely refactored with better configuration and error handling
+  - `src/features/gallery/hooks/useProjectDetails.ts` - Updated to use improved service API
+  - `src/app/gallery/[slug]/page.tsx` - Simplified with consistent data retrieval approach
+- **Implementation Details**:
+  - Added comprehensive error logging for easier debugging
+  - Implemented robust path validation to avoid 404 errors
+  - Improved project name matching with case-insensitive lookup
+  - Added boundaries and checks for image indices to prevent out-of-range errors
+  - Consolidated special case handling within project configurations
+  - Created fallback mechanism with proper placeholder image
+  - Improved JSDoc comments for better code documentation
+  - Enhanced readability with clear separation of concerns
+  - Maintained backward compatibility with existing image naming conventions
+
+**Benefits**: All gallery images now reliably render on both client and server-rendered components, providing a consistent experience across the site. The improved error handling ensures users never see broken images, and the robust path generation supports inconsistent file naming conventions without requiring file reorganization.
+
+### Gallery Image Count Fix (September 2025)
+
+Fixed an issue with incorrect image counts in gallery project pages:
+
+- **What Changed**: Updated the image count configuration to match the actual number of images available for each project
+- **Files Modified**:
+  - `src/features/gallery/services/galleryImageService.ts` - Corrected image counts for Alamo, CastroValley, RedwoodCity and other projects
+  - Fixed off-by-one error in image loop iteration logic
+- **Implementation Details**:
+  - Verified actual image counts in the filesystem
+  - Updated image configuration to match real directory contents
+  - Fixed loop calculation to prevent attempting to access non-existent images
+  - Added additional error handling for image path generation
+  - Made image loading more resilient to missing images
+
+**Benefits**: All projects now display the correct number of images in their galleries, with no 404 errors or missing images. The system is now more resilient to filesystem changes or inconsistencies.
+
+### Gallery Image Service Export Fix (April 2025)
+
+Fixed an issue with gallery image not rendering on individual project pages:
+
+- **What Changed**: Updated the export mechanism for the gallery image service to ensure compatibility with server components
+- **Files Modified**:
+  - `src/features/gallery/services/galleryImageService.ts` - Changed export format and added error handling
+  - `src/features/gallery/index.ts` - Updated to provide direct exports for server component compatibility 
+  - `src/app/gallery/[slug]/page.tsx` - Updated import statements to use the feature index exports
+- **Implementation Details**:
+  - Removed module.exports in favor of consistent named exports
+  - Added comprehensive error handling in all gallery image functions
+  - Ensured export consistency between client and server components
+  - Updated import paths to follow best practices
+  - Created a fallback placeholder image
+  - Added error logging for easier debugging
+
+**Benefits**: All gallery project pages now correctly display images, with proper error handling and fallback mechanisms in place. The improved export structure ensures compatibility across both client and server components in the Next.js application.
+
+### Complete Gallery Image Service Rewrite (April 2025)
+
+Completely redesigned the gallery image system with a more robust, configuration-driven approach:
+
+- **What Changed**: Replaced the ad-hoc gallery image handling with a comprehensive configuration-driven system
+- **Files Modified**:
+  - `src/features/gallery/services/galleryImageService.ts` - Complete rewrite with configuration-based approach
+  - `src/features/gallery/services/galleryDataService.ts` - Updated to use the new image service
+  - `src/features/gallery/hooks/useGalleryProjects.ts` - Updated to use the new image service
+  - `src/features/gallery/hooks/useProjectDetails.ts` - Updated with error handling and new service usage
+  - `src/app/gallery/[slug]/page.tsx` - Simplified with new image service integration
+  - Added placeholder image to provide graceful fallback
+- **Implementation Details**:
+  - Created a centralized image configuration system that explicitly maps projects to file patterns
+  - Implemented special case handling for inconsistent naming patterns
+  - Added strong typing with TypeScript interfaces for configuration
+  - Implemented a robust path generation system with clear separation of concerns
+  - Created a proper fallback system with placeholder image
+  - Added comprehensive error handling throughout
+  - Improved code organization with clear sections (Configuration, Helpers, Public API)
+  - Added JSDoc comments to improve code maintainability 
+  - Zero impact on page load performance
+  - No database changes required
+
+**Benefits**: All gallery images now render correctly across the site in both the gallery list view and the detailed project pages, providing a complete visual experience for users browsing project showcases. The new configuration-driven approach makes it easy to add new projects with different naming conventions and provides a more maintainable codebase for future development.
+
+### Gallery Image Path Handling Improvements (April 2025)
+
+Fixed inconsistent gallery image rendering with an improved image path handling system:
+
+- **What Changed**: Enhanced the gallery image service to handle inconsistent file naming patterns
+- **Files Modified**:
+  - `src/features/gallery/services/galleryImageService.ts` - Improved the getImagePath function to handle various naming patterns
+  - Added a proper placeholder.jpg for fallback image display
+- **Implementation Details**:
+  - Added special case handling for inconsistent file naming conventions
+  - Fixed case sensitivity issues with image paths (e.g., oakland-1.jpg vs Danville-1.jpg)
+  - Improved handling of project-specific naming formats (CastroValley with special format for image 9)
+  - Implemented a more robust path generation system to accommodate different naming patterns
+  - Created a comprehensive mapping of file naming patterns by project type
+  - Added detailed debug logging to identify path construction issues
+  - Created a proper placeholder image to prevent 404 errors
+  - Zero impact on page load performance
+  - No database changes required
+
+**Benefits**: All gallery images now render across the site in both the gallery list view and the detailed project pages, providing a complete visual experience for users browsing project showcases. The implementation is backward compatible and handles the existing inconsistent naming patterns without requiring renaming of files.
+
+### Google Tag Integration for Conversion Tracking (April 2025)
 
 Added Google Tag (gtag.js) implementation for Askshachar to enable conversion tracking on Google Ads and Analytics:
 
@@ -278,7 +482,7 @@ Added Google Tag (gtag.js) implementation for Askshachar to enable conversion tr
 
 **Benefits**: This integration enables accurate tracking of lead generation and form submissions in Google Ads and Analytics, allowing for better ROI measurement and campaign optimization.
 
-### In-Memory Data Storage Implementation (April 2024)
+### In-Memory Data Storage Implementation (April 2025)
 
 Replaced MongoDB with an in-memory data storage system for simplified deployment:
 

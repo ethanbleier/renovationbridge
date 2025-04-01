@@ -1,43 +1,9 @@
-export interface GalleryImage {
-  src: string;
-  alt: string;
-  width?: number;
-  height?: number;
-}
+// Re-export types from lib/gallery-data
+export * from '../../../lib/gallery-data';
 
-export interface ProjectDetails {
-  title: string;
-  location: string;
-  description: string;
-  featuredImage: string;
-  category: string;
-  completionDate: string;
-  details: {
-    services: string[];
-    scope: string;
-    challenges?: string;
-    solutions?: string;
-    duration: string;
-  };
-  images: GalleryImage[];
+// Additional gallery-specific types can be added here
+export interface GallerySettings {
+  thumbnailSize: 'small' | 'medium' | 'large';
+  showCaptions: boolean;
+  lightboxEnabled: boolean;
 }
-
-export interface ProjectMap {
-  [key: string]: {
-    title: string;
-    location: string;
-    category: string;
-    description: string;
-  }
-}
-
-export type Project = {
-  id: string;
-  title: string;
-  category: string;
-  location: string;
-  description: string;
-  imageSrc: string;
-  slug: string;
-  available: boolean;
-}; 

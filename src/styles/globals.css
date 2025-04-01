@@ -7,6 +7,11 @@
     @apply bg-cream text-black;
   }
   
+  /* Hide header when lightbox is open */
+  body.lightbox-open header {
+    display: none;
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
     font-family: var(--font-sarabun);

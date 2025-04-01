@@ -1,54 +1,26 @@
-'use client';
+import { useState, useEffect } from 'react';
+import { GalleryProject } from '../../../lib/gallery-data';
+import { galleryDataService } from '../services/galleryDataService';
 
-import { useState, useMemo } from 'react';
-import { Project } from '../types';
-import { projectInfo } from '../services/galleryDataService';
-import * as GalleryService from '../services/galleryImageService';
-
+/**
+ * Hook for accessing gallery projects
+ * @returns Object containing gallery projects and loading state
+ */
 export function useGalleryProjects() {
-  // Generate all projects from the project info
-  const allProjects = useMemo<Project[]>(() => {
-    // Use Object.keys instead of getAllProjectNames
-    const projectNames = Object.keys(projectInfo);
-    
-    return projectNames
-      .map(name => {
-        const info = projectInfo[name];
-        if (!info) return null;
-        
-        return {
-          id: name.toLowerCase(),
-          title: info.title,
-          category: info.category,
-          location: info.location,
-          description: info.description,
-          imageSrc: GalleryService.getProjectFeaturedImage(name),
-          slug: name.toLowerCase(),
-          available: true
-        };
-      })
-      .filter(Boolean) as Project[];
+  const [projects, setProjects] = useState<GalleryProject[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    try {
+      const data = galleryDataService.getAllProjects();
+      setProjects(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      setLoading(false);
+    }
   }, []);
 
-  // Filter categories for the filter bar
-  const categories = useMemo<string[]>(() => {
-    return Array.from(new Set(['All', ...allProjects.map(project => project.category)])).sort();
-  }, [allProjects]);
-
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  
-  // Filter projects based on selected category
-  const filteredProjects = useMemo(() => {
-    return selectedCategory === 'All'
-      ? allProjects
-      : allProjects.filter(project => project.category === selectedCategory);
-  }, [allProjects, selectedCategory]);
-
-  return {
-    allProjects,
-    filteredProjects,
-    categories,
-    selectedCategory,
-    setSelectedCategory
-  };
-} 
+  return { projects, loading, error };
+}
