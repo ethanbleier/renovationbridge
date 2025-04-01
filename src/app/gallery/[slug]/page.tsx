@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       images: [
         {
           url: project.imageCount > 0 
-            ? `/images/gallery/${project.folder}/${project.name}-1.jpg` 
+            ? `/images/gallery/${project.folder}/${project.id}-1.jpg` 
             : '/images/gallery/placeholder.jpg',
           width: 1200,
           height: 630,
