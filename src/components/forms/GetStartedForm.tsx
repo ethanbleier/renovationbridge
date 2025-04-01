@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import ConversionTracker from '@/components/analytics/ConversionTracker'
 
 // Step components
 const ProjectTypeStep = ({ onNext }: { onNext: (formData: any) => void }) => {
@@ -354,6 +355,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [trackConversion, setTrackConversion] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -459,6 +461,7 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
         }
         
         setIsSuccess(true)
+        setTrackConversion(true)
         onFinish()
       } catch (err) {
         console.error('Error submitting form:', err);
@@ -493,6 +496,8 @@ const ContactFormStep = ({ onBack, onFinish, formData }: { onBack: () => void, o
 
   return (
     <div>
+      {trackConversion && <ConversionTracker conversionType="get_started_form" value={1.0} />}
+      
       <h1 className="text-xl md:text-3xl font-bold text-secondary mb-2 md:mb-4">Almost there!</h1>
       <p className="text-xs md:text-sm text-gray mb-3 md:mb-6">
         Please provide your contact information to connect with our vetted professionals.

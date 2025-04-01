@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import ConversionTracker from '@/components/analytics/ConversionTracker'
 
 type FormValues = {
   name: string
@@ -27,6 +28,7 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [trackConversion, setTrackConversion] = useState(false)
   
   const { 
     register, 
@@ -94,6 +96,7 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
       if (onSubmit) {
         onSubmit(data);
         setIsSuccess(true);
+        setTrackConversion(true);
         reset();
         localStorage.removeItem('footerContactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -126,6 +129,7 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
       }
       
       setIsSuccess(true)
+      setTrackConversion(true)
       reset()
       // Clear saved form data after successful submission
       localStorage.removeItem('footerContactFormData')
@@ -152,6 +156,8 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
   
   return (
     <div className="w-full rounded-lg bg-white p-4 shadow-md transition-all hover:shadow-lg">
+      {trackConversion && <ConversionTracker conversionType="footer_form" value={1.0} />}
+      
       <h3 className="text-lg font-bold mb-3 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-0.5 after:bg-primary after:left-0 after:-bottom-1">Get Started</h3>
       
       {isSuccess ? (

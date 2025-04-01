@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+import ConversionTracker from '@/components/analytics/ConversionTracker'
 
 export const metadata: Metadata = {
   title: 'Thank You | Renovation Bridge',
@@ -9,6 +10,9 @@ export const metadata: Metadata = {
 export default function ThankYouPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-16">
+      {/* Track conversion when thank-you page loads */}
+      <ConversionTracker conversionType="form_submission" value={1.0} />
+      
       <div className="bg-white shadow-md rounded-lg p-8 text-center">
         <div className="mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
