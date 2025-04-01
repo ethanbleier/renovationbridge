@@ -291,6 +291,22 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
+### Gallery Image Optimization Fix (April 2025)
+
+Fixed image rendering issues that were causing 400 errors for some gallery projects:
+
+- **What Changed**: Removed the `unoptimized` flag in the Image component that was causing Next.js image optimization failures
+- **Files Modified**:
+  - `src/features/gallery/components/ImageGallery.tsx` - Removed the `unoptimized` flag that was incorrectly bypassing Next.js image optimization in production
+- **Implementation Details**:
+  - Identified that the `unoptimized={process.env.NODE_ENV === 'production'}` flag was causing 400 errors for some images
+  - Removed the flag to allow Next.js to properly optimize all images
+  - Fixed broken image URLs for Alamo, Oakland, and Tice projects
+  - Maintained consistent image rendering across all projects
+  - No changes required to the file structure or naming conventions
+
+**Benefits**: All gallery images now render correctly across the site with proper Next.js image optimization, providing a consistent visual experience for users browsing project showcases with optimal performance.
+
 ### Interactive Gallery Showcase Implementation (October 2025)
 
 Implemented a comprehensive gallery showcase with dynamic project pages and interactive features:
