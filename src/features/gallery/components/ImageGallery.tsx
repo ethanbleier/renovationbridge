@@ -22,6 +22,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
 }) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   
   const images = galleryDataService.getProjectImages(project);
   
@@ -36,6 +37,11 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
     setLightboxOpen(false);
   };
   
+  const handleImageError = (index: number) => {
+    setImageErrors(prev => ({ ...prev, [index]: true }));
+    console.error(`Failed to load image: ${images[index].src}`);
+  };
+  
   // Placeholder implementation
   return (
     <div className="image-gallery">
@@ -47,11 +53,13 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
             onClick={() => openLightbox(index)}
           >
             <Image 
-              src={image.src} 
+              src={imageErrors[index] ? '/images/gallery/placeholder.jpg' : image.src} 
               alt={image.alt} 
               width={240}
               height={160}
               className="object-cover"
+              onError={() => handleImageError(index)}
+              unoptimized={process.env.NODE_ENV === 'production'} // Bypass optimization in production
             />
             {settings.showCaptions && <p className="caption">{image.alt}</p>}
           </div>
@@ -62,11 +70,13 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
         <div className="lightbox" onClick={closeLightbox}>
           <div className="lightbox-content">
             <Image 
-              src={images[activeImageIndex].src} 
+              src={imageErrors[activeImageIndex] ? '/images/gallery/placeholder.jpg' : images[activeImageIndex].src} 
               alt={images[activeImageIndex].alt} 
               width={800}
               height={600}
               className="object-contain"
+              onError={() => handleImageError(activeImageIndex)}
+              unoptimized={process.env.NODE_ENV === 'production'} // Bypass optimization in production
             />
             <button className="close-button" onClick={closeLightbox}>Close</button>
           </div>

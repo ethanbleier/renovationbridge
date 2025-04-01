@@ -10,6 +10,13 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    // Ensure static images are properly processed in production
+    domains: ['renovationbridge.com'],
+    // Add common image formats to be optimized
+    formats: ['image/avif', 'image/webp'],
+    // Set reasonable size limits
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
   // Configuration for Vercel deployment
   swcMinify: true,
