@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import ConversionTracker from '@/components/analytics/ConversionTracker'
 
 type FormValues = {
   name: string
@@ -29,6 +30,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [trackConversion, setTrackConversion] = useState(false)
   
   const { 
     register, 
@@ -96,6 +98,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       if (onSubmit) {
         onSubmit(data);
         setIsSuccess(true);
+        setTrackConversion(true);
         reset();
         localStorage.removeItem('contactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -127,6 +130,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       }
       
       setIsSuccess(true)
+      setTrackConversion(true)
       reset()
       // Clear saved form data after successful submission
       localStorage.removeItem('contactFormData')
@@ -154,6 +158,8 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
   
   return (
     <div className="w-full rounded-lg bg-white p-6 md:p-8 shadow-lg transition-all hover:shadow-xl">
+      {trackConversion && <ConversionTracker conversionType="contact_form" value={1.0} />}
+      
       <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-lavender after:left-0 after:-bottom-2">Get Started Today</h3>
       {isSuccess ? (
         <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center animate-fadeIn">

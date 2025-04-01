@@ -255,6 +255,29 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
+### Google Tag Integration for Conversion Tracking (August 2025)
+
+Added Google Tag (gtag.js) implementation for Askshachar to enable conversion tracking on Google Ads and Analytics:
+
+- **What Changed**: Integrated Google Tag Manager script with conversion tracking for form submissions
+- **Files Modified**:
+  - `src/app/layout.tsx` - Added Google Tag script in the head section
+  - `src/components/analytics/ConversionTracker.tsx` - Created client component for tracking conversions
+  - `src/types/gtag.d.ts` - Added TypeScript declarations for gtag
+  - `src/app/thank-you/page.tsx` - Added conversion tracking to thank-you page
+  - `src/components/forms/GetStartedForm.tsx` - Added conversion tracking to main lead generation form
+  - `src/components/forms/ContactForm.tsx` - Added conversion tracking to contact form
+  - `src/components/forms/FooterContactForm.tsx` - Added conversion tracking to footer form
+- **Implementation Details**:
+  - Uses Google Tag ID 'Askshachar' for tracking
+  - Tracks various conversion types with different labels (form_submission, get_started_form, contact_form, footer_form)
+  - Implements client-side tracking with fallbacks for SSR
+  - Supports enhanced conversion tracking with value assignment
+  - Zero impact on initial page load performance (async script)
+  - Works with Next.js App Router architecture
+
+**Benefits**: This integration enables accurate tracking of lead generation and form submissions in Google Ads and Analytics, allowing for better ROI measurement and campaign optimization.
+
 ### In-Memory Data Storage Implementation (April 2024)
 
 Replaced MongoDB with an in-memory data storage system for simplified deployment:
