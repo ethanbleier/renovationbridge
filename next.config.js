@@ -17,7 +17,7 @@ const nextConfig = {
       },
     ],
     // Ensure static images are properly processed in production
-    domains: ['renovationbridge.com', 'renovationbridge.vercel.app', 'localhost', 'vercel.app'],
+    domains: ['renovationbridge.com', 'renovationbridge.vercel.app', 'localhost', 'vercel.app', 'renovationbridge-git-gallery-renovationbridge-4efe6e62.vercel.app'],
     // Add common image formats to be optimized
     formats: ['image/avif', 'image/webp'],
     // Set reasonable size limits

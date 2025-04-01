@@ -49,9 +49,12 @@ The project gallery showcases completed renovation projects with the following f
 - **Filename Format**: Images follow the naming pattern `[LocationName]-[Number].jpg` (e.g., `CastroValley-1.jpg`)
 - **Responsive Gallery Component**: The `ImageGallery` component displays project images with customizable settings
 - **Lightbox Integration**: Full-screen image viewing capabilities with navigation controls
+- **Unrestricted Image Loading**: Support for direct image access from any valid domain without dimension restrictions
 
 ### Recent Gallery Updates
 
+- Removed dimension restrictions to allow direct loading of images from various domains including `renovationbridge-git-gallery-renovationbridge-4efe6e62.vercel.app`
+- Added support for loading images from all project galleries including Tice and Alamo without limitations
 - Fixed image path construction to correctly reference image filenames without spaces
 - Created a comprehensive feature directory structure in `src/features/gallery/`
 - Updated Redwood City project to include 6 images previously missing from the data
