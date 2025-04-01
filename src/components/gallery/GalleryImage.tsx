@@ -28,6 +28,7 @@ export default function GalleryImage({
   onClick
 }: GalleryImageProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [placeholderError, setPlaceholderError] = useState(false);
   
   // Handle image loading
   const handleImageLoad = () => {
@@ -40,9 +41,8 @@ export default function GalleryImage({
     setIsLoading(false);
   };
 
-  // Create a tiny placeholder version of the image URL for blur effect
-  // This ensures a preview is visible immediately
-  const placeholderSrc = src.replace(/(\.jpg|\.jpeg|\.png)$/, '-thumb$1');
+  // Use same image for placeholder but at lower quality via Next.js
+  const placeholderSrc = '/images/gallery/placeholder.jpg';
 
   return (
     <div
@@ -56,11 +56,10 @@ export default function GalleryImage({
       )}
       onClick={onClick}
     >
-      {/* Low-res placeholder that shows immediately */}
+      {/* Simple placeholder when loading */}
       {isLoading && (
         <div 
-          className="absolute inset-0 bg-cover bg-center blur-md opacity-50 scale-105"
-          style={{ backgroundImage: `url(${placeholderSrc})` }}
+          className="absolute inset-0 bg-gray-200 blur-sm opacity-50"
           aria-hidden="true"
         />
       )}
@@ -76,6 +75,7 @@ export default function GalleryImage({
         onLoad={handleImageLoad}
         onError={handleImageError}
         loading={priority ? 'eager' : 'lazy'}
+        unoptimized={true}
         className={cn(
           'object-cover transition-all duration-300',
           isLoading ? 'scale-110 blur-2xl opacity-0' : 'scale-100 blur-0 opacity-100',
