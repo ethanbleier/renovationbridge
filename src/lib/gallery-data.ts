@@ -5,6 +5,7 @@ export interface GalleryProject {
   imageCount: number;
   description: string;
   folder: string;
+  underMaintenance?: boolean;
 }
 
 export const galleryProjects: GalleryProject[] = [
@@ -137,6 +138,22 @@ export const galleryProjects: GalleryProject[] = [
  */
 export function getProjectBySlug(slug: string): GalleryProject | undefined {
   return galleryProjects.find(project => project.slug === slug);
+}
+
+/**
+ * Returns only projects that are visible (not under maintenance)
+ * @returns Array of visible gallery projects
+ */
+export function getVisibleProjects(): GalleryProject[] {
+  return galleryProjects.filter(project => !project.underMaintenance);
+}
+
+/**
+ * Returns only projects that are under maintenance
+ * @returns Array of projects under maintenance
+ */
+export function getMaintenanceProjects(): GalleryProject[] {
+  return galleryProjects.filter(project => project.underMaintenance);
 }
 
 /**

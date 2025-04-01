@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { galleryProjects } from '@/lib/gallery-data';
+import { galleryDataService } from '@/features/gallery/services/galleryDataService';
 
 export const metadata: Metadata = {
   title: 'Project Gallery | Renovation Bridge',
@@ -26,6 +26,9 @@ export const metadata: Metadata = {
 };
 
 export default function GalleryPage() {
+  const visibleProjects = galleryDataService.getVisibleProjects();
+  const maintenanceProjects = galleryDataService.getMaintenanceProjects();
+  
   return (
     <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-12">
@@ -36,7 +39,7 @@ export default function GalleryPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {galleryProjects.map((project) => (
+        {visibleProjects.map((project) => (
           <Link href={`/gallery/${project.slug}`} key={project.id} className="h-full">
             <div className="group bg-white rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl h-full flex flex-col">
               <div className="relative h-64 w-full">
@@ -69,6 +72,34 @@ export default function GalleryPage() {
           </Link>
         ))}
       </div>
+
+      {maintenanceProjects.length > 0 && (
+        <div className="mt-16">
+          <div className="border border-indigo-100 bg-indigo-50 rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Projects Being Enhanced</h2>
+            <p className="text-gray-700">
+              Our team is currently enhancing the following project showcases with additional high-resolution imagery and detailed transformation documentation. 
+              These exclusive projects will be available soon.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 opacity-70">
+            {maintenanceProjects.map((project) => (
+              <div key={project.id} className="bg-white rounded-lg overflow-hidden shadow-md h-full flex flex-col">
+                <div className="relative h-64 w-full bg-gray-100 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                    <span className="text-gray-500 font-medium">Coming Soon</span>
+                  </div>
+                </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{project.name}</h2>
+                  <p className="text-gray-600 mb-4 flex-grow">{project.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   );
 } 

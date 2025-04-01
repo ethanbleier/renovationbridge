@@ -1,4 +1,11 @@
-import { GalleryProject, galleryProjects, getProjectBySlug, getProjectImages } from '../../../lib/gallery-data';
+import { 
+  GalleryProject, 
+  galleryProjects, 
+  getProjectBySlug, 
+  getProjectImages,
+  getVisibleProjects,
+  getMaintenanceProjects
+} from '../../../lib/gallery-data';
 
 /**
  * Service for retrieving gallery project data
@@ -10,6 +17,22 @@ export const galleryDataService = {
    */
   getAllProjects: (): GalleryProject[] => {
     return galleryProjects;
+  },
+
+  /**
+   * Get only visible gallery projects (not under maintenance)
+   * @returns Array of visible gallery projects
+   */
+  getVisibleProjects: (): GalleryProject[] => {
+    return getVisibleProjects();
+  },
+
+  /**
+   * Get projects that are currently under maintenance
+   * @returns Array of projects under maintenance
+   */
+  getMaintenanceProjects: (): GalleryProject[] => {
+    return getMaintenanceProjects();
   },
 
   /**
