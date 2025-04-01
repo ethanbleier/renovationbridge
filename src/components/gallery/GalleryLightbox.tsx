@@ -147,6 +147,7 @@ export default function GalleryLightbox({
             sizes="(max-width: 768px) 100vw, 90vw"
             priority
             onLoad={handleImageLoad}
+            unoptimized={true}
           />
         </div>
         
@@ -180,6 +181,7 @@ export default function GalleryLightbox({
                     className="w-full h-full object-cover"
                     width={56}
                     height={40}
+                    unoptimized={true}
                   />
                 </button>
               ))}

@@ -59,7 +59,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               height={160}
               className="object-cover"
               onError={() => handleImageError(index)}
-              unoptimized={process.env.VERCEL_ENV === 'preview'}
+              unoptimized={true}
             />
             {settings.showCaptions && <p className="caption">{image.alt}</p>}
           </div>
@@ -76,7 +76,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               height={600}
               className="object-contain"
               onError={() => handleImageError(activeImageIndex)}
-              unoptimized={process.env.VERCEL_ENV === 'preview'}
+              unoptimized={true}
             />
             <button className="close-button" onClick={closeLightbox}>Close</button>
           </div>

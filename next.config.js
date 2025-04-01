@@ -9,9 +9,15 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.vercel.app',
+        port: '',
+        pathname: '/**',
+      },
     ],
     // Ensure static images are properly processed in production
-    domains: ['renovationbridge.com', 'renovationbridge.vercel.app', 'localhost'],
+    domains: ['renovationbridge.com', 'renovationbridge.vercel.app', 'localhost', 'vercel.app'],
     // Add common image formats to be optimized
     formats: ['image/avif', 'image/webp'],
     // Set reasonable size limits
