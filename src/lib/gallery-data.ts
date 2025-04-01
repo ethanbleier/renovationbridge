@@ -12,7 +12,7 @@ export const galleryProjects: GalleryProject[] = [
     id: 'Alamo',
     name: 'Alamo',
     slug: 'alamo',
-    imageCount: 7,
+    imageCount: 3,
     description: 'Before and after renovation photos. Interior and exterior shots.',
     folder: 'Project-Alamo',
   },
