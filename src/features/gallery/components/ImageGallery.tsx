@@ -59,7 +59,6 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               height={160}
               className="object-cover"
               onError={() => handleImageError(index)}
-              unoptimized={process.env.NODE_ENV === 'production'} // Bypass optimization in production
             />
             {settings.showCaptions && <p className="caption">{image.alt}</p>}
           </div>
@@ -76,7 +75,6 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               height={600}
               className="object-contain"
               onError={() => handleImageError(activeImageIndex)}
-              unoptimized={process.env.NODE_ENV === 'production'} // Bypass optimization in production
             />
             <button className="close-button" onClick={closeLightbox}>Close</button>
           </div>
