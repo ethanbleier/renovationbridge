@@ -23,8 +23,8 @@ const nextConfig = {
     // Set reasonable size limits
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    // Allow unoptimized images to prevent issues
-    unoptimized: process.env.NODE_ENV !== 'production',
+    // Force unoptimized images in all environments
+    unoptimized: true,
   },
   // Configuration for Vercel deployment
   swcMinify: true,
