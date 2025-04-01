@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +23,23 @@ export default function GalleryLightbox({
   const [currentIndex, setCurrentIndex] = useState(selectedIndex);
   const [isLoading, setIsLoading] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Navigation functions with useCallback
+  const nextImage = useCallback(() => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    // Wait for animation to complete
+    setTimeout(() => setIsAnimating(false), 300);
+  }, [isAnimating, images.length]);
+
+  const previousImage = useCallback(() => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+    // Wait for animation to complete
+    setTimeout(() => setIsAnimating(false), 300);
+  }, [isAnimating, images.length]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -51,7 +68,7 @@ export default function GalleryLightbox({
       document.body.style.overflow = '';
       document.body.classList.remove('lightbox-open');
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, nextImage, previousImage]);
 
   // Update current index when selected index changes
   useEffect(() => {
@@ -63,23 +80,6 @@ export default function GalleryLightbox({
   useEffect(() => {
     setIsLoading(true);
   }, [currentIndex]);
-
-  // Navigation functions
-  const nextImage = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    // Wait for animation to complete
-    setTimeout(() => setIsAnimating(false), 300);
-  };
-
-  const previousImage = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-    // Wait for animation to complete
-    setTimeout(() => setIsAnimating(false), 300);
-  };
 
   const handleImageLoad = () => {
     setIsLoading(false);
@@ -174,10 +174,12 @@ export default function GalleryLightbox({
                     currentIndex === index ? "border-white scale-110" : "border-transparent opacity-60 hover:opacity-100"
                   )}
                 >
-                  <img 
+                  <Image 
                     src={image.src} 
                     alt={`Thumbnail ${index + 1}`} 
                     className="w-full h-full object-cover"
+                    width={56}
+                    height={40}
                   />
                 </button>
               ))}

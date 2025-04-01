@@ -46,7 +46,13 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
             className={`thumbnail thumbnail-${settings.thumbnailSize}`}
             onClick={() => openLightbox(index)}
           >
-            <img src={image.src} alt={image.alt} />
+            <Image 
+              src={image.src} 
+              alt={image.alt} 
+              width={240}
+              height={160}
+              className="object-cover"
+            />
             {settings.showCaptions && <p className="caption">{image.alt}</p>}
           </div>
         ))}
@@ -55,7 +61,13 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       {lightboxOpen && (
         <div className="lightbox" onClick={closeLightbox}>
           <div className="lightbox-content">
-            <img src={images[activeImageIndex].src} alt={images[activeImageIndex].alt} />
+            <Image 
+              src={images[activeImageIndex].src} 
+              alt={images[activeImageIndex].alt} 
+              width={800}
+              height={600}
+              className="object-contain"
+            />
             <button className="close-button" onClick={closeLightbox}>Close</button>
           </div>
         </div>

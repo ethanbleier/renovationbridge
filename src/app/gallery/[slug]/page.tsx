@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { galleryProjects, getProjectBySlug, getProjectImages } from '@/lib/gallery-data';
 import ProjectGallery from '@/components/gallery/ProjectGallery';
@@ -151,10 +152,13 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
                   >
                     <div className="aspect-video relative rounded-lg overflow-hidden bg-gray-100">
                       {/* Add preloded image with priority flag */}
-                      <img 
+                      <Image 
                         src={`/images/gallery/${relatedProject.folder}/${relatedProject.id}-1.jpg`}
                         alt={`${relatedProject.name} Renovation`}
+                        width={600}
+                        height={338}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        priority={false}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-40 transition-all flex items-end">
                         <div className="p-4 w-full">
