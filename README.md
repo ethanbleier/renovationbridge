@@ -179,7 +179,7 @@ Fixed image rendering issues that were causing 400 errors for some gallery proje
 
 **Benefits**: All gallery images now render correctly across the site with proper Next.js image optimization, providing a consistent visual experience for users browsing project showcases with optimal performance. The fix ensures compatibility with case-sensitive file systems and servers in production environments.
 
-### Interactive Gallery Showcase Implementation (October 2025)
+### Interactive Gallery Showcase Implementation (April 2025)
 
 Implemented a comprehensive gallery showcase with dynamic project pages and interactive features:
 
@@ -205,7 +205,7 @@ Implemented a comprehensive gallery showcase with dynamic project pages and inte
 
 **Benefits**: The new gallery showcase provides an immersive way for potential clients to browse completed renovation projects with high-quality images. The implementation is performant, SEO-friendly, and offers an excellent user experience with features like lightbox viewing and keyboard navigation. The centralized data management makes it easy to add new projects in the future.
 
-### Gallery Pages Restructured for Static Routing (September 2025)
+### Gallery Pages Restructured for Static Routing (April 2025)
 
 Completely redesigned the gallery project pages to use static routing instead of dynamic routes:
 
@@ -242,7 +242,7 @@ Completely redesigned the gallery project pages to use static routing instead of
 
 **Benefits**: This change significantly improves reliability by eliminating dynamic route handling and case-sensitive slug matching. Each project now has its own dedicated page component, making debugging easier and ensuring consistent rendering. The hardcoded approach eliminates URL parsing errors and provides more predictable behavior.
 
-### Gallery Image Service Robustness Improvements (September 2025)
+### Gallery Image Service Robustness Improvements (April 2025)
 
 Enhanced the gallery image service to provide more reliable image loading:
 
