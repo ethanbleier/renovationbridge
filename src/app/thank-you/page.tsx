@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
+import GoogleAdsTracker from '@/components/analytics/GoogleAdsTracker'
 
 export const metadata: Metadata = {
   title: 'Thank You | Renovation Bridge',
@@ -12,6 +13,8 @@ export default function ThankYouPage() {
     <div className="container mx-auto max-w-4xl px-4 py-16">
       {/* Track conversion when thank-you page loads */}
       <ConversionTracker conversionType="form_submission" value={1.0} />
+      {/* Track Google Ads conversion */}
+      <GoogleAdsTracker conversionLabel="signup" conversionValue={1.0} />
       
       <div className="bg-white shadow-md rounded-lg p-8 text-center">
         <div className="mb-6">

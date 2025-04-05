@@ -2,91 +2,159 @@
 
 import GuideImageCarousel from '@/components/ui/GuideImageCarousel'
 import GuideDownloadForm from '@/components/forms/GuideDownloadForm'
-import { useState } from 'react'
-import Image from 'next/image'
+import { useState, useRef, useEffect } from 'react'
+import type { MouseEvent } from 'react'
 
 export default function FreeGuideSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
   const images = [
+    "/images/guide/open.png",
     "/images/guide/ajar.png",
     "/images/guide/double.png",
-    "/images/guide/open.png",
     "/images/guide/guide.png",
   ]
   
+  const MAX_ROTATION = 10;
+
+  // Auto-rotate images every 5 seconds
+  useEffect(() => {
+    timeoutRef.current = setInterval(() => {
+      if (!isHovering) {
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      }
+    }, 5000);
+    
+    return () => {
+      if (timeoutRef.current) {
+        clearInterval(timeoutRef.current);
+      }
+    };
+  }, [isHovering, images.length]);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateY = ((x - centerX) / centerX) * MAX_ROTATION * -1;
+    const rotateX = ((y - centerY) / centerY) * MAX_ROTATION;
+
+    setRotation({ x: rotateX, y: rotateY });
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    setRotation({ x: 0, y: 0 });
+  };
+
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-white">
+    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white to-gray-50">
       <div className="container-custom px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Image with Animation */}
           <div className="relative order-2 lg:order-1">
-            <div className="relative w-full max-w-sm mx-auto">
-              {/* Book Preview with Rotating Images */}
-              <div className="relative hover:animate-none">
-                <div className="transition-all duration-300 hover:translate-y-[-5px]">
+            <div 
+              className="relative w-full max-w-sm mx-auto" 
+              style={{ perspective: '1000px' }} 
+              ref={containerRef}
+              onMouseMove={handleMouseMove}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              {/* Main image display with 3D effect */}
+              <div 
+                className="relative"
+                style={{
+                  transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${isHovering ? 1.05 : 1})`,
+                  transition: 'transform 0.1s ease-out',
+                }}
+              >
+                <div className="relative rounded-xl overflow-hidden shadow-2xl">
                   <GuideImageCarousel 
                     images={images}
                     currentIndex={currentImageIndex}
                     setCurrentIndex={setCurrentImageIndex}
                   />
                   
-                  {/* Horizontal image slider */}
-                  <div className="mt-4 sm:mt-6 relative flex items-center justify-center">
-                    {/* Left arrow */}
+                  {/* Overlaid navigation controls */}
+                  <div className="absolute inset-0 flex items-center justify-between px-3 opacity-0 hover:opacity-100 transition-opacity duration-300">
                     <button 
-                      className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 sm:p-2 shadow-md z-10 hover:bg-white transition-colors"
-                      onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
+                      className="bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-md transition-all duration-300 transform hover:scale-110"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+                      }}
                       aria-label="Previous image"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                     
-                    {/* Thumbnails - now with fixed width container and centered content */}
-                    <div className="flex justify-center mx-auto px-8 sm:px-12">
-                      <div className="flex space-x-2 sm:space-x-4 py-2">
-                        {images.map((src, index) => (
-                          <div 
-                            key={index}
-                            onClick={() => setCurrentImageIndex(index)}
-                            className={`relative flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-md overflow-hidden cursor-pointer transition-all duration-300 ${
-                              index === currentImageIndex 
-                                ? 'ring-2 ring-amber-600 scale-105' 
-                                : 'ring-1 ring-gray-200 opacity-70 hover:opacity-100'
-                            }`}
-                          >
-                            <Image
-                              src={src}
-                              alt={`Guide preview ${index + 1}`}
-                              className="w-full h-full object-cover"
-                              width={64}
-                              height={64}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Right arrow */}
                     <button 
-                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 sm:p-2 shadow-md z-10 hover:bg-white transition-colors"
-                      onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
+                      className="bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-md transition-all duration-300 transform hover:scale-110"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+                      }}
                       aria-label="Next image"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
                   </div>
+                  
+                  {/* Image indicator dots */}
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                    {images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentImageIndex(index);
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex 
+                            ? 'bg-primary w-4' 
+                            : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Go to image ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
+                
+                {/* Add a subtle reflection effect */}
+                <div 
+                  className="w-full h-5 mt-1 rounded-b-xl mx-auto"
+                  style={{ 
+                    background: 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)',
+                    transform: 'scaleY(-1)',
+                    opacity: 0.3,
+                  }}
+                />
               </div>
             </div>
           </div>
           
           {/* Content */}
           <div className="space-y-4 sm:space-y-6 md:max-w-lg order-1 lg:order-2">
-            <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-lavender text-primary rounded-full text-xs sm:text-sm font-semibold mb-2">
+            <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-lavender/20 text-primary rounded-full text-xs sm:text-sm font-semibold mb-2">
               Free Resource
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary">Complete Renovation Planning Guide</h2>

@@ -9,6 +9,11 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/structured-data'
 import { sarabun } from '@/lib/fonts'
 
+
+const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID;
+
+const GOOGLE_ADS_ID = process.env.GOOGLE_ADS_ID;
+
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
@@ -78,15 +83,16 @@ export default function RootLayout({
       <head>
         <JsonLd data={[generateOrganizationSchema(), generateLocalBusinessSchema()]} />
         
-        {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=kr6ogvmJhcYJD-VHigfXAg"></script>
+        {/* Google Analytics */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>
         <script 
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'kr6ogvmJhcYJD-VHigfXAg');
+              gtag('config', '${GA_MEASUREMENT_ID}');
+              gtag('config', '${GOOGLE_ADS_ID}');
             `
           }} 
         />

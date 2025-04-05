@@ -24,7 +24,7 @@ export default function HowItWorksPage() {
               href="/get-started" 
               className="btn btn-primary text-lg px-8 py-3 hover:bg-primary-dark hover:scale-105 hover:shadow-lg transition-all duration-300"
             >
-              Next
+              Get Started
             </Link>
           </div>
         </div>
