@@ -39,4 +39,4 @@ const GoogleAdsTracker = ({
   return null;
 };
 
-export default GoogleAdsTracker; 
+export default GoogleAdsTracker;

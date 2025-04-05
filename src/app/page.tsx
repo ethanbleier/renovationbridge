@@ -6,6 +6,7 @@ import HowItWorksSection from '@/components/sections/HowItWorksSection'
 import AsSeenOnTV from '@/components/sections/AsSeenOnTV'
 import CTASection from '@/components/sections/CTASection'
 import PlatformSection from '@/components/sections/PlatformSection'
+import ServiceAreaMapSection from '@/components/sections/ServiceAreaMapSection'
 import PageSeo from '@/components/seo/PageSeo'
 import { generateServiceSchema, generateFAQSchema } from '@/lib/structured-data'
 import { Metadata } from 'next'
@@ -68,6 +69,9 @@ export default function Home() {
       
       {/* As Seen on TV Section */}
       <AsSeenOnTV />
+      
+      {/* Service Area Map Section */}
+      <ServiceAreaMapSection />
       
       {/* CTA Section */}
       <CTASection />
