@@ -87,8 +87,8 @@ export default function TestimonialsSection() {
                 <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 sm:-top-10">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border-4 border-white shadow-md overflow-hidden">
                     <Image 
-                      src="/images/profiles/jonah-profile-pic.png" 
-                      alt="Jonah K" 
+                      src="/images/profiles/mick.png" 
+                      alt="Mick Jordan" 
                       width={80} 
                       height={80}
                       className="w-full h-full object-cover"
@@ -105,10 +105,10 @@ export default function TestimonialsSection() {
                   </div>
                 </div>
                 <p className="text-gray italic mb-4 sm:mb-6 text-center text-xs sm:text-sm flex-grow line-clamp-6 sm:line-clamp-none">
-                  "I had nothing short of a fantastic experience working with Renovation Bridge to find a contractor for my project. The team was professional, responsive, and made the entire process smooth and hassle-free. They quickly connected me with a highly skilled contractor who exceeded my expectations in terms of quality, cost, and timeliness."
+                  "My experience with renovation bridge met and exceeded my expectations. Getting started with a project was overwhelming to say the least, and renovation bridges streamlined process took a massive weight off my shoulders. I also found that the staff were very helpful, and did not hesitate to provide personal support. Would highly reccomend!"
                 </p>
                 <div className="text-center mt-auto">
-                  <h4 className="font-bold text-base sm:text-lg">Jonah K</h4>
+                  <h4 className="font-bold text-base sm:text-lg">Mick Jordan</h4>
                   <p className="text-gray text-xs sm:text-sm">Walnut Creek</p>
                 </div>
               </div>

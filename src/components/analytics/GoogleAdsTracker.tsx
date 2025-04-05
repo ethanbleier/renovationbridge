@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 
-// Remove hardcoded fallback value
-const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+// Use the correct Google Ads ID
+const GOOGLE_ADS_ID = 'AW-16912546121';
 
 interface GoogleAdsTrackerProps {
   conversionLabel?: string;
@@ -15,8 +15,8 @@ const GoogleAdsTracker = ({
   conversionValue 
 }: GoogleAdsTrackerProps) => {
   useEffect(() => {
-    // Only track if Google Ads ID is available
-    if (typeof window !== 'undefined' && window.gtag && GOOGLE_ADS_ID) {
+    // Only track if window and gtag are available
+    if (typeof window !== 'undefined' && window.gtag) {
       // Track Google Ads conversion
       if (conversionLabel) {
         window.gtag('event', 'conversion', {
@@ -30,8 +30,8 @@ const GoogleAdsTracker = ({
           'send_page_view': false
         });
       }
-    } else if (!GOOGLE_ADS_ID) {
-      console.warn('Google Ads tracking is disabled: NEXT_PUBLIC_GOOGLE_ADS_ID is not set');
+    } else if (!window.gtag) {
+      console.warn('Google Ads tracking is disabled: gtag is not available');
     }
   }, [conversionLabel, conversionValue]);
 
