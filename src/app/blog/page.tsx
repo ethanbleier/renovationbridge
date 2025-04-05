@@ -99,14 +99,6 @@ export default function BlogPage() {
             <p className="text-lg text-gray">
               Expert advice, industry trends, and inspiring stories to help you transform your home
             </p>
-            <div className="mt-4 flex items-center justify-center gap-2 text-sm font-mono bg-amber-50 py-2 px-4 rounded-md border border-amber-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <p className="text-amber-700">
-                Our blog service is currently undergoing maintenance. Full functionality coming soon.
-              </p>
-            </div>
           </div>
         </div>
       </section>
