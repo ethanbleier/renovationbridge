@@ -82,85 +82,74 @@ export default function GuidePage() {
         </section>
         
         {/* Premium Guide Download Section - Above the fold for lead capture */}
-        <section id="download-guide" className="mb-20">
-          <div className="bg-gradient-to-r from-blue-50 to-lavender/30 shadow-xl p-8 md:p-12 rounded-2xl border border-gray-100">
-            <div className="flex flex-col-reverse lg:flex-row items-center gap-10">
-              <div className="w-full lg:w-3/5 z-10">
-                <div className="flex items-center mb-4">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">FREE DOWNLOAD</span>
+        <section id="download-guide" className="mb-16">
+          <div className="bg-gradient-to-r from-blue-50 to-lavender/30 shadow-lg rounded-xl border border-gray-100">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Content column */}
+              <div className="lg:col-span-7 p-6 md:p-8 z-10">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">FREE DOWNLOAD</span>
                   <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded-full">PREMIUM CONTENT</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-semibold mb-4 tracking-tight">Complete Renovation Guide</h2>
-                <p className="text-gray-700 mb-4 leading-relaxed">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-3 tracking-tight">Complete Renovation Guide</h2>
+                <p className="text-gray-700 mb-3 text-sm md:text-base">
                   Get our comprehensive renovation guide with expert tips, checklists, and planning templates to make your renovation project a success.
                 </p>
-                <ul className="mb-6 space-y-3">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="flex-1">Step-by-step renovation planning framework</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="flex-1">Budgeting templates and cost breakdowns</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="flex-1">Contractor selection checklist</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="flex-1">Timeline planning guide with Gantt chart template</span>
-                  </li>
-                </ul>
                 
-                {/* Visual guide mockup for small screens */}
-                <div className="block lg:hidden mb-6 relative">
-                  <div className="relative w-full max-w-[220px] mx-auto">
-                    <div className="relative bg-white p-2 rounded-lg shadow-xl">
-                      <Image
-                        src="/images/guide/guide-preview-2.png"
-                        alt="Complete Renovation Guide Cover"
-                        width={220}
-                        height={280}
-                        className="rounded object-cover"
-                      />
-                      <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-bl-lg rounded-tr-lg">FREE</div>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Step-by-step planning framework</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Budgeting templates</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Contractor selection checklist</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Timeline planning guide</span>
                   </div>
                 </div>
               </div>
-              <div className="w-full lg:w-2/5">
-                <div className="flex flex-col items-center">
-                  {/* Visual guide mockup with clean design */}
-                  <div className="relative mb-8">
-                    <div className="relative bg-white p-2 rounded-lg shadow-xl">
-                      <Image
-                        src="/images/guide/guide-preview-2.png"
-                        alt="Complete Renovation Guide Cover"
-                        width={240}
-                        height={320}
-                        className="rounded object-cover"
-                      />
-                      <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-bl-lg rounded-tr-lg">FREE</div>
-                    </div>
+              
+              {/* Form column */}
+              <div className="lg:col-span-5 bg-white/80 p-6 rounded-b-xl lg:rounded-r-xl lg:rounded-bl-none">
+                <div className="flex items-start gap-4 mb-4">
+                  {/* Guide mockup image */}
+                  <div className="relative w-20 h-28 flex-shrink-0">
+                    <Image
+                      src="/images/guide/guide-preview-2.png"
+                      alt="Guide Preview"
+                      fill
+                      className="rounded-md object-cover shadow-md"
+                    />
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold py-0.5 px-1.5 rounded-md">FREE</div>
                   </div>
-                  <GuideDownloadForm 
-                    guideTitle="Complete Home Renovation Guide" 
-                    guideType="renovation-planner" 
-                    downloadUrl="/pdfs/guide.pdf"
-                    buttonText="Download Free Guide"
-                    successHeading="Your guide is ready!"
-                    successMessage="Thanks for your interest in a successful renovation"
-                  />
+                  <div>
+                    <h3 className="font-medium text-lg">Get instant access</h3>
+                    <p className="text-sm text-gray-600">Enter your details below</p>
+                  </div>
                 </div>
+                <GuideDownloadForm 
+                  guideTitle="Complete Home Renovation Guide" 
+                  guideType="renovation-planner" 
+                  downloadUrl="/pdfs/guide.pdf"
+                  buttonText="Download Free Guide"
+                  successHeading="Your guide is ready!"
+                  successMessage="Thanks for your interest in a successful renovation"
+                />
               </div>
             </div>
           </div>
