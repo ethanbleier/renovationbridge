@@ -111,62 +111,6 @@ renovationbridge/
 └── config files       # Various configuration files
 ```
 
-## 🛠️ Getting Started
-
-1. **Prerequisites**
-   - Node.js 20.0.0 or higher
-   - npm 10.0.0 or higher (comes with Node.js 20)
-
-2. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/renovationbridge.git
-   cd renovationbridge
-   ```
-
-3. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-4. **Configure environment variables**
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your configuration settings
-   # Note: MONGODB_URI is no longer required as we use in-memory storage
-   ```
-
-5. **Start development server**
-   ```bash
-   npm run dev
-   # or
-   ./start.sh
-   ```
-
-6. **Open [http://localhost:3000](http://localhost:3000)**
-
-## 🧪 Local Testing
-
-Renovation Bridge includes a comprehensive suite of testing tools to ensure code quality and functionality.
-
-### Using the Testing Script
-
-A convenient testing script is provided to run various testing operations:
-
-```bash
-# Make the script executable (first time only)
-chmod +x scripts/testing.sh
-
-# Run the testing script
-./scripts/testing.sh
-```
-
-The script provides the following options:
-1. Start development server
-2. Run linting
-3. Run unit tests
-4. Run end-to-end tests
-5. Run all tests
-
 ### Manual Testing Commands
 
 You can also run these commands directly:
@@ -214,135 +158,6 @@ npm run type-check
   - Dynamic meta descriptions
 - **Incremental Static Regeneration** - Fast page loads with dynamic content
 
-## 🚀 Deployment
-
-### Vercel Deployment
-
-Renovation Bridge is configured for seamless deployment on Vercel's platform.
-
-1. **Prerequisites**
-   - A [Vercel account](https://vercel.com/signup)
-   - Vercel CLI (optional, for command-line deployment)
-     ```bash
-     npm install -g vercel
-     ```
-
-2. **Connect Repository to Vercel**
-   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
-   - Click "Add New" > "Project"
-   - Select your GitHub repository
-   - Configure the project:
-     - Framework Preset: Next.js
-     - Root Directory: ./
-     - Build Command: `npm run build`
-     - Output Directory: .next
-
-3. **Set Environment Variables**
-   - In Vercel dashboard, navigate to your project
-   - Go to Settings > Environment Variables
-   - Add all required environment variables from `.env.production.local`
-   - Key variables to include:
-     ```
-     JWT_SECRET
-     REVALIDATION_SECRET
-     API_URL
-     API_TOKEN
-     ```
-
-4. **Deploy Using the Script**
-   ```bash
-   # Run the deployment script
-   ./scripts/test-deploy.sh
-   # Select option 3 for production deployment
-   ```
-
-5. **Manual Deployment Using Vercel CLI**
-   ```bash
-   # Login to Vercel
-   vercel login
-   
-   # Deploy to development environment
-   vercel
-   
-   # Deploy to production
-   vercel --prod
-   ```
-
-6. **Automatic Deployments**
-   - Every push to the `main` branch will trigger an automatic deployment
-   - Preview deployments are created for pull requests
-   - Configure branch deployments in the Vercel dashboard under Settings > Git
-
-7. **Revalidation API**
-   - Content revalidation is configured at `/api/revalidate`
-   - Use this endpoint with the appropriate secret token to refresh content
-   - Example:
-     ```bash
-     curl -X POST https://your-domain.vercel.app/api/revalidate \
-       -H "Authorization: Bearer YOUR_REVALIDATION_SECRET" \
-       -H "Content-Type: application/json" \
-       -d '{"contentType":"post","slug":"example-post"}'
-     ```
-
-8. **Monitoring**
-   - Monitor your deployment through the Vercel dashboard
-   - View logs, analytics, and performance metrics
-   - Set up status alerts for your production deployment
-
-## 🔄 Recent Updates
-
-### Google Ads Conversion Tracking Implementation (April 2025)
-
-Added Google Ads conversion tracking to enable accurate ROI measurement for advertising campaigns:
-
-- **What Changed**: 
-  - Integrated Google Ads tag (gtag.js) with the measurement ID AW-16912546121
-  - Added conversion tracking on the thank-you page with the "signup" conversion label
-  - Added form submission tracking in the GetStartedForm with the "form_submission" conversion label
-  - Created a reusable GoogleAdsTracker component for conversion tracking
-  - Added environment variables for Google Ads configuration
-- **Files Modified**:
-  - `src/app/layout.tsx` - Added Google Ads tag configuration alongside Google Analytics
-  - `src/components/analytics/GoogleAdsTracker.tsx` - Created new component for Google Ads conversion tracking
-  - `src/app/thank-you/page.tsx` - Added Google Ads conversion tracking to the form submission success page
-  - `src/components/forms/GetStartedForm.tsx` - Added Google Ads conversion tracking to the lead generation form
-  - `.env` and `.env.example` - Added `GOOGLE_ADS_ID` and `NEXT_PUBLIC_GOOGLE_ADS_ID` environment variables
-- **Implementation Details**:
-  - Uses Google Ads ID (AW-16912546121) with support for multiple conversion labels
-  - Server-side configuration available via `GOOGLE_ADS_ID` environment variable
-  - Client-side configuration available via `NEXT_PUBLIC_GOOGLE_ADS_ID` environment variable
-  - Supports two conversion types: "signup" (page load) and "form_submission" (form submit)
-  - Supports conversion value tracking for ROI calculation
-  - Works alongside existing Google Analytics implementation
-  - Zero impact on initial page load performance (uses same async gtag.js script)
-  - Follows best practices for conversion tracking implementation
-
-**Benefits**: This integration enables accurate tracking of advertising performance and ROI in Google Ads, allowing for better campaign optimization and budget allocation. The conversion tracking helps identify which ads and keywords are driving valuable leads, improving overall marketing effectiveness.
-
-### Google Analytics Implementation (April 2025)
-
-Implemented Google Analytics 4 tracking with Google tag:
-
-- **What Changed**: 
-  - Integrated Google Analytics 4 using the official Google tag implementation
-  - Updated the measurement ID to G-XQ8QS58PK0
-  - Configured to track pageviews and user interactions
-  - Added environment variables for Google Analytics configuration
-- **Files Modified**:
-  - `src/app/layout.tsx` - Updated Google tag script in the head section to use the environment variable
-  - `src/components/analytics/ConversionTracker.tsx` - Updated to use the environment variable for conversion tracking
-  - `.env` and `.env.example` - Added `GA_MEASUREMENT_ID` and `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variables
-- **Implementation Details**:
-  - Uses Google Analytics 4 (GA4) measurement ID format
-  - Server-side configuration available via `GA_MEASUREMENT_ID` environment variable
-  - Client-side configuration available via `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variable
-  - Asynchronously loads the gtag.js script to minimize performance impact
-  - Automatically tracks page views across the site
-  - Works with Next.js App Router architecture
-  - Follows privacy best practices with no cookie banner requirements when configured properly in Google Analytics
-
-**Benefits**: This integration enables accurate tracking of user behavior, page views, and engagement metrics, providing valuable insights into site performance and user journeys to help optimize the user experience and marketing efforts.
-
 ### Gallery Image Optimization Fix (April 2025)
 
 Fixed image rendering issues that were causing 400 errors for some gallery projects:
@@ -364,7 +179,7 @@ Fixed image rendering issues that were causing 400 errors for some gallery proje
 
 **Benefits**: All gallery images now render correctly across the site with proper Next.js image optimization, providing a consistent visual experience for users browsing project showcases with optimal performance. The fix ensures compatibility with case-sensitive file systems and servers in production environments.
 
-### Interactive Gallery Showcase Implementation (October 2025)
+### Interactive Gallery Showcase Implementation (April 2025)
 
 Implemented a comprehensive gallery showcase with dynamic project pages and interactive features:
 
@@ -390,7 +205,7 @@ Implemented a comprehensive gallery showcase with dynamic project pages and inte
 
 **Benefits**: The new gallery showcase provides an immersive way for potential clients to browse completed renovation projects with high-quality images. The implementation is performant, SEO-friendly, and offers an excellent user experience with features like lightbox viewing and keyboard navigation. The centralized data management makes it easy to add new projects in the future.
 
-### Gallery Pages Restructured for Static Routing (September 2025)
+### Gallery Pages Restructured for Static Routing (April 2025)
 
 Completely redesigned the gallery project pages to use static routing instead of dynamic routes:
 
@@ -427,7 +242,7 @@ Completely redesigned the gallery project pages to use static routing instead of
 
 **Benefits**: This change significantly improves reliability by eliminating dynamic route handling and case-sensitive slug matching. Each project now has its own dedicated page component, making debugging easier and ensuring consistent rendering. The hardcoded approach eliminates URL parsing errors and provides more predictable behavior.
 
-### Gallery Image Service Robustness Improvements (September 2025)
+### Gallery Image Service Robustness Improvements (April 2025)
 
 Enhanced the gallery image service to provide more reliable image loading:
 
