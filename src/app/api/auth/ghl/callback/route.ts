@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { saveTokenData, TokenData, getStoredTokens } from '@/utils/ghlAuth';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     // Get the authorization code from the URL
     const url = new URL(request.url);
@@ -46,25 +48,17 @@ export async function GET(request: Request) {
     const expiresAt = Date.now() + ((tokenData.expires_in || 86400) * 1000);
     
     // Save the token data to your storage solution
-    // This is a placeholder - implement your own secure storage
-    const saveResult = await saveTokenData({
+    const newTokenData: TokenData = {
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
       expiresAt,
       locationId: locationId || undefined
-    });
+    };
+    
+    const saveResult = await saveTokenData(newTokenData);
     
     if (!saveResult) {
       return NextResponse.redirect(new URL('/api/auth/ghl/error?error=save_token', request.url));
-    }
-    
-    // Update environment variables for immediate use
-    // Note: This does not persist across restarts and is for development only
-    process.env.GHL_ACCESS_TOKEN = tokenData.access_token;
-    process.env.GHL_REFRESH_TOKEN = tokenData.refresh_token;
-    process.env.GHL_TOKEN_EXPIRES_AT = expiresAt.toString();
-    if (locationId) {
-      process.env.GHL_LOCATION_ID = locationId;
     }
     
     // Redirect to success page
@@ -72,44 +66,5 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error in GHL OAuth callback:', error);
     return NextResponse.redirect(new URL('/api/auth/ghl/error?error=unknown', request.url));
-  }
-}
-
-// Save token data to your storage solution
-// This is a placeholder - implement your own secure storage
-async function saveTokenData(tokenData: { 
-  accessToken: string, 
-  refreshToken: string, 
-  expiresAt: number,
-  locationId?: string 
-}) {
-  try {
-    // For demonstration only - log token info
-    console.log('Token data received:', {
-      accessTokenPrefix: tokenData.accessToken.substring(0, 5) + '...',
-      refreshTokenPrefix: tokenData.refreshToken.substring(0, 5) + '...',
-      expiresAt: new Date(tokenData.expiresAt).toISOString(),
-      locationId: tokenData.locationId || 'using default'
-    });
-    
-    // In a real application, you would save this data to a secure database
-    // or use a service like AWS Secrets Manager, Azure Key Vault, etc.
-    
-    // For development, you might want to save to .env.local
-    if (process.env.NODE_ENV === 'development') {
-      // This is not ideal for production, but works for development
-      // You would need to implement file system operations here
-      console.log('DEVELOPMENT MODE: Would save token data to .env.local');
-      
-      // Return true to indicate successful save for demo purposes
-      return true;
-    }
-    
-    // For production, implement your secure storage solution here
-    
-    return true;
-  } catch (error) {
-    console.error('Error saving token data:', error);
-    return false;
   }
 } 

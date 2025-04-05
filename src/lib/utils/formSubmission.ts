@@ -1,3 +1,5 @@
+import { getStoredTokens } from '@/utils/ghlAuth';
+
 type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor';
 
 // Default tags to apply to all submissions
@@ -69,9 +71,10 @@ export function formatGHLData(formData: any, formType: FormType) {
 // Generic function to submit to GoHighLevel
 export async function submitToGHL(formData: any, formType: FormType) {
   try {
-    // Get GoHighLevel API credentials
-    const apiKey = process.env.GHL_API_KEY;
-    const locationId = process.env.GHL_LOCATION_ID;
+    // Get GoHighLevel API credentials from environment or token storage
+    const tokenData = getStoredTokens();
+    const apiKey = tokenData?.accessToken || process.env.GHL_API_KEY;
+    const locationId = tokenData?.locationId || process.env.GHL_LOCATION_ID;
     
     if (!apiKey || !locationId) {
       throw new Error('GoHighLevel API credentials not configured');

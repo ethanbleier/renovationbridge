@@ -291,6 +291,58 @@ Renovation Bridge is configured for seamless deployment on Vercel's platform.
 
 ## 🔄 Recent Updates
 
+### Google Ads Conversion Tracking Implementation (April 2025)
+
+Added Google Ads conversion tracking to enable accurate ROI measurement for advertising campaigns:
+
+- **What Changed**: 
+  - Integrated Google Ads tag (gtag.js) with the measurement ID AW-16912546121
+  - Added conversion tracking on the thank-you page with the "signup" conversion label
+  - Added form submission tracking in the GetStartedForm with the "form_submission" conversion label
+  - Created a reusable GoogleAdsTracker component for conversion tracking
+  - Added environment variables for Google Ads configuration
+- **Files Modified**:
+  - `src/app/layout.tsx` - Added Google Ads tag configuration alongside Google Analytics
+  - `src/components/analytics/GoogleAdsTracker.tsx` - Created new component for Google Ads conversion tracking
+  - `src/app/thank-you/page.tsx` - Added Google Ads conversion tracking to the form submission success page
+  - `src/components/forms/GetStartedForm.tsx` - Added Google Ads conversion tracking to the lead generation form
+  - `.env` and `.env.example` - Added `GOOGLE_ADS_ID` and `NEXT_PUBLIC_GOOGLE_ADS_ID` environment variables
+- **Implementation Details**:
+  - Uses Google Ads ID (AW-16912546121) with support for multiple conversion labels
+  - Server-side configuration available via `GOOGLE_ADS_ID` environment variable
+  - Client-side configuration available via `NEXT_PUBLIC_GOOGLE_ADS_ID` environment variable
+  - Supports two conversion types: "signup" (page load) and "form_submission" (form submit)
+  - Supports conversion value tracking for ROI calculation
+  - Works alongside existing Google Analytics implementation
+  - Zero impact on initial page load performance (uses same async gtag.js script)
+  - Follows best practices for conversion tracking implementation
+
+**Benefits**: This integration enables accurate tracking of advertising performance and ROI in Google Ads, allowing for better campaign optimization and budget allocation. The conversion tracking helps identify which ads and keywords are driving valuable leads, improving overall marketing effectiveness.
+
+### Google Analytics Implementation (April 2025)
+
+Implemented Google Analytics 4 tracking with Google tag:
+
+- **What Changed**: 
+  - Integrated Google Analytics 4 using the official Google tag implementation
+  - Updated the measurement ID to G-XQ8QS58PK0
+  - Configured to track pageviews and user interactions
+  - Added environment variables for Google Analytics configuration
+- **Files Modified**:
+  - `src/app/layout.tsx` - Updated Google tag script in the head section to use the environment variable
+  - `src/components/analytics/ConversionTracker.tsx` - Updated to use the environment variable for conversion tracking
+  - `.env` and `.env.example` - Added `GA_MEASUREMENT_ID` and `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variables
+- **Implementation Details**:
+  - Uses Google Analytics 4 (GA4) measurement ID format
+  - Server-side configuration available via `GA_MEASUREMENT_ID` environment variable
+  - Client-side configuration available via `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variable
+  - Asynchronously loads the gtag.js script to minimize performance impact
+  - Automatically tracks page views across the site
+  - Works with Next.js App Router architecture
+  - Follows privacy best practices with no cookie banner requirements when configured properly in Google Analytics
+
+**Benefits**: This integration enables accurate tracking of user behavior, page views, and engagement metrics, providing valuable insights into site performance and user journeys to help optimize the user experience and marketing efforts.
+
 ### Gallery Image Optimization Fix (April 2025)
 
 Fixed image rendering issues that were causing 400 errors for some gallery projects:

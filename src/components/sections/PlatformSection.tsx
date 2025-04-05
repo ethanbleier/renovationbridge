@@ -9,6 +9,7 @@ const platforms = [
   { name: 'Houzz', logo: '/images/platforms/houzz.png' },
   { name: 'NBC', logo: '/images/platforms/nbc.png' },
   { name: 'Nextdoor', logo: '/images/platforms/nextdoor.png' },
+  { name: 'Yelp', logo: '/images/platforms/yelp.webp' },
 ]
 
 export default function PlatformSection() {

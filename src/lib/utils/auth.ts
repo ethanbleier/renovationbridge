@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import type { IUser } from '../models/User';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('JWT_SECRET environment variable is not set. Authentication will fail.');
+}
 const TOKEN_EXPIRY = '7d';
 
 export type TokenPayload = {
@@ -13,6 +16,10 @@ export type TokenPayload = {
 };
 
 export function generateToken(user: IUser): string {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is not set');
+  }
+  
   const payload: TokenPayload = {
     userId: user.id,
     email: user.email,
@@ -43,6 +50,11 @@ export function clearAuthCookie(): void {
 }
 
 export function verifyToken(token: string): TokenPayload | null {
+  if (!JWT_SECRET) {
+    console.error('JWT_SECRET environment variable is not set');
+    return null;
+  }
+  
   try {
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch (error) {
