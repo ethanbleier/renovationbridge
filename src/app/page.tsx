@@ -66,12 +66,12 @@ export default function Home() {
 
       {/* How It Works Section */}
       <HowItWorksSection />
+
+      {/* Service Area Map Section */}
+      <ServiceAreaMapSection />
       
       {/* As Seen on TV Section */}
       <AsSeenOnTV />
-      
-      {/* Service Area Map Section */}
-      <ServiceAreaMapSection />
       
       {/* CTA Section */}
       <CTASection />

@@ -1,177 +1,196 @@
 "use client";
 
 import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useRef } from 'react';
 
 export default function HowItWorksSection() {
-  // Reference to the entire section
   const sectionRef = useRef(null);
   
-  // Get scroll progress within this section
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      }
+    }
+  };
   
-  // Create transforms for each card based on scroll position
-  const card1Opacity = useTransform(scrollYProgress, [0, 0.2, 0.3], [0, 1, 1]);
-  const card1Y = useTransform(scrollYProgress, [0, 0.2, 0.3], [100, 0, 0]);
-  
-  const card2Opacity = useTransform(scrollYProgress, [0.25, 0.45, 0.55], [0, 1, 1]);
-  const card2Y = useTransform(scrollYProgress, [0.25, 0.45, 0.55], [100, 0, 0]);
-  
-  const card3Opacity = useTransform(scrollYProgress, [0.5, 0.7, 0.8], [0, 1, 1]);
-  const card3Y = useTransform(scrollYProgress, [0.5, 0.7, 0.8], [100, 0, 0]);
-  
-  const buttonOpacity = useTransform(scrollYProgress, [0.25, 0.95], [0, 1]);
-  const buttonScale = useTransform(scrollYProgress, [0.25, 0.95], [0.9, 1]);
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-16 md:py-20 bg-lavender">
-      <div className="container-custom px-4 sm:px-6">
+    <section 
+      ref={sectionRef} 
+      className="py-20 sm:py-24 md:py-32 bg-gradient-to-b from-lavender/40 to-lavender/60"
+    >
+      <div className="container-custom px-4 sm:px-6 max-w-7xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8 sm:mb-12"
+          variants={containerVariants}
+          className="mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 sm:mb-4">How It Works</h2>
-          <p className="text-center text-gray max-w-3xl mx-auto text-sm sm:text-base">
-            Our simple process connects you with the perfect contractor for your project
-          </p>
+          <motion.div variants={itemVariants} className="flex flex-col items-center">
+            <span className="text-primary text-sm font-medium tracking-wider uppercase mb-3">Simple Process</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4">How It Works</h2>
+            <div className="w-16 h-1 bg-primary rounded mb-6"></div>
+            <p className="text-center text-gray-600 max-w-2xl mx-auto text-base sm:text-lg">
+              Our streamlined process connects you with the perfect contractor for your dream renovation project
+            </p>
+          </motion.div>
         </motion.div>
         
-        <div className="space-y-8 sm:space-y-12 md:space-y-16 max-w-4xl mx-auto">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={containerVariants}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
+        >
           {/* Step 1 */}
-          <motion.div 
-            style={{ opacity: card1Opacity, y: card1Y }}
-            className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:shadow-xl"
+          <motion.div
+            variants={itemVariants}
+            className="bg-white rounded-xl shadow-lg p-6 sm:p-8 transform transition-all hover:shadow-xl hover:scale-105 flex flex-col relative overflow-hidden group"
           >
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/4 bg-primary p-4 sm:p-6 flex items-center justify-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white text-primary rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold">
-                  1
-                </div>
-              </div>
-              <div className="md:w-3/4 p-4 sm:p-6 md:p-8">
-                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Submit Your Project</h3>
-                <p className="text-gray text-sm sm:text-base mb-3 sm:mb-4">
-                  Fill out our simple form with details about your renovation project. We collect essential information to understand your vision, budget, and timeline requirements.
-                </p>
-                <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base">
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl mr-4">1</div>
+              <h3 className="text-xl font-bold">Submit Your Project</h3>
+            </div>
+            <p className="text-gray-600 mb-5">
+              Share your vision by completing our simple project form. We collect the essential details to understand your needs.
+            </p>
+            <ul className="space-y-3 mb-6 text-sm">
+              {[
+                "Describe your renovation scope and goals",
+                "Set your budget parameters",
+                "Specify your desired timeline"
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="bg-primary/10 p-1 rounded mr-3 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    <span>Describe your project scope and goals</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Set your budget expectations</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Indicate your preferred timeline</span>
-                  </li>
-                </ul>
-              </div>
+                  </span>
+                  <span className="text-gray-700">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="h-0.5 w-full bg-gray-100 mb-5"></div>
+            <div className="mt-auto">
+              <span className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
+                Get Started
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
             </div>
           </motion.div>
           
           {/* Step 2 */}
-          <motion.div 
-            style={{ opacity: card2Opacity, y: card2Y }}
-            className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:shadow-xl"
+          <motion.div
+            variants={itemVariants}
+            className="bg-white rounded-xl shadow-lg p-6 sm:p-8 transform transition-all hover:shadow-xl hover:scale-105 flex flex-col relative overflow-hidden group"
           >
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/4 bg-primary p-4 sm:p-6 flex items-center justify-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white text-primary rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold">
-                  2
-                </div>
-              </div>
-              <div className="md:w-3/4 p-4 sm:p-6 md:p-8">
-                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Get Matched</h3>
-                <p className="text-gray text-sm sm:text-base mb-3 sm:mb-4">
-                  We'll match you with pre-vetted contractors who specialize in your project type. Our boutique algorithm finds professionals with proven experience in similar renovations.
-                </p>
-                <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base">
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl mr-4">2</div>
+              <h3 className="text-xl font-bold">Get Matched</h3>
+            </div>
+            <p className="text-gray-600 mb-5">
+              We'll connect you with pre-vetted contractors who specialize in your specific project type and requirements.
+            </p>
+            <ul className="space-y-3 mb-6 text-sm">
+              {[
+                "Review profiles of qualified contractors",
+                "Compare past work and client testimonials",
+                "Evaluate quotes and project approaches"
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="bg-primary/10 p-1 rounded mr-3 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    <span>Receive profiles of qualified contractors</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Review past work and client testimonials</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Compare quotes and project approaches</span>
-                  </li>
-                </ul>
-              </div>
+                  </span>
+                  <span className="text-gray-700">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="h-0.5 w-full bg-gray-100 mb-5"></div>
+            <div className="mt-auto">
+              <span className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
+                How Matching Works
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
             </div>
           </motion.div>
           
           {/* Step 3 */}
-          <motion.div 
-            style={{ opacity: card3Opacity, y: card3Y }}
-            className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:shadow-xl"
+          <motion.div
+            variants={itemVariants}
+            className="bg-white rounded-xl shadow-lg p-6 sm:p-8 transform transition-all hover:shadow-xl hover:scale-105 flex flex-col relative overflow-hidden group"
           >
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/4 bg-primary p-4 sm:p-6 flex items-center justify-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white text-primary rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold">
-                  3
-                </div>
-              </div>
-              <div className="md:w-3/4 p-4 sm:p-6 md:p-8">
-                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3">Start Your Renovation</h3>
-                <p className="text-gray text-sm sm:text-base mb-3 sm:mb-4">
-                  Choose your preferred contractor and begin your renovation with confidence. We'll remain available throughout your project to ensure everything runs smoothly.
-                </p>
-                <ul className="space-y-1.5 sm:space-y-2 text-sm sm:text-base">
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl mr-4">3</div>
+              <h3 className="text-xl font-bold">Start Renovation</h3>
+            </div>
+            <p className="text-gray-600 mb-5">
+              Choose your ideal contractor and begin your renovation journey with confidence and our continued support.
+            </p>
+            <ul className="space-y-3 mb-6 text-sm">
+              {[
+                "Finalize project details and contracts",
+                "Receive ongoing support from our team",
+                "Track progress and project milestones"
+              ].map((item, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="bg-primary/10 p-1 rounded mr-3 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    <span>Finalize project details and contracts</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Receive ongoing support from our team</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mt-0.5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Track progress and milestones</span>
-                  </li>
-                </ul>
-              </div>
+                  </span>
+                  <span className="text-gray-700">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="h-0.5 w-full bg-gray-100 mb-5"></div>
+            <div className="mt-auto">
+              <span className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
+                Our Support Process
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
         
         <motion.div 
-          style={{ opacity: buttonOpacity, scale: buttonScale }}
-          className="text-center mt-10 sm:mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="text-center mt-16"
         >
-          <Link href="/how-it-works" className="btn btn-primary inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base">
+          <Link 
+            href="/how-it-works" 
+            className="inline-flex items-center justify-center px-8 py-4 text-base font-medium rounded-full text-white bg-primary hover:bg-primary/90 transition-colors duration-300 shadow-md hover:shadow-lg"
+          >
             Learn More About Our Process
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </Link>
