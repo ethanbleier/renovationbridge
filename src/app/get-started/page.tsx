@@ -13,7 +13,7 @@ export default function GetStartedPage() {
       setTimeout(() => {
         const yOffset = -20; // Slightly above the form
         const formPosition = formRef.current?.getBoundingClientRect().top || 0;
-        const offsetPosition = formPosition + window.pageYOffset + yOffset;
+        const offsetPosition = formPosition + window.scrollY + yOffset;
         
         window.scrollTo({
           top: offsetPosition,
@@ -60,19 +60,19 @@ export default function GetStartedPage() {
                       <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span>Free design consultation (valued at $250)</span>
+                      <span>Free priority consultations with multiple vetted contractors</span>
                     </li>
                     <li className="flex items-start text-xs">
                       <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span>Priority matching within 24 hours</span>
+                      <span>24/7 support from a dedicated RB Matchmaker</span>
                     </li>
                     <li className="flex items-start text-xs">
                       <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span>Exclusive material discount vouchers</span>
+                      <span>Contract negotiation and review</span>
                     </li>
                   </ul>
                 </div>

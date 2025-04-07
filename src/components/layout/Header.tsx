@@ -10,6 +10,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isResourcesOpen, setIsResourcesOpen] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(true)
+  const [isHeaderShrunk, setIsHeaderShrunk] = useState(false)
   const lastScrollY = useRef(0)
   const pathname = usePathname()
   
@@ -37,6 +38,13 @@ const Header = () => {
         }
       }
       
+      // Handle header shrinking on all pages
+      if (currentScrollY > 50) {
+        setIsHeaderShrunk(true)
+      } else {
+        setIsHeaderShrunk(false)
+      }
+      
       lastScrollY.current = currentScrollY
     }
     
@@ -56,10 +64,10 @@ const Header = () => {
   }
 
   return (
-    <header className={`bg-white shadow-sm sticky top-0 z-50 transition-transform duration-300 ${
+    <header className={`bg-white shadow-sm sticky top-0 z-50 transition-all duration-300 ${
       headerVisible ? 'translate-y-0' : '-translate-y-full'
-    }`}>
-      <div className="container-custom py-4 pr-3 md:pr-5 lg:pr-8">
+    } ${isHeaderShrunk ? 'py-1' : 'py-2'}`}>
+      <div className={`container-custom ${isHeaderShrunk ? 'py-2' : 'py-4'} pr-3 md:pr-5 lg:pr-8 transition-all duration-300`}>
         <div className="flex items-center justify-between gap-4 lg:gap-8">
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0">
@@ -68,7 +76,11 @@ const Header = () => {
               alt="Renovation Bridge Logo" 
               width={180} 
               height={40}
-              className="w-[150px] sm:w-[170px] lg:w-[220px]"
+              className={`transition-all duration-300 ${
+                isHeaderShrunk 
+                  ? 'w-[130px] sm:w-[150px] lg:w-[180px]' 
+                  : 'w-[150px] sm:w-[170px] lg:w-[220px]'
+              }`}
               style={{ height: "auto" }}
               priority
             />
@@ -119,10 +131,18 @@ const Header = () => {
           {/* CTA Buttons - Hidden on get-started page */}
           {!isGetStartedPage && (
             <div className="hidden md:flex items-center space-x-3 lg:space-x-4 flex-shrink-0">
-              <Link href="/for-contractors" className="px-3 py-2 lg:px-4 lg:py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 whitespace-nowrap text-sm lg:text-base">
+              <Link href="/for-contractors" className={`transition-all duration-300 ${
+                isHeaderShrunk 
+                  ? 'px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-sm' 
+                  : 'px-3 py-2 lg:px-4 lg:py-2 text-sm lg:text-base'
+              } border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transform hover:scale-105 whitespace-nowrap`}>
                 For Contractors
               </Link>
-              <Link href="/get-started" className="cta-btn transform hover:scale-105 transition-transform duration-200 whitespace-nowrap text-sm lg:text-base px-3 py-2 lg:px-5 lg:py-2">
+              <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
+                isHeaderShrunk 
+                  ? 'px-2.5 py-1.5 lg:px-4 lg:py-1.5 text-sm' 
+                  : 'px-3 py-2 lg:px-5 lg:py-2 text-sm lg:text-base'
+              }`}>
                 GET STARTED
               </Link>
             </div>
