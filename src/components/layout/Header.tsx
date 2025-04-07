@@ -143,7 +143,7 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white px-4 pt-2 pb-4 shadow-inner">
+        <div className={`bg-white px-4 pt-2 pb-4 shadow-inner ${isGetStartedPage ? '' : 'md:hidden'}`}>
           <nav className="flex flex-col space-y-3">
             <Link 
               href="/how-it-works" 
