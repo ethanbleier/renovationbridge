@@ -21,7 +21,6 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  // FAQ structured data for the home page
   const faqSchema = generateFAQSchema([
     {
       question: "How does Renovation Bridge work?",
@@ -40,7 +39,7 @@ export default function Home() {
   // Services structured data
   const serviceSchema = generateServiceSchema(
     "Home Renovation Services",
-    "Renovation Bridge helps homeowners connect with vetted contractors for kitchen, bathroom, and whole-home renovation projects.",
+    "Renovation Bridge helps homeowners connect with vetted contractors for renovation projects.",
     "https://renovationbridge.com/services",
     "https://renovationbridge.com/images/services/renovation.jpg"
   );

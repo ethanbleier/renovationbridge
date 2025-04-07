@@ -1,4 +1,5 @@
-import { Metadata } from 'next'
+import { Metadata} from 'next'
+import React from 'react';
 
 export const metadata: Metadata = {
   title: 'Get Started | Renovation Bridge',

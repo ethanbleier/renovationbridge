@@ -15,7 +15,6 @@ const ConversionTracker = ({
   value = 1.0 
 }: ConversionTrackerProps) => {
   useEffect(() => {
-    // Only track if Google Analytics ID is available
     if (typeof window !== 'undefined' && window.gtag && GA_MEASUREMENT_ID) {
       // Track conversion
       window.gtag('event', 'conversion', {
@@ -36,7 +35,6 @@ const ConversionTracker = ({
     }
   }, [conversionType, value]);
 
-  // This component doesn't render anything
   return null;
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import Accordion, { AccordionItem } from '@/components/ui/Accordion';
+import { AccordionItem } from '@/components/ui/Accordion';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ChevronRightIcon, EnvelopeIcon } from '@heroicons/react/24/outline';

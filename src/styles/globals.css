@@ -96,6 +96,42 @@
     border-radius: 0.1875rem; /* 3px - further reduced to maintain concentricity with the larger gap */
   }
   
+  /* Deal card with neon swirling border */
+  .deal-card {
+    @apply relative rounded-xl p-4 z-10 overflow-hidden;
+  }
+  
+  .deal-card:before {
+    content: '';
+    @apply absolute -top-1 -right-1 -bottom-1 -left-1 rounded-xl z-[-1];
+    background: linear-gradient(
+      125deg, 
+      rgba(126, 87, 194, 0.7), /* Purple */
+      rgba(49, 59, 192, 0.7), /* Primary blue */
+      rgba(0, 183, 255, 0.7), /* Cyan */
+      rgba(106, 192, 69, 0.7), /* Green */
+      rgba(126, 87, 194, 0.7) /* Purple again */
+    );
+    background-size: 400% 400%;
+    animation: neon-swirl 8s linear infinite;
+    filter: blur(3px);
+    opacity: 0.7;
+  }
+  
+  .deal-card:after {
+    content: '';
+    @apply absolute top-0 right-0 bottom-0 left-0 rounded-xl bg-gradient-to-r from-primary/10 to-lavender/30 z-0;
+  }
+  
+  .deal-card-content {
+    @apply relative z-10;
+  }
+  
+  .deal-card:hover:before {
+    animation: neon-swirl 4s linear infinite, neon-pulse 2s ease-in-out infinite alternate;
+    opacity: 0.85;
+  }
+  
   @keyframes glowing-border {
     0% {
       background-position: 0% 50%;
@@ -105,6 +141,24 @@
     }
     100% {
       background-position: 0% 50%;
+    }
+  }
+  
+  @keyframes neon-swirl {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 300% 0%;
+    }
+  }
+  
+  @keyframes neon-pulse {
+    0% {
+      filter: blur(3px) brightness(1);
+    }
+    100% {
+      filter: blur(4px) brightness(1.2);
     }
   }
   

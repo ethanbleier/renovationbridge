@@ -179,7 +179,7 @@ spinner() {
   
   while [ "$(ps a | awk '{print $1}' | grep $pid 2>/dev/null)" ]; do
     for char in "${chars[@]}"; do
-      printf "\r%s Loading... %s" "🔄" "$char"
+      printf "\r%s%s" "$char"
       sleep $delay
       
       # Increment counter and check for timeout

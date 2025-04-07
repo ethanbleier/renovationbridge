@@ -19,6 +19,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@types/jsdom": "^21.1.7",
+    "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",

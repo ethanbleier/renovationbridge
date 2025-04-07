@@ -74,6 +74,7 @@ const Header = () => {
             />
           </Link>
 
+          {/* Desktop Navigation - Hidden on get-started page for improved lead capture */}
           {/* Desktop Navigation - Hidden on get-started page */}
           {!isGetStartedPage && (
             <nav className="hidden md:flex items-center space-x-4 lg:space-x-8 flex-grow justify-center">
@@ -130,7 +131,7 @@ const Header = () => {
 
           {/* On get-started page, add spacer div to push menu button to the right side */}
           {isGetStartedPage && <div className="flex-grow"></div>}
-
+          {/* TODO: fix where menu button is populating in non-getstarted form views too. Should only display in mobile, splitscreen and /get-started */}
           {/* Mobile Menu Button - Always visible */}
           <button
             className="text-gray-500 hover:text-gray-700 focus:outline-none"
