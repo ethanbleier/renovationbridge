@@ -93,9 +93,8 @@ export default function ProjectGallery({
                 alt={image.alt}
                 aspectRatio={index % 2 === 0 ? "square" : "video"}
                 className="w-full"
-                priority={index === 0} // Load first image with priority
                 fill
-                onClick={() => openLightbox(leftColumnImages.indexOf(image))}
+                onClick={() => openLightbox(gridImages.indexOf(image))}
               />
             </div>
           ))}
@@ -113,9 +112,8 @@ export default function ProjectGallery({
                 alt={image.alt}
                 aspectRatio={index % 2 === 1 ? "square" : "video"}
                 className="w-full"
-                priority={index === 0} // Load first image with priority
                 fill
-                onClick={() => openLightbox(middleColumnImages.indexOf(image))}
+                onClick={() => openLightbox(gridImages.indexOf(image))}
               />
             </div>
           ))}
@@ -134,9 +132,8 @@ export default function ProjectGallery({
                   alt={image.alt}
                   aspectRatio={index % 2 === 0 ? "video" : "square"}
                   className="w-full"
-                  priority={index === 0} // Load first image with priority
                   fill
-                  onClick={() => openLightbox(rightColumnImages.indexOf(image))}
+                  onClick={() => openLightbox(gridImages.indexOf(image))}
                 />
               </div>
             ))}
