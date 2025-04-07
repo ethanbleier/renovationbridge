@@ -9,7 +9,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
 import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/structured-data'
 import { sarabun } from '@/lib/fonts'
-
+import Script from 'next/script'
 
 const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID;
 
@@ -81,22 +81,23 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <JsonLd data={[generateOrganizationSchema(), generateLocalBusinessSchema()]} />
-        
-        {/* Google Tag Manager */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-16912546121"></script>
-        <script 
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              ${GA_MEASUREMENT_ID ? `gtag('config', '${GA_MEASUREMENT_ID}');` : ''}
-              gtag('config', 'AW-16912546121');
-            `
-          }} 
-        />
       </head>
       <body className={`${inter.variable} ${sarabun.variable} font-sans antialiased`}>
+        {/* Google Tag Manager */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-16912546121"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            ${GA_MEASUREMENT_ID ? `gtag('config', '${GA_MEASUREMENT_ID}');` : ''}
+            gtag('config', 'AW-16912546121');
+          `}
+        </Script>
+        
         <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-grow">

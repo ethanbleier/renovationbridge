@@ -1,1 +1,0 @@
-Note: We need to add a Bay Area map image at '/public/images/maps/bay-area-map.png'
