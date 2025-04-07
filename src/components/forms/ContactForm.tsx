@@ -160,7 +160,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
     <div className="w-full rounded-lg bg-white p-6 md:p-8 shadow-lg transition-all hover:shadow-xl">
       {trackConversion && <ConversionTracker conversionType="contact_form" value={1.0} />}
       
-      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-lavender after:left-0 after:-bottom-2">Get Started Today</h3>
+      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-primary after:left-0 after:-bottom-2">Get Started Today</h3>
       {isSuccess ? (
         <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center animate-fadeIn">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
