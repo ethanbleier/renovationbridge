@@ -23,6 +23,14 @@ yarn-error.log*
 
 # Testing
 coverage
+# Playwright test results and reports
+test-results/
+playwright-report/
+**/test-results/
+**/*.trace.zip
+**/*trace.zip
+**/*-trace.zip
+**/playwright-artifacts*/
 
 # IDE files
 .idea
