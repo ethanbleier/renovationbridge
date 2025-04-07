@@ -6,13 +6,12 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import JsonLd from '@/components/seo/JsonLd'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/next'
 import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/structured-data'
 import { sarabun } from '@/lib/fonts'
 
 
 const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID;
-
-const GOOGLE_ADS_ID = process.env.GOOGLE_ADS_ID;
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -25,19 +24,19 @@ export const metadata: Metadata = {
   description: 'Renovation Bridge helps Bay Area homeowners renovate smarter by connecting them with vetted contractors for their renovation projects.',
   metadataBase: new URL('https://renovationbridge.com'),
   authors: [{ name: 'Renovation Bridge Team' }],
-  keywords: ['renovation', 'home remodeling', 'contractors', 'Bay Area', 'home improvement'],
+  keywords: ['renovation', 'home remodeling', 'contractors', 'Bay Area', 'home improvement', 'renovation bridge', 'onn matalon', 'ethan bleier'],
   generator: 'Next.js',
   applicationName: 'Renovation Bridge',
   referrer: 'origin-when-cross-origin',
-  creator: 'Renovation Bridge',
+  creator: 'Ethan Bleier',
   publisher: 'Renovation Bridge',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://renovationbridge.com',
     siteName: 'Renovation Bridge',
-    title: 'Renovation Bridge - Smart Home Renovation Solutions',
-    description: 'Renovation Bridge helps Bay Area homeowners renovate smarter by connecting them with vetted contractors for their renovation projects.',
+    title: 'Renovation Bridge - Home Renovation Solutions',
+    description: 'Renovation Bridge connects homeowners with vetted contractors for their renovation projects.',
     images: [
       {
         url: '/images/logos/og-image.jpg',
@@ -105,6 +104,7 @@ export default function RootLayout({
           </main>
           <Footer />
           <SpeedInsights dsn="ZNga99anB7eSaJjchi9phAZv6n7" />
+          <Analytics />
         </div>
       </body>
     </html>

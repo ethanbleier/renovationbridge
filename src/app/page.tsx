@@ -6,6 +6,7 @@ import HowItWorksSection from '@/components/sections/HowItWorksSection'
 import AsSeenOnTV from '@/components/sections/AsSeenOnTV'
 import CTASection from '@/components/sections/CTASection'
 import PlatformSection from '@/components/sections/PlatformSection'
+import ServiceAreaMapSection from '@/components/sections/ServiceAreaMapSection'
 import PageSeo from '@/components/seo/PageSeo'
 import { generateServiceSchema, generateFAQSchema } from '@/lib/structured-data'
 import { Metadata } from 'next'
@@ -20,7 +21,6 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  // FAQ structured data for the home page
   const faqSchema = generateFAQSchema([
     {
       question: "How does Renovation Bridge work?",
@@ -39,7 +39,7 @@ export default function Home() {
   // Services structured data
   const serviceSchema = generateServiceSchema(
     "Home Renovation Services",
-    "Renovation Bridge helps homeowners connect with vetted contractors for kitchen, bathroom, and whole-home renovation projects.",
+    "Renovation Bridge helps homeowners connect with vetted contractors for renovation projects.",
     "https://renovationbridge.com/services",
     "https://renovationbridge.com/images/services/renovation.jpg"
   );
@@ -65,6 +65,9 @@ export default function Home() {
 
       {/* How It Works Section */}
       <HowItWorksSection />
+
+      {/* Service Area Map Section */}
+      <ServiceAreaMapSection />
       
       {/* As Seen on TV Section */}
       <AsSeenOnTV />

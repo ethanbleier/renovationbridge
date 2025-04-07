@@ -15,7 +15,6 @@ const GoogleAdsTracker = ({
   conversionValue 
 }: GoogleAdsTrackerProps) => {
   useEffect(() => {
-    // Only track if window and gtag are available
     if (typeof window !== 'undefined' && window.gtag) {
       // Track Google Ads conversion
       if (conversionLabel) {
@@ -35,8 +34,7 @@ const GoogleAdsTracker = ({
     }
   }, [conversionLabel, conversionValue]);
 
-  // This component doesn't render anything
   return null;
 };
 
-export default GoogleAdsTracker; 
+export default GoogleAdsTracker;

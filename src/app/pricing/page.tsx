@@ -345,238 +345,289 @@ export default function PricingCalculator() {
   };
 
   return (
-    <div className="container-custom py-12 md:py-16">
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-lavender/30 to-primary/10 rounded-3xl transform -rotate-1 scale-105"></div>
-        <h1 className="relative text-3xl md:text-4xl font-bold text-center mb-6 pt-8 text-primary">
-          Renovation Budget Calculator
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Header Section */}
+      <div className="max-w-4xl mx-auto text-center mb-12">
+        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-4">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+            Renovation Budget Calculator
+          </span>
         </h1>
-        <p className="relative text-center text-gray-600 mb-10 max-w-2xl mx-auto">
+        <p className="max-w-2xl mx-auto text-xl text-gray-500">
           Plan your perfect renovation with our budget calculator. Estimate costs, ROI, and savings timeline.
         </p>
       </div>
-      
-      <div className="max-w-4xl mx-auto bg-white p-8 md:p-10 rounded-xl shadow-lg border border-lavender/20 relative z-10 overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-primary/5 to-lavender/10 rounded-full transform translate-x-16 -translate-y-16"></div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-          <div className="md:col-span-1">
-            <label className="block text-lg font-medium mb-2 text-gray-700">Estimated Home Value:</label>
-            <input 
-              type="text" 
-              {...homeValueRef}
-              className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white/80 shadow-sm"
-              placeholder="$0"
-              value={homeValueFormatted}
-              onChange={handleHomeValueChange}
-            />
-            {errors.homeValue && <span className="text-red-500 text-sm mt-1 block">This field is required</span>}
-          </div>
-          
-          <div className="md:col-span-1">
-            <label className="block text-lg font-medium mb-2 text-gray-700">Annual Income:</label>
-            <input 
-              type="text" 
-              {...yearlyIncomeRef}
-              className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white/80 shadow-sm"
-              placeholder="$0"
-              value={yearlyIncomeFormatted}
-              onChange={handleYearlyIncomeChange}
-            />
-            {errors.yearlyIncome && <span className="text-red-500 text-sm mt-1 block">This field is required</span>}
-          </div>
-          
-          <div className="md:col-span-1">
-            <label className="block text-lg font-medium mb-2 text-gray-700">Project Type:</label>
-            <select 
-              {...register('projectType', { required: true })}
-              className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white/80 shadow-sm"
-            >
-              <option value="">Select</option>
-              {projectTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-            {errors.projectType && <span className="text-red-500 text-sm mt-1 block">This field is required</span>}
-          </div>
+
+      {/* Calculator Form Card */}
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 mb-16">
+        {/* Form Header */}
+        <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6">
+          <h2 className="text-2xl font-bold text-gray-800">Enter Your Details</h2>
+          <p className="text-gray-600 text-sm mt-1">Fill in the details below to calculate your renovation budget</p>
         </div>
-        
-        <div className="flex justify-center mt-10">
-          <button 
-            onClick={handleSubmit(onSubmit)}
-            className="btn btn-primary mx-2 px-8 py-3 font-semibold rounded-lg shadow-md transform transition-transform hover:scale-105"
-          >
-            Calculate
-          </button>
-          <button 
-            onClick={onReset}
-            className="btn bg-white text-primary border border-primary hover:bg-lavender/20 mx-2 px-8 py-3 font-semibold rounded-lg shadow-sm"
-          >
-            Reset
-          </button>
+
+        {/* Form Body */}
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Estimated Home Value</label>
+              <div className="relative rounded-md shadow-sm">
+                <input 
+                  type="text" 
+                  {...homeValueRef}
+                  className="block w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all"
+                  placeholder="$0"
+                  value={homeValueFormatted}
+                  onChange={handleHomeValueChange}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-gray-500 sm:text-sm">USD</span>
+                </div>
+              </div>
+              {errors.homeValue && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Annual Income</label>
+              <div className="relative rounded-md shadow-sm">
+                <input 
+                  type="text" 
+                  {...yearlyIncomeRef}
+                  className="block w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all"
+                  placeholder="$0"
+                  value={yearlyIncomeFormatted}
+                  onChange={handleYearlyIncomeChange}
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-gray-500 sm:text-sm">USD</span>
+                </div>
+              </div>
+              {errors.yearlyIncome && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Project Type</label>
+              <select 
+                {...register('projectType', { required: true })}
+                className="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary transition-all"
+              >
+                <option value="">Select a project type</option>
+                {projectTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+              {errors.projectType && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-center space-x-4">
+            <button 
+              onClick={handleSubmit(onSubmit)}
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:scale-105"
+            >
+              Calculate
+            </button>
+            <button 
+              onClick={onReset}
+              className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       </div>
       
+      {/* Results Section */}
       {showResults && results && (
-        <div className="max-w-6xl mx-auto mt-16 bg-white p-8 rounded-xl shadow-lg border border-lavender/20 relative z-10 overflow-hidden">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-secondary/5 to-primary/10 rounded-full transform -translate-x-32 -translate-y-32"></div>
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tr from-lavender/10 to-primary/5 rounded-full transform translate-x-24 translate-y-24"></div>
-          
-          <div className="flex justify-between items-center mb-6 relative z-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-primary">Renovation Budget Calculation Results</h2>
+        <div className="max-w-6xl mx-auto transition-all duration-500 animate-fadeIn">
+          {/* Results Header */}
+          <div className="bg-white rounded-t-2xl shadow-lg p-6 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-100">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Renovation Budget Results</h2>
+              <p className="text-gray-500">Based on your {results.low.projectType.toLowerCase()} project</p>
+            </div>
             <button 
               disabled
-              className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-lg shadow-md transition-all cursor-not-allowed relative group"
+              className="mt-4 md:mt-0 flex items-center gap-2 bg-gray-200 text-gray-500 px-4 py-2 rounded-lg opacity-60 cursor-not-allowed relative group"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
               Download PDF
-              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-primary text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 Coming Soon
               </span>
             </button>
           </div>
-          
-          <div className="overflow-x-auto relative z-10">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gradient-to-r from-primary/90 to-secondary/90 text-white">
-                  <th className="p-5 text-left rounded-tl-lg"></th>
-                  <th className="p-5 text-center font-medium text-lg">Low</th>
-                  <th className="p-5 text-center font-medium text-lg">Middle</th>
-                  <th className="p-5 text-center font-medium text-lg rounded-tr-lg">High</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">Initial Budget</td>
-                  <td className="p-5 text-center">{formatCurrency(results.low.initialBudget)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.middle.initialBudget)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.high.initialBudget)}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">Contingency Fund</td>
-                  <td className="p-5 text-center">{formatCurrency(results.low.contingencyFund)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.middle.contingencyFund)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.high.contingencyFund)}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">Time To Save In Months</td>
-                  <td className="p-5 text-center">{formatMonths(results.low.timeToSave)}</td>
-                  <td className="p-5 text-center">{formatMonths(results.middle.timeToSave)}</td>
-                  <td className="p-5 text-center">{formatMonths(results.high.timeToSave)}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">How Much To Save Per Month</td>
-                  <td className="p-5 text-center">{formatCurrency(results.low.monthlySavings)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.middle.monthlySavings)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.high.monthlySavings)}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">Estimated ROI</td>
-                  <td className="p-5 text-center">{results.low.roi.toFixed(2)}%</td>
-                  <td className="p-5 text-center">{results.middle.roi.toFixed(2)}%</td>
-                  <td className="p-5 text-center">{results.high.roi.toFixed(2)}%</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">Value Increase</td>
-                  <td className="p-5 text-center">{formatCurrency(results.low.valueIncrease)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.middle.valueIncrease)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.high.valueIncrease)}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-5 font-medium">Estimated Updated Home Value</td>
-                  <td className="p-5 text-center">{formatCurrency(results.low.updatedHomeValue)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.middle.updatedHomeValue)}</td>
-                  <td className="p-5 text-center">{formatCurrency(results.high.updatedHomeValue)}</td>
-                </tr>
-                <tr className="border-b bg-primary/5 font-semibold">
-                  <td className="p-5 text-lg">Total Budget</td>
-                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.low.totalBudget)}</td>
-                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.middle.totalBudget)}</td>
-                  <td className="p-5 text-center text-primary font-bold text-xl">{formatCurrency(results.high.totalBudget)}</td>
-                </tr>
-              </tbody>
-            </table>
+
+          {/* Results Table */}
+          <div className="bg-white shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th scope="col" className="px-6 py-5 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4"></th>
+                    <th scope="col" className="px-6 py-5 bg-blue-50 text-center text-sm font-medium text-blue-700 uppercase tracking-wider">Low Tier</th>
+                    <th scope="col" className="px-6 py-5 bg-purple-50 text-center text-sm font-medium text-purple-700 uppercase tracking-wider">Middle Tier</th>
+                    <th scope="col" className="px-6 py-5 bg-indigo-50 text-center text-sm font-medium text-indigo-700 uppercase tracking-wider">High Tier</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Initial Budget</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.initialBudget)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.initialBudget)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.initialBudget)}</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Contingency Fund</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.contingencyFund)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.contingencyFund)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.contingencyFund)}</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Time To Save</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatMonths(results.low.timeToSave)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatMonths(results.middle.timeToSave)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatMonths(results.high.timeToSave)}</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Monthly Savings</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.monthlySavings)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.monthlySavings)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.monthlySavings)}</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Estimated ROI</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{results.low.roi.toFixed(2)}%</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{results.middle.roi.toFixed(2)}%</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{results.high.roi.toFixed(2)}%</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Value Increase</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.valueIncrease)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.valueIncrease)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.valueIncrease)}</td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Updated Home Value</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.updatedHomeValue)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.updatedHomeValue)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.updatedHomeValue)}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-5 whitespace-nowrap text-base font-bold text-gray-900">Total Budget</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-center text-blue-600 bg-blue-50">{formatCurrency(results.low.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-center text-purple-600 bg-purple-50">{formatCurrency(results.middle.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-center text-indigo-600 bg-indigo-50">{formatCurrency(results.high.totalBudget)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          
-          <div className="mt-10 p-8 bg-gradient-to-r from-lavender/20 to-cream rounded-lg shadow-inner relative z-10">
-            <h3 className="text-xl font-bold mb-4 text-primary">Understanding Your Budget</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-5 rounded-lg shadow-sm">
-                <h4 className="font-semibold text-lg mb-2">Total Budget</h4>
-                <p className="text-gray-700">
+
+          {/* Understanding Your Budget */}
+          <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Understanding Your Budget</h3>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
+                <div className="flex items-center mb-3">
+                  <div className="bg-blue-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-medium text-gray-900">Total Budget</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
                   Includes both initial budget and contingency fund to cover unexpected expenses during your renovation.
                 </p>
               </div>
-              <div className="bg-white p-5 rounded-lg shadow-sm">
-                <h4 className="font-semibold text-lg mb-2">Monthly Savings</h4>
-                <p className="text-gray-700">
+              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
+                <div className="flex items-center mb-3">
+                  <div className="bg-purple-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-medium text-gray-900">Monthly Savings</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
                   Recommended amount to set aside each month based on your income to reach your renovation goal.
                 </p>
               </div>
-              <div className="bg-white p-5 rounded-lg shadow-sm">
-                <h4 className="font-semibold text-lg mb-2">Return on Investment</h4>
-                <p className="text-gray-700">
+              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
+                <div className="flex items-center mb-3">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <h4 className="font-medium text-gray-900">Return on Investment</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
                   Estimated percentage of your investment that may be recouped through increased home value.
                 </p>
               </div>
             </div>
           </div>
-          
-          <div className="mt-12 p-8 bg-white rounded-lg shadow-sm">
-            <h3 className="text-xl font-bold mb-2">Save Your Results</h3>
-            <p className="text-gray-700 mb-4">
-              Enter your contact information to save these results and receive additional renovation insights.
-            </p>
-            
-            {leadSubmitted ? (
-              <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Thank you! Your results have been saved.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="you@example.com"
-                  />
+
+          {/* Save Results */}
+          <div className="bg-white rounded-lg shadow-lg mt-8 mb-8 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Save Your Results</h3>
+              <p className="mt-1 text-sm text-gray-500">Enter your contact information to save these results and receive additional renovation insights.</p>
+            </div>
+            <div className="p-6">
+              {leadSubmitted ? (
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md flex items-center">
+                  <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <p className="text-green-700">Thank you! Your results have been saved.</p>
                 </div>
+              ) : (
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="(123) 456-7890"
-                  />
-                </div>
-                <div className="md:col-span-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="you@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="(123) 456-7890"
+                      />
+                    </div>
+                  </div>
                   <button
                     onClick={captureLeadData}
                     disabled={!email || !phone || isLeadSubmitting}
-                    className="btn btn-primary w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isLeadSubmitting ? 'Saving...' : 'Save My Results'}
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}

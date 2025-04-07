@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import GuideDownloadForm from '@/components/forms/GuideDownloadForm'
 
 export const metadata = {
   title: 'Renovation Guide | Renovation Bridge',
@@ -47,87 +48,193 @@ const guideTopics = [
 
 export default function GuidePage() {
   return (
-    <main className="container-custom py-12 md:py-20">
-      {/* Back Button */}
-      <div className="mb-8">
-        <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-700">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
-          Back
-        </Link>
+    <main className="relative min-h-screen scroll-smooth">
+      {/* Background image - only for hero section */}
+      <div className="hidden md:block absolute top-0 left-0 right-0 h-[330px] z-0">
+        <Image 
+          src="/images/guide/multiple.png" 
+          alt="Background" 
+          fill 
+          className="object-cover opacity-15"
+          priority
+        />
       </div>
       
-      <section className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6">Renovation Guide</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Your comprehensive resource for planning, executing, and enjoying your home renovation project.
-        </p>
-      </section>
+      {/* Add a visual divider */}
+      <div className="hidden md:block absolute top-[330px] left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-gray-200 to-transparent z-0"></div>
       
-      <section className="mb-16">
-        <div className="bg-lavender/20 rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-          <div className="md:w-1/2">
-            <h2 className="text-3xl font-semibold mb-4">Why This Guide?</h2>
-            <p className="text-gray-700 mb-4">
-              Renovation projects can be overwhelming, especially for first-timers. We've created this guide to help you navigate 
-              every step of the renovation process with confidence.
-            </p>
-            <p className="text-gray-700 mb-6">
-              Based on our extensive experience and customer feedback, we've compiled the most useful information 
-              to ensure your renovation journey is as smooth as possible.
-            </p>
-            <Link href="#topics" className="btn btn-primary">
-              Explore Topics
-            </Link>
-          </div>
-          <div className="md:w-1/2 relative h-64 md:h-80 w-full">
-            <Image
-              src="/images/guide/guide-preview-1.png"
-              alt="Home renovation in progress"
-              fill
-              className="object-cover rounded-lg"
-            />
-          </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        {/* Back Button */}
+        <div className="mb-8">
+          <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+            Back
+          </Link>
         </div>
-      </section>
-      
-      <section id="topics" className="mb-16">
-        <h2 className="text-3xl font-semibold mb-8 text-center">Guide Topics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {guideTopics.map((topic) => (
-            <div key={topic.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 flex flex-col">
-              <div className="w-12 h-12 bg-lavender/20 rounded-full flex items-center justify-center mb-4">
-                <Image src={topic.icon} alt="" width={24} height={24} />
+        
+        <section className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">Renovation Guide</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+            Your comprehensive resource for planning, executing, and enjoying your home renovation project.
+          </p>
+        </section>
+        
+        {/* Premium Guide Download Section - Above the fold for lead capture */}
+        <section id="download-guide" className="mb-16">
+          <div className="bg-gradient-to-r from-blue-50 to-lavender/30 shadow-lg rounded-xl border border-gray-100">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Content column */}
+              <div className="lg:col-span-7 p-6 md:p-8 z-10">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">FREE DOWNLOAD</span>
+                  <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded-full">PREMIUM CONTENT</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-semibold mb-3 tracking-tight">Complete Renovation Guide</h2>
+                <p className="text-gray-700 mb-3 text-sm md:text-base">
+                  Get our comprehensive renovation guide with expert tips, checklists, and planning templates to make your renovation project a success.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Step-by-step planning framework</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Budgeting templates</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Contractor selection checklist</span>
+                  </div>
+                  <div className="flex items-start">
+                    <svg className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="flex-1 text-sm">Timeline planning guide</span>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-medium mb-2">{topic.title}</h3>
-              <p className="text-gray-600 mb-4 flex-grow">{topic.description}</p>
-              <Link href={`/guide/${topic.id}`} className="text-primary font-medium hover:underline inline-flex items-center">
-                Read more
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+              
+              {/* Form column */}
+              <div className="lg:col-span-5 bg-white/80 p-6 rounded-b-xl lg:rounded-r-xl lg:rounded-bl-none">
+                <div className="flex items-start gap-4 mb-4">
+                  {/* Guide mockup image */}
+                  <div className="relative w-20 h-28 flex-shrink-0">
+                    <Image
+                      src="/images/guide/guide-preview-2.png"
+                      alt="Guide Preview"
+                      fill
+                      className="rounded-md object-cover shadow-md"
+                    />
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold py-0.5 px-1.5 rounded-md">FREE</div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-lg">Get instant access</h3>
+                    <p className="text-sm text-gray-600">Enter your details below</p>
+                  </div>
+                </div>
+                <GuideDownloadForm 
+                  guideTitle="Complete Home Renovation Guide" 
+                  guideType="renovation-planner" 
+                  downloadUrl="/pdfs/guide.pdf"
+                  buttonText="Download Free Guide"
+                  successHeading="Your guide is ready!"
+                  successMessage="Thanks for your interest in a successful renovation"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section className="mb-20 pt-6">
+          <div className="bg-white shadow-xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 rounded-2xl border border-gray-100">
+            <div className="md:w-1/2">
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6 tracking-tight">Why This Guide?</h2>
+              <p className="text-gray-700 mb-5 leading-relaxed">
+                Renovation projects can be overwhelming, especially for first-timers. We've created this guide to help you navigate 
+                every step of the renovation process with confidence.
+              </p>
+              <p className="text-gray-700 mb-8 leading-relaxed">
+                Based on our extensive experience and customer feedback, we've compiled the most useful information 
+                to ensure your renovation journey is as smooth as possible.
+              </p>
+              <Link href="#topics" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+                Explore Topics
               </Link>
             </div>
-          ))}
-        </div>
-      </section>
-      
-      <section className="bg-gray-50 rounded-xl p-8 md:p-12">
-        <h2 className="text-3xl font-semibold mb-6 text-center">Need Personalized Help?</h2>
-        <p className="text-center text-gray-700 max-w-2xl mx-auto mb-8">
-          If you have specific questions or need personalized guidance for your renovation project, 
-          our team of experts is ready to help.
-        </p>
-        <div className="flex justify-center">
-          <Link href="/get-started" className="btn btn-primary mr-4">
-            Get Started
-          </Link>
-          <Link href="/how-it-works" className="btn btn-outline">
-            Learn More
-          </Link>
-        </div>
-      </section>
+            <div className="md:w-1/2 relative h-64 md:h-96 w-full rounded-xl overflow-hidden shadow-2xl transform transition-transform hover:scale-[1.02] duration-300">
+              <Image
+                src="/images/guide/guide-preview-2.png"
+                alt="Home renovation in progress"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </section>
+        
+        <section id="topics" className="mb-20 scroll-mt-20">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-center tracking-tight">Guide Topics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {guideTopics.map((topic) => (
+              <div key={topic.id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 flex flex-col h-full transform hover:-translate-y-1">
+                <div className="w-14 h-14 bg-lavender/20 rounded-full flex items-center justify-center mb-6">
+                  <Image src={topic.icon} alt="" width={28} height={28} />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">{topic.title}</h3>
+                <p className="text-gray-600 mb-6 flex-grow leading-relaxed">{topic.description}</p>
+                <a href="#download-guide" className="group text-blue-600 font-medium hover:text-blue-800 inline-flex items-center transition-colors">
+                  Read more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+        
+        {/* Secondary CTA for Guide Download - Strategic placement after browsing topics */}
+        <section className="mb-20">
+          <div className="bg-gradient-to-r from-lavender/20 to-blue-50 shadow-lg p-8 rounded-xl text-center">
+            <h3 className="text-2xl font-semibold mb-3">Want to take this guide with you?</h3>
+            <p className="mb-5 text-gray-700 max-w-2xl mx-auto">
+              Download our complete renovation guide PDF to reference offline and share with your family or contractor.
+            </p>
+            <a href="#download-guide" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Get Your Free Guide
+            </a>
+          </div>
+        </section>
+        
+        <section className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 md:p-12 mb-10">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-center tracking-tight">Need Personalized Help?</h2>
+          <p className="text-center text-gray-700 max-w-2xl mx-auto mb-10 leading-relaxed">
+            If you have specific questions or need personalized guidance for your renovation project, 
+            our team of experts is ready to help.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/get-started" className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-md">
+              Get Started
+            </Link>
+            <Link href="/how-it-works" className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm">
+              Learn More
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   )
 } 

@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
   body {
     @apply bg-cream text-black;
   }
@@ -128,5 +132,36 @@
   
   .animate-slideDown {
     animation: slideDown 0.3s ease forwards;
+  }
+  
+  /* Get Started Form Animations */
+  @keyframes scaleIn {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-scaleIn {
+    animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
   }
 } 
