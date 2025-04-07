@@ -130,11 +130,10 @@ const Header = () => {
 
           {/* On get-started page, add spacer div to push menu button to the right side */}
           {isGetStartedPage && <div className="flex-grow"></div>}
-          {/* TODO: fix where menu button is populating in non-getstarted form views too. Should only display in mobile, splitscreen and /get-started */}
 
-          {/* Mobile Menu Button - Always visible */}
+          {/* Mobile Menu Button - Should only be visible on mobile or get-started page */}
           <button
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            className={`text-gray-500 hover:text-gray-700 focus:outline-none ${isGetStartedPage ? '' : 'md:hidden'}`}
             onClick={handleMenuToggle}
           >
             {isMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
