@@ -182,8 +182,6 @@ export default function HowItWorksPage() {
               <Link
                 href="/get-started"
                 className="inline-block bg-primary text-white font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-primary-dark transition-all duration-300"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 Continue
               </Link>
@@ -282,8 +280,6 @@ export default function HowItWorksPage() {
             <Link
               href="/get-started"
               className="inline-block bg-white text-primary font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-300"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               Unlock Home Potential
             </Link>

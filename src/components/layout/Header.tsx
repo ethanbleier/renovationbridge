@@ -153,7 +153,7 @@ const Header = () => {
                     Blog
                   </Link>
                   <Link href="/pricing" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px] animate-[fadeIn_0.3s_0.1s_both]">
-                    Quick Quote
+                    Pricing Calculator
                   </Link>
                   <Link href="/real-estate-referral" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px] animate-[fadeIn_0.3s_0.2s_both]">
                     Referral Program
@@ -177,7 +177,7 @@ const Header = () => {
                 isHeaderShrunk 
                   ? 'px-2.5 py-1.5 lg:px-4 lg:py-1.5 text-sm' 
                   : 'px-3 py-2 lg:px-5 lg:py-2 text-sm lg:text-base'
-              }`} target="_blank" rel="noopener noreferrer">
+              }`}>
                 GET STARTED
               </Link>
             </div>
@@ -276,9 +276,7 @@ const Header = () => {
               <Link 
                 href="/get-started" 
                 className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2"
-                onClick={() => setIsMenuOpen(false)}
-                target="_blank" 
-                rel="noopener noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
               >
                 GET STARTED
               </Link>

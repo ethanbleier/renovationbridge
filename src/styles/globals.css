@@ -32,6 +32,17 @@
   h3 {
     @apply text-xl md:text-2xl;
   }
+  
+  /* Custom select styling to override native appearance */
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1em;
+  }
 }
 
 @layer components {
@@ -53,6 +64,17 @@
   
   .form-input {
     @apply w-full p-2 md:p-3 border border-gray/30 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50;
+  }
+  
+  .form-select {
+    @apply w-full p-2 md:p-3 pr-10 border border-gray/30 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1em;
   }
   
   .contractor-btn {

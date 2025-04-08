@@ -103,7 +103,7 @@ const ServiceAreaMapSection = () => {
                       Whole House Renovations
                     </li>
                   </ul>
-                  <Link href="/get-started" target="_blank" rel="noopener noreferrer">
+                  <Link href="/get-started">
                     <button className="mt-5 bg-primary hover:bg-opacity-90 text-black px-4 py-2 rounded-md transition-colors w-full cta-btn">
                       Get Started in {serviceAreas.find(a => a.id === activeArea)?.name}
                     </button>

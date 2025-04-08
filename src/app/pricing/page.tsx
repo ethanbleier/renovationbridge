@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
+import 'charts.css';
 
 // Format currency input with $ and commas
 const formatCurrencyInput = (value: string): string => {
@@ -54,14 +55,17 @@ type TierResult = {
 export default function PricingCalculator() {
   const [results, setResults] = useState<CalculationResults | null>(null);
   const [showResults, setShowResults] = useState(false);
-  const [homeValueFormatted, setHomeValueFormatted] = useState('$');
-  const [yearlyIncomeFormatted, setYearlyIncomeFormatted] = useState('$');
+  const [homeValueNumber, setHomeValueNumber] = useState(300000); // Default for slider
+  const [yearlyIncomeNumber, setYearlyIncomeNumber] = useState(80000); // Default for slider
+  const [homeValueFormatted, setHomeValueFormatted] = useState(formatCurrencyInput(`$${homeValueNumber}`));
+  const [yearlyIncomeFormatted, setYearlyIncomeFormatted] = useState(formatCurrencyInput(`$${yearlyIncomeNumber}`));
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(false);
   
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, reset, watch, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       homeValue: '',
       yearlyIncome: '',
@@ -69,11 +73,16 @@ export default function PricingCalculator() {
     }
   });
 
-  // Initialize form values
+  // Watch for form value changes to enable real-time calculation
+  const watchHomeValue = watch('homeValue');
+  const watchYearlyIncome = watch('yearlyIncome');
+  const watchProjectType = watch('projectType');
+
+  // Initialize form values with defaults
   useEffect(() => {
-    setValue('homeValue', '$');
-    setValue('yearlyIncome', '$');
-  }, [setValue]);
+    setValue('homeValue', homeValueFormatted);
+    setValue('yearlyIncome', yearlyIncomeFormatted);
+  }, [setValue, homeValueFormatted, yearlyIncomeFormatted]);
 
   const projectTypes = [
     "Kitchen Renovation",
@@ -94,18 +103,175 @@ export default function PricingCalculator() {
   const homeValueRef = register('homeValue', { required: true });
   const yearlyIncomeRef = register('yearlyIncome', { required: true });
 
+  // Handlers for input focus
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.select();
+  };
+
   // Update input handlers for currency formatting
   const handleHomeValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrencyInput(e.target.value);
     setHomeValueFormatted(formatted);
     setValue('homeValue', formatted);
+    
+    // Extract numeric value for the slider
+    const numericValue = Number(formatted.replace(/[^0-9]/g, ''));
+    if (numericValue) {
+      setHomeValueNumber(numericValue);
+    }
   };
 
   const handleYearlyIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrencyInput(e.target.value);
     setYearlyIncomeFormatted(formatted);
     setValue('yearlyIncome', formatted);
+    
+    // Extract numeric value for the slider
+    const numericValue = Number(formatted.replace(/[^0-9]/g, ''));
+    if (numericValue) {
+      setYearlyIncomeNumber(numericValue);
+    }
   };
+
+  // Slider handlers
+  const handleHomeValueSlider = (value: number) => {
+    setHomeValueNumber(value);
+    const formatted = formatCurrencyInput(`$${value}`);
+    setHomeValueFormatted(formatted);
+    setValue('homeValue', formatted);
+  };
+
+  const handleIncomeSlider = (value: number) => {
+    setYearlyIncomeNumber(value);
+    const formatted = formatCurrencyInput(`$${value}`);
+    setYearlyIncomeFormatted(formatted);
+    setValue('yearlyIncome', formatted);
+  };
+
+  // Real-time calculations when values change
+  useEffect(() => {
+    if (isRealTimeEnabled && homeValueNumber >= 50000 && yearlyIncomeNumber >= 8000 && watchProjectType) {
+      try {
+        const calculatedResults = {
+          low: calculateTier(homeValueNumber, yearlyIncomeNumber, watchProjectType, 'low'),
+          middle: calculateTier(homeValueNumber, yearlyIncomeNumber, watchProjectType, 'middle'),
+          high: calculateTier(homeValueNumber, yearlyIncomeNumber, watchProjectType, 'high')
+        };
+        
+        setResults(calculatedResults);
+        setShowResults(true);
+      } catch (error) {
+        console.error('Calculation error:', error);
+      }
+    }
+  }, [isRealTimeEnabled, homeValueNumber, yearlyIncomeNumber, watchProjectType, calculateTier]);
+
+  useEffect(() => {
+    if (results && showResults) {
+      // Find all bar elements
+      const chartContainer = document.getElementById('chart-container');
+      const chartLegend = document.querySelector('.chart-legend');
+      
+      if (chartContainer && chartLegend) {
+        const lowTierBars = chartContainer.querySelectorAll('.tier-low');
+        const middleTierBars = chartContainer.querySelectorAll('.tier-middle');
+        const highTierBars = chartContainer.querySelectorAll('.tier-high');
+        const allBars = chartContainer.querySelectorAll('.bar-tier');
+        
+        const lowLegendItem = chartLegend.querySelector('.low');
+        const middleLegendItem = chartLegend.querySelector('.middle');
+        const highLegendItem = chartLegend.querySelector('.high');
+        
+        // Function to handle mouseover for a specific tier
+        const handleTierMouseOver = (activeTierBars: Element[]) => {
+          // Fade out all bars
+          allBars.forEach(bar => {
+            bar.classList.add('opacity-40');
+          });
+          
+          // Show only the active tier
+          activeTierBars.forEach(bar => {
+            bar.classList.remove('opacity-40');
+            bar.classList.add('opacity-100');
+          });
+        };
+        
+        // Function to reset all bars opacity
+        const resetBars = () => {
+          allBars.forEach(bar => {
+            bar.classList.remove('opacity-40', 'opacity-100');
+          });
+        };
+        
+        // Add event listeners to bars
+        lowTierBars.forEach(bar => {
+          bar.addEventListener('mouseover', () => handleTierMouseOver(Array.from(lowTierBars)));
+          bar.addEventListener('mouseout', resetBars);
+        });
+        
+        middleTierBars.forEach(bar => {
+          bar.addEventListener('mouseover', () => handleTierMouseOver(Array.from(middleTierBars)));
+          bar.addEventListener('mouseout', resetBars);
+        });
+        
+        highTierBars.forEach(bar => {
+          bar.addEventListener('mouseover', () => handleTierMouseOver(Array.from(highTierBars)));
+          bar.addEventListener('mouseout', resetBars);
+        });
+        
+        // Add event listeners to legend items
+        if (lowLegendItem) {
+          lowLegendItem.addEventListener('mouseover', () => handleTierMouseOver(Array.from(lowTierBars)));
+          lowLegendItem.addEventListener('mouseout', resetBars);
+        }
+        
+        if (middleLegendItem) {
+          middleLegendItem.addEventListener('mouseover', () => handleTierMouseOver(Array.from(middleTierBars)));
+          middleLegendItem.addEventListener('mouseout', resetBars);
+        }
+        
+        if (highLegendItem) {
+          highLegendItem.addEventListener('mouseover', () => handleTierMouseOver(Array.from(highTierBars)));
+          highLegendItem.addEventListener('mouseout', resetBars);
+        }
+        
+        // Clean up event listeners
+        return () => {
+          // Remove event listeners from bars
+          lowTierBars.forEach(bar => {
+            bar.removeEventListener('mouseover', () => handleTierMouseOver(Array.from(lowTierBars)));
+            bar.removeEventListener('mouseout', resetBars);
+          });
+          
+          middleTierBars.forEach(bar => {
+            bar.removeEventListener('mouseover', () => handleTierMouseOver(Array.from(middleTierBars)));
+            bar.removeEventListener('mouseout', resetBars);
+          });
+          
+          highTierBars.forEach(bar => {
+            bar.removeEventListener('mouseover', () => handleTierMouseOver(Array.from(highTierBars)));
+            bar.removeEventListener('mouseout', resetBars);
+          });
+          
+          // Remove event listeners from legend items
+          if (lowLegendItem) {
+            lowLegendItem.removeEventListener('mouseover', () => handleTierMouseOver(Array.from(lowTierBars)));
+            lowLegendItem.removeEventListener('mouseout', resetBars);
+          }
+          
+          if (middleLegendItem) {
+            middleLegendItem.removeEventListener('mouseover', () => handleTierMouseOver(Array.from(middleTierBars)));
+            middleLegendItem.removeEventListener('mouseout', resetBars);
+          }
+          
+          if (highLegendItem) {
+            highLegendItem.removeEventListener('mouseover', () => handleTierMouseOver(Array.from(highTierBars)));
+            highLegendItem.removeEventListener('mouseout', resetBars);
+          }
+        };
+      }
+    }
+  }, [results, showResults]);
 
   const onSubmit = (data: FormData) => {
     try {
@@ -113,9 +279,10 @@ export default function PricingCalculator() {
       const cleanHomeValue = data.homeValue.replace(/[$,]/g, '');
       const cleanYearlyIncome = data.yearlyIncome.replace(/[$,]/g, '');
       
-      const homeValue = Number(cleanHomeValue);
-      const yearlyIncome = Number(cleanYearlyIncome);
-      const projectType = data.projectType;
+      // Use the numeric state values if the inputs are empty, otherwise parse the input values
+      const homeValue = cleanHomeValue ? Number(cleanHomeValue) : homeValueNumber;
+      const yearlyIncome = cleanYearlyIncome ? Number(cleanYearlyIncome) : yearlyIncomeNumber;
+      const projectType = data.projectType || 'Kitchen Renovation';
 
       // Validate inputs
       if (!homeValue || !yearlyIncome || !projectType || 
@@ -123,6 +290,9 @@ export default function PricingCalculator() {
         alert("Please check your inputs:\n• Home value must be at least $50,000\n• Yearly income must be at least $8,000\n• Project type must be selected");
         return;
       }
+
+      // Enable real-time calculations after first submit
+      setIsRealTimeEnabled(true);
 
       // Calculate for each tier
       const calculatedResults = {
@@ -143,9 +313,33 @@ export default function PricingCalculator() {
     reset();
     setResults(null);
     setShowResults(false);
-    setHomeValueFormatted('$');
-    setYearlyIncomeFormatted('$');
+    setHomeValueFormatted(formatCurrencyInput(`$${homeValueNumber}`));
+    setYearlyIncomeFormatted(formatCurrencyInput(`$${yearlyIncomeNumber}`));
+    setHomeValueNumber(300000);
+    setYearlyIncomeNumber(80000);
+    setIsRealTimeEnabled(false);
   };
+
+  // Format chart data from results
+  const chartData = useMemo(() => {
+    if (!results) return [];
+    
+    // Generate 12 months of ROI data
+    return Array.from({ length: 12 }, (_, i) => {
+      const month = i + 1;
+      // Calculate partial ROI based on month (linear progression)
+      const lowROI = (results.low.valueIncrease / 12) * month;
+      const middleROI = (results.middle.valueIncrease / 12) * month;
+      const highROI = (results.high.valueIncrease / 12) * month;
+      
+      return {
+        month: `Month ${month}`,
+        "Low Tier": Math.round(lowROI),
+        "Middle Tier": Math.round(middleROI),
+        "High Tier": Math.round(highROI)
+      };
+    });
+  }, [results]);
 
   function calculateTier(homeValue: number, yearlyIncome: number, projectType: string, tier: 'low' | 'middle' | 'high') {
     // Project coefficient
@@ -380,7 +574,7 @@ export default function PricingCalculator() {
         {/* Form Body */}
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-1">
               <label className="block text-sm font-medium text-gray-700">Estimated Home Value</label>
               <div className="relative rounded-md shadow-sm">
                 <input 
@@ -390,15 +584,34 @@ export default function PricingCalculator() {
                   placeholder="$0"
                   value={homeValueFormatted}
                   onChange={handleHomeValueChange}
+                  onFocus={handleInputFocus}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                   <span className="text-gray-500 sm:text-sm">USD</span>
                 </div>
               </div>
+              <div className="mt-2">
+                <input
+                  type="range"
+                  min={50000}
+                  max={4000000}
+                  step={10000}
+                  value={homeValueNumber}
+                  onChange={(e) => handleHomeValueSlider(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%, rgb(229, 231, 235) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%)`,
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>$50K</span>
+                  <span>$4M</span>
+                </div>
+              </div>
               {errors.homeValue && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-1">
               <label className="block text-sm font-medium text-gray-700">Annual Income</label>
               <div className="relative rounded-md shadow-sm">
                 <input 
@@ -408,19 +621,38 @@ export default function PricingCalculator() {
                   placeholder="$0"
                   value={yearlyIncomeFormatted}
                   onChange={handleYearlyIncomeChange}
+                  onFocus={handleInputFocus}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                   <span className="text-gray-500 sm:text-sm">USD</span>
                 </div>
               </div>
+              <div className="mt-2">
+                <input
+                  type="range"
+                  min={8000}
+                  max={1000000}
+                  step={1000}
+                  value={yearlyIncomeNumber}
+                  onChange={(e) => handleIncomeSlider(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%, rgb(229, 231, 235) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%)`,
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>$8K</span>
+                  <span>$1M</span>
+                </div>
+              </div>
               {errors.yearlyIncome && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-1">
               <label className="block text-sm font-medium text-gray-700">Project Type</label>
               <select 
                 {...register('projectType', { required: true })}
-                className="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary transition-all"
+                className="form-select"
               >
                 <option value="">Select a project type</option>
                 {projectTypes.map((type) => (
@@ -537,6 +769,125 @@ export default function PricingCalculator() {
             </div>
           </div>
 
+          {/* Budget Breakdown Visualization */}
+          <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Budget Breakdown</h3>
+              <p className="text-sm text-gray-500 mt-1">Visual representation of your budget allocation</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Low Tier Budget Breakdown */}
+                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                    <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                    Low Tier Budget
+                  </h4>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Initial Budget</span>
+                      <span>{formatCurrency(results.low.initialBudget)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-blue-400 h-2.5 rounded-full" style={{
+                        width: `${(results.low.initialBudget / results.low.totalBudget * 100).toFixed(0)}%`
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Contingency Fund</span>
+                      <span>{formatCurrency(results.low.contingencyFund)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-blue-600 h-2.5 rounded-full" style={{
+                        width: `${(results.low.contingencyFund / results.low.totalBudget * 100).toFixed(0)}%`
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Total Budget</span>
+                      <span className="text-lg font-bold text-blue-600">{formatCurrency(results.low.totalBudget)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Middle Tier Budget Breakdown */}
+                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                    <span className="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
+                    Middle Tier Budget
+                  </h4>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Initial Budget</span>
+                      <span>{formatCurrency(results.middle.initialBudget)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-purple-400 h-2.5 rounded-full" style={{
+                        width: `${(results.middle.initialBudget / results.middle.totalBudget * 100).toFixed(0)}%`
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Contingency Fund</span>
+                      <span>{formatCurrency(results.middle.contingencyFund)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-purple-600 h-2.5 rounded-full" style={{
+                        width: `${(results.middle.contingencyFund / results.middle.totalBudget * 100).toFixed(0)}%`
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Total Budget</span>
+                      <span className="text-lg font-bold text-purple-600">{formatCurrency(results.middle.totalBudget)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* High Tier Budget Breakdown */}
+                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                    <span className="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>
+                    High Tier Budget
+                  </h4>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Initial Budget</span>
+                      <span>{formatCurrency(results.high.initialBudget)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-indigo-400 h-2.5 rounded-full" style={{
+                        width: `${(results.high.initialBudget / results.high.totalBudget * 100).toFixed(0)}%`
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Contingency Fund</span>
+                      <span>{formatCurrency(results.high.contingencyFund)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-indigo-600 h-2.5 rounded-full" style={{
+                        width: `${(results.high.contingencyFund / results.high.totalBudget * 100).toFixed(0)}%`
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Total Budget</span>
+                      <span className="text-lg font-bold text-indigo-600">{formatCurrency(results.high.totalBudget)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Understanding Your Budget */}
           <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
             <div className="px-6 py-5 border-b border-gray-200">
@@ -581,6 +932,237 @@ export default function PricingCalculator() {
                 <p className="text-gray-600 text-sm">
                   Estimated percentage of your investment that may be recouped through increased home value.
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ROI over time */}
+          <div className="bg-white shadow-lg p-6 mb-4 mt-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">ROI Over Time</h3>
+            <div className="w-full overflow-x-auto">
+              <style jsx>{`
+                .charts-css {
+                  height: 300px;
+                  max-width: 100%;
+                  margin: 0 auto;
+                  --color-1: rgba(59, 130, 246, 0.5);
+                  --color-2: rgba(147, 51, 234, 0.5);
+                  --color-3: rgba(79, 70, 229, 0.5);
+                }
+                
+                .charts-css caption {
+                  margin-bottom: 1rem;
+                  font-weight: 500;
+                  color: #4b5563;
+                }
+                
+                .charts-css.column tbody tr {
+                  padding-inline-end: 0.5rem;
+                }
+                
+                .charts-css tbody tr th {
+                  font-size: 0.75rem;
+                  color: #6b7280;
+                  font-weight: 400;
+                }
+                
+                .charts-css .data-tooltip {
+                  position: absolute;
+                  top: -1.5rem;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background: rgba(55, 65, 81, 0.9);
+                  color: white;
+                  padding: 0.2rem 0.4rem;
+                  border-radius: 0.25rem;
+                  font-size: 0.75rem;
+                  opacity: 0;
+                  transition: opacity 0.2s;
+                  white-space: nowrap;
+                }
+                
+                .charts-css td:hover .data-tooltip {
+                  opacity: 1;
+                }
+
+                .charts-css.column tbody .data-tbody {
+                  display: flex;
+                  justify-content: space-around;
+                  width: 100%;
+                }
+
+                .chart-wrapper {
+                  max-width: 800px;
+                  margin: 0 auto;
+                  padding: 1rem 2rem 2rem 3rem;
+                  position: relative;
+                }
+                
+                /* X and Y axis labels */
+                .axis-labels .x-label {
+                  position: absolute;
+                  bottom: -10px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  font-size: 0.875rem;
+                  font-weight: 500;
+                  color: #4b5563;
+                }
+                
+                .axis-labels .y-label {
+                  position: absolute;
+                  left: -40px;
+                  top: 50%;
+                  transform: rotate(-90deg) translateX(-50%);
+                  transform-origin: left top;
+                  font-size: 0.875rem;
+                  font-weight: 500;
+                  color: #4b5563;
+                }
+                
+                /* Chart annotations */
+                .chart-annotations {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  height: 100%;
+                  width: 100%;
+                  pointer-events: none;
+                }
+                
+                .chart-annotations .y-max,
+                .chart-annotations .y-min {
+                  position: absolute;
+                  left: -5px;
+                  font-size: 0.75rem;
+                  color: #6b7280;
+                }
+                
+                .chart-annotations .y-max {
+                  top: 1.5rem;
+                }
+                
+                .chart-annotations .y-min {
+                  bottom: 1.5rem;
+                }
+                
+                /* Better grid styling */
+                .charts-css.column.show-primary-axis {
+                  --primary-axis-color: rgba(229, 231, 235, 0.8);
+                  --primary-axis-width: 2px;
+                }
+                
+                .charts-css.column.show-4-secondary-axes {
+                  --secondary-axes-color: rgba(229, 231, 235, 0.5);
+                }
+
+                /* Tier hover effects */
+                .bar-tier {
+                  transition: opacity 0.3s ease;
+                }
+
+                /* We'll use JavaScript for the hover effects instead of CSS */
+                /* Custom Tailwind-like classes for opacity */
+                .opacity-40 {
+                  opacity: 0.4;
+                }
+                
+                .opacity-100 {
+                  opacity: 1;
+                }
+
+                /* Legend hover effects */
+                .chart-legend-item {
+                  cursor: pointer;
+                  transition: opacity 0.3s ease;
+                }
+
+                /* Add data-tier attributes to allow JavaScript hover handling */
+                .tier-low {
+                  --tier: "low";
+                }
+                
+                .tier-middle {
+                  --tier: "middle";
+                }
+                
+                .tier-high {
+                  --tier: "high";
+                }
+              `}</style>
+              
+              <div className="chart-wrapper" id="chart-container">
+                <table className="charts-css column show-primary-axis show-4-secondary-axes show-labels data-spacing-4 reverse-data">
+                  <caption>Return on Investment Over 12 Months</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Month</th>
+                      <th scope="col">Low Tier</th>
+                      <th scope="col">Middle Tier</th>
+                      <th scope="col">High Tier</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chartData.map((data, index) => {
+                      const maxValue = Math.max(
+                        ...chartData.map(d => Math.max(d["Low Tier"], d["Middle Tier"], d["High Tier"]))
+                      );
+                      return (
+                        <tr key={data.month}>
+                          <th scope="row">{data.month}</th>
+                          <td className="tier-low bar-tier" style={{
+                            "--size": `calc(${data["Low Tier"]} / ${maxValue})`,
+                            "--color": "rgba(59, 130, 246, 0.5)"
+                          } as React.CSSProperties}>
+                            <span className="data-tooltip">{formatCurrency(data["Low Tier"])}</span>
+                          </td>
+                          <td className="tier-middle bar-tier" style={{
+                            "--size": `calc(${data["Middle Tier"]} / ${maxValue})`,
+                            "--color": "rgba(147, 51, 234, 0.5)"
+                          } as React.CSSProperties}>
+                            <span className="data-tooltip">{formatCurrency(data["Middle Tier"])}</span>
+                          </td>
+                          <td className="tier-high bar-tier" style={{
+                            "--size": `calc(${data["High Tier"]} / ${maxValue})`,
+                            "--color": "rgba(79, 70, 229, 0.5)"
+                          } as React.CSSProperties}>
+                            <span className="data-tooltip">{formatCurrency(data["High Tier"])}</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                
+                {/* Axis Labels */}
+                <div className="axis-labels">
+                  <div className="x-label">Months</div>
+                  <div className="y-label">Return on Investment ($)</div>
+                </div>
+                
+                {/* Chart Annotations */}
+                <div className="chart-annotations">
+                  <div className="y-max">{formatCurrency(Math.max(
+                    ...chartData.map(d => Math.max(d["Low Tier"], d["Middle Tier"], d["High Tier"]))
+                  ))}</div>
+                  <div className="y-min">$0</div>
+                </div>
+              </div>
+
+              {/* Chart Legend */}
+              <div className="flex justify-center items-center mt-4 space-x-6 chart-legend">
+                <div className="flex items-center chart-legend-item low">
+                  <div className="w-4 h-4 bg-blue-400 rounded-sm mr-2"></div>
+                  <span className="text-sm text-gray-600">Low Tier</span>
+                </div>
+                <div className="flex items-center chart-legend-item middle">
+                  <div className="w-4 h-4 bg-purple-400 rounded-sm mr-2"></div>
+                  <span className="text-sm text-gray-600">Middle Tier</span>
+                </div>
+                <div className="flex items-center chart-legend-item high">
+                  <div className="w-4 h-4 bg-indigo-400 rounded-sm mr-2"></div>
+                  <span className="text-sm text-gray-600">High Tier</span>
+                </div>
               </div>
             </div>
           </div>

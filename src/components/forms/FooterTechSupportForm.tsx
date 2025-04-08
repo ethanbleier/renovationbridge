@@ -25,7 +25,7 @@ const FooterTechSupportForm = () => {
       
       <div className="flex justify-center">
         <a
-          href="https://mail.google.com/mail/u/0/?fs=1&to=onn@renovationbridge.com&tf=cm"
+          href="https://mail.google.com/mail/u/0/?fs=1&to=onn@renovationbridge.com&su=Support%20Ticket&tf=cm"
           target="_blank"
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center px-4 py-2 bg-primary hover:bg-opacity-90 text-white text-sm font-medium rounded-md shadow transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
