@@ -188,7 +188,7 @@ const Header = () => {
 
           {/* Mobile Menu Button - Should only be visible on mobile or get-started page */}
           <button
-            className={`text-gray-500 hover:text-gray-700 focus:outline-none ${isGetStartedPage ? '' : 'md:hidden'}`}
+            className={`text-gray-500 hover:text-gray-700 focus:outline-none ${isGetStartedPage ? 'hidden' : 'md:hidden'}`}
             onClick={handleMenuToggle}
           >
             {isMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
@@ -197,8 +197,8 @@ const Header = () => {
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className={`bg-white px-4 pt-2 pb-4 shadow-inner ${isGetStartedPage ? '' : 'md:hidden'}`}>
+      {isMenuOpen && !isGetStartedPage && (
+        <div className={`bg-white px-4 pt-2 pb-4 shadow-inner md:hidden`}>
           <nav className="flex flex-col space-y-3">
             <Link 
               href="/how-it-works" 
