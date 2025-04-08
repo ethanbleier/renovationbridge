@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
@@ -72,6 +72,61 @@ export default function PricingCalculator() {
       projectType: 'Kitchen Renovation'
     }
   });
+
+  // Move calculateTier declaration here, before it's used in useEffect
+  const calculateTier = useCallback((homeValue: number, yearlyIncome: number, projectType: string, tier: 'low' | 'middle' | 'high') => {
+    // Project coefficient
+    const coefficient = getProjectCoefficient(projectType, tier);
+    
+    // Initial Budget
+    const initialBudget = homeValue * coefficient;
+    
+    const contingencyRates = {
+      low: 0.1,
+      middle: 0.15,
+      high: 0.25
+    };
+    
+    const monthlySavingRates = {
+      low: 0.2,
+      middle: 0.25,
+      high: 0.3
+    };
+
+    // Calculate contingency fund
+    const contingencyFund = initialBudget * contingencyRates[tier];
+    
+    // Calculate monthly savings
+    const monthlyIncome = yearlyIncome / 12;
+    const monthlySavings = monthlyIncome * monthlySavingRates[tier];
+    
+    // Total budget
+    const totalBudget = initialBudget + contingencyFund;
+    
+    // Time to save
+    const timeToSave = totalBudget / monthlySavings;
+    
+    // Get ROI coefficient
+    const roiCoefficient = getROICoefficient(projectType, tier);
+    
+    // Calculate value increase
+    const valueIncrease = totalBudget * roiCoefficient;
+    
+    // Updated home value
+    const updatedHomeValue = homeValue + valueIncrease;
+
+    return {
+      initialBudget,
+      contingencyFund,
+      timeToSave,
+      monthlySavings,
+      roi: roiCoefficient * 100,
+      totalBudget,
+      valueIncrease,
+      updatedHomeValue,
+      projectType
+    };
+  }, []);
 
   // Watch for form value changes to enable real-time calculation
   const watchHomeValue = watch('homeValue');
@@ -341,60 +396,6 @@ export default function PricingCalculator() {
     });
   }, [results]);
 
-  function calculateTier(homeValue: number, yearlyIncome: number, projectType: string, tier: 'low' | 'middle' | 'high') {
-    // Project coefficient
-    const coefficient = getProjectCoefficient(projectType, tier);
-    
-    // Initial Budget
-    const initialBudget = homeValue * coefficient;
-    
-    const contingencyRates = {
-      low: 0.1,
-      middle: 0.15,
-      high: 0.25
-    };
-    
-    const monthlySavingRates = {
-      low: 0.2,
-      middle: 0.25,
-      high: 0.3
-    };
-
-    // Calculate contingency fund
-    const contingencyFund = initialBudget * contingencyRates[tier];
-    
-    // Calculate monthly savings
-    const monthlyIncome = yearlyIncome / 12;
-    const monthlySavings = monthlyIncome * monthlySavingRates[tier];
-    
-    // Total budget
-    const totalBudget = initialBudget + contingencyFund;
-    
-    // Time to save
-    const timeToSave = totalBudget / monthlySavings;
-    
-    // Get ROI coefficient
-    const roiCoefficient = getROICoefficient(projectType, tier);
-    
-    // Calculate value increase
-    const valueIncrease = totalBudget * roiCoefficient;
-    
-    // Updated home value
-    const updatedHomeValue = homeValue + valueIncrease;
-
-    return {
-      initialBudget,
-      contingencyFund,
-      timeToSave,
-      monthlySavings,
-      roi: roiCoefficient * 100,
-      totalBudget,
-      valueIncrease,
-      updatedHomeValue,
-      projectType
-    };
-  }
-
   function getProjectCoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
     const coefficients = {
       low: {
@@ -566,9 +567,13 @@ export default function PricingCalculator() {
       {/* Calculator Form Card */}
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 mb-16">
         {/* Form Header */}
-        <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6">
-          <h2 className="text-2xl font-bold text-gray-800">Enter Your Details</h2>
-          <p className="text-gray-600 text-sm mt-1">Fill in the details below to calculate your renovation budget</p>
+        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-8 border-b border-gray-200">
+          <h2 className="text-3xl font-bold text-gray-800 mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Enter Your Details</h2>
+          <div className="space-y-2">
+            <p className="text-gray-500 text-sm leading-relaxed">
+             Enter your home value and annual income directly or use the sliders to estimate your home value and annual income. We'll help calculate a renovation budget that works for you.
+            </p>
+          </div>
         </div>
 
         {/* Form Body */}

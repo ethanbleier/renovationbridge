@@ -1,3 +1,17 @@
+### Replaced Deprecated Punycode Module with Userland Alternative
+
+Replaced the deprecated Node.js built-in punycode module with its userland alternative:
+
+- **What Changed**: Explicitly installed the punycode npm package as a direct dependency to replace the deprecated Node.js built-in version
+- **Implementation Details**:
+  - Added punycode as a direct dependency in package.json
+  - This addresses future Node.js deprecation warnings
+  - Ensures consistent behavior across Node.js versions
+  - No code changes were required as the API remains compatible
+  - Dependency packages like tough-cookie and tr46 will use the userland version
+
+**Benefits**: This change ensures the application will continue to work correctly when the built-in punycode module is removed from Node.js in future versions. It maintains compatibility with URL handling, internationalized domain names (IDN), and third-party packages that rely on punycode functionality.
+
 ### Gallery Image Optimization Fix
 
 Fixed image rendering issues that were causing 400 errors for some gallery projects:

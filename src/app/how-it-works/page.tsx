@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import { useMediaQuery } from 'react-responsive';
 
 // Custom accordion component with smooth animations
 interface AccordionItemProps {
@@ -14,6 +16,8 @@ interface AccordionItemProps {
 }
 
 const AccordionItem = ({ title, children, isOpen, toggle }: AccordionItemProps) => {
+  const prefersReducedMotion = useReducedMotion();
+  
   return (
     <div className="border-b border-gray-200 last:border-b-0">
       <button
@@ -33,8 +37,13 @@ const AccordionItem = ({ title, children, isOpen, toggle }: AccordionItemProps) 
       </button>
       <motion.div
         initial={false}
-        animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
+        animate={{ 
+          height: isOpen ? 'auto' : 0, 
+          opacity: isOpen ? 1 : 0 
+        }}
+        transition={{ 
+          duration: prefersReducedMotion ? 0 : 0.3 
+        }}
         className="overflow-hidden"
       >
         <div className="pb-4 text-gray-600">
@@ -81,28 +90,30 @@ interface ProcessStepProps {
 }
 
 const ProcessStep = ({ number, title, description, bulletPoints }: ProcessStepProps) => {
+  const prefersReducedMotion = useReducedMotion();
+  
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20, scale: prefersReducedMotion ? 1 : 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="relative border-l-2 border-primary pl-8 pb-12 last:pb-0 ml-4 transform-gpu"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: prefersReducedMotion ? 0.3 : 0.6, ease: "easeOut" }}
+      className="relative border-l-2 border-primary pl-8 pb-12 last:pb-0 ml-4 will-change-transform"
     >
       <motion.div 
         className="absolute left-[-17px] top-0 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold"
-        initial={{ scale: 0.8 }}
-        whileInView={{ scale: [0.8, 1.2, 1] }}
-        transition={{ duration: 0.7, times: [0, 0.5, 1] }}
+        initial={{ scale: prefersReducedMotion ? 1 : 0.8 }}
+        whileInView={{ scale: prefersReducedMotion ? 1 : [0.8, 1.2, 1] }}
+        transition={{ duration: prefersReducedMotion ? 0.3 : 0.7, times: [0, 0.5, 1] }}
       >
         {number}
       </motion.div>
       <div>
         <motion.h3 
           className="text-2xl font-bold text-gray-800 mb-3"
-          initial={{ opacity: 0, x: -10 }}
+          initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -10 }}
           whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, delay: 0.1 }}
         >
           {title}
         </motion.h3>
@@ -110,7 +121,7 @@ const ProcessStep = ({ number, title, description, bulletPoints }: ProcessStepPr
           className="text-gray-600 mb-4"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, delay: 0.1 }}
         >
           {description}
         </motion.p>
@@ -118,23 +129,17 @@ const ProcessStep = ({ number, title, description, bulletPoints }: ProcessStepPr
           className="space-y-2"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, delay: 0.1 }}
         >
           {bulletPoints.map((point, index) => (
-            <motion.li 
-              key={index} 
-              className="flex items-start"
-              initial={{ opacity: 0, x: -5 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 + (index * 0.1) }}
-            >
+            <li key={index} className="flex items-start">
               <span className="bg-primary/10 text-primary p-1 rounded-full mr-2 mt-1 flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </span>
               <span>{point}</span>
-            </motion.li>
+            </li>
           ))}
         </motion.ul>
       </div>
@@ -143,6 +148,26 @@ const ProcessStep = ({ number, title, description, bulletPoints }: ProcessStepPr
 };
 
 export default function HowItWorksPage() {
+  const [isMounted, setIsMounted] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Skip animations during SSR or on mobile
+  const animationProps = !isMounted || prefersReducedMotion ? { 
+    initial: {}, 
+    animate: {}, 
+    transition: {} 
+  } : {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.7 }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section - With background image */}
@@ -152,8 +177,12 @@ export default function HowItWorksPage() {
             src="/images/projects/new-home-1.jpg" 
             alt="Background" 
             fill 
-            className="object-cover"
             priority
+            sizes="100vw"
+            quality={isMobile ? 70 : 85}
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhMUFRsf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AJeT8dgbK40zOrMZY1WNVQELvOgI5IJ1J5rn1YwJ3FO9gSktaIi/v//Z"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40 mix-blend-multiply" />
         </div>
@@ -165,9 +194,7 @@ export default function HowItWorksPage() {
             Back
           </Link>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
+            {...animationProps}
             className="text-center"
           >
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">How We Work</h1>
@@ -175,9 +202,9 @@ export default function HowItWorksPage() {
               We make home renovations easy by connecting you with the perfect contractors for your project.
             </p>
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
+              initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+              animate={prefersReducedMotion ? {} : { opacity: 1, scale: 1 }}
+              transition={prefersReducedMotion ? {} : { delay: 0.2, duration: 0.3 }}
             >
               <Link
                 href="/get-started"
@@ -194,10 +221,10 @@ export default function HowItWorksPage() {
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}
+            whileInView={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Our Simple Process</h2>
@@ -210,7 +237,7 @@ export default function HowItWorksPage() {
             <ProcessStep
               number="1"
               title="Tell Us Your Vision"
-              description="It all starts with you. Whether you're imagining a sleek kitchen upgrade or a full-home transformation, we want to hear every detail. Share your project goals, style preferences, and must-haves — the more specific, the better."
+              description="It all starts with you. Whether you're imagining a sleek kitchen upgrade or a full-home transformation, we want to hear every detail. Share your project goals, style preferences, and must-haves."
               bulletPoints={[
                 "Describe your dream space",
                 "Set your budget expectations",
@@ -221,7 +248,7 @@ export default function HowItWorksPage() {
             <ProcessStep
               number="2"
               title="Expert Matchmaking with a Human Touch"
-              description="We handpick a selection of top contractors who specialize in your type of project and cover all your needs. These are experienced, vetted professionals ready to give you real, competitive bids."
+              description="We handpick top contractors who specialize in your project type and cover all your needs. These are experienced, vetted professionals ready to give you competitive bids."
               bulletPoints={[
                 "Thoroughly vetted contractors",
                 "Matched to your specific needs",
@@ -232,7 +259,7 @@ export default function HowItWorksPage() {
             <ProcessStep
               number="3"
               title="Free Walkthroughs, Real Bids"
-              description="Your selected contractors will be scheduled to meet with you all in one day or spread out over the week. They'll take a detailed walkthrough of your space and provide a personalized bid for your project."
+              description="Your selected contractors will meet with you to take a detailed walkthrough of your space and provide a personalized bid for your project."
               bulletPoints={[
                 "Convenient scheduling",
                 "Detailed project assessment",
@@ -243,7 +270,7 @@ export default function HowItWorksPage() {
             <ProcessStep
               number="4"
               title="Confident Decisions"
-              description="With multiple walkthroughs completed, you're equipped to make an informed choice. No pressure, no rush — just a clear path forward to the renovation you envision."
+              description="With multiple walkthroughs completed, you're equipped to make an informed choice. No pressure, no rush — just a clear path forward."
               bulletPoints={[
                 "Compare multiple options",
                 "Take your time deciding",
@@ -254,7 +281,7 @@ export default function HowItWorksPage() {
             <ProcessStep
               number="5"
               title="We've Got Your Back"
-              description="Even after you've chosen your contractor, we're still here for you. Whether you need help communicating, resolving issues, or just want a bit of extra guidance, we've got your back. Our commitment doesn't end when your project wraps up — we offer 36 months of post-project support to ensure your satisfaction."
+              description="Even after you've chosen your contractor, we're still here for you. We offer 36 months of post-project support to ensure your satisfaction."
               bulletPoints={[
                 "36 months of post-project support",
                 "Help with communication issues",
@@ -269,10 +296,10 @@ export default function HowItWorksPage() {
       <section className="py-16 bg-primary">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.5 }}
             className="text-center"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your Home?</h2>
