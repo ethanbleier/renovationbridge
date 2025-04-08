@@ -132,7 +132,7 @@ export default function HeroSection() {
             </p>
             
             <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
-              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-sm sm:text-base w-full xs:w-auto">
+              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-sm sm:text-base w-full xs:w-auto" target="_blank" rel="noopener noreferrer">
                 Get Started
               </Link>
               <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all text-sm sm:text-base w-full xs:w-auto">

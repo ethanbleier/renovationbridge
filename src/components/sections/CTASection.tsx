@@ -8,7 +8,7 @@ export default function CTASection() {
         <p className="max-w-2xl mx-auto mb-6 sm:mb-8 text-base sm:text-lg opacity-90">
           Connect with top-rated contractors in your area and get your renovation started right.
         </p>
-        <Link href="/get-started" className="btn bg-white text-primary hover:bg-opacity-90 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3">
+        <Link href="/get-started" className="btn bg-white text-primary hover:bg-opacity-90 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3" target="_blank" rel="noopener noreferrer">
           Get Started Today
         </Link>
       </div>

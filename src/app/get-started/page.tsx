@@ -24,18 +24,12 @@ export default function GetStartedPage() {
   }, []);
 
   return (
-    <div className="py-8 md:py-12 w-full">
+    <div className="py-12 md:py-16 w-full">
       <div className="max-w-[1400px] mx-auto relative px-4 xl:px-8">
         {/* Background decorative elements - expanded to use more screen real estate */}
         <div className="absolute -top-20 -left-20 w-40 h-40 bg-lavender/20 rounded-full blur-3xl opacity-70 hidden md:block"></div>
         <div className="absolute top-1/3 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-60 hidden md:block"></div>
         <div className="absolute bottom-1/4 -left-40 w-80 h-80 bg-lavender/10 rounded-full blur-3xl opacity-50 hidden md:block"></div>
-        
-        {/* Header - wider to use more screen space */}
-        <div className="text-center mb-8 max-w-3xl mx-auto">
-          <h1 className="text-3xl md:text-5xl font-bold text-secondary mb-3">Get Started with Renovation Bridge</h1>
-          <p className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">Tell us about your project and we'll connect you with the perfect professionals.</p>
-        </div>
         
         {/* Form and Summer Deal Container - Using more horizontal space */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

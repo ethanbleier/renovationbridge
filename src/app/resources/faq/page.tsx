@@ -251,7 +251,7 @@ export default function FAQPage() {
                 <h3 className="text-2xl font-bold text-gray-800 mb-4">Still have questions?</h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto">Don't see your question answered? Our team is ready to help you with any inquiries.</p>
                 <Link 
-                  href="https://mail.google.com/mail/?view=cm&fs=1&to=info@renovationbridge.com" 
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=onn@renovationbridge.com" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium rounded-full hover:bg-primary-dark transition-colors shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"

@@ -26,7 +26,7 @@ export const generateOrganizationSchema = (): StructuredData => {
       '@type': 'ContactPoint',
       telephone: '+1-415-555-1234',
       contactType: 'customer service',
-      email: 'info@renovationbridge.com',
+      email: 'onn@renovationbridge.com',
       availableLanguage: ['English']
     }
   };

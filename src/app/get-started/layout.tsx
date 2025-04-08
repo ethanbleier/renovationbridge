@@ -12,6 +12,8 @@ export default function GetStartedLayout({
   children: React.ReactNode
 }) {
   return (
-    <>{children}</>
+    <div data-no-footer={true}>
+      {children}
+    </div>
   )
 } 
