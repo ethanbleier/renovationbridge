@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { FaFacebookF, FaInstagram, FaYoutube, FaXTwitter } from 'react-icons/fa6'
 import FooterContactForm from '../forms/FooterContactForm'
+import FooterTechSupportForm from '../forms/FooterTechSupportForm'
 import { usePathname } from 'next/navigation'
 
 const Footer = () => {
@@ -16,9 +17,9 @@ const Footer = () => {
   return (
     <footer className="bg-white pt-16 pb-8">
       <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
           {/* Resources Column */}
-          <div>
+          <div className="lg:col-span-3">
             <h4 className="text-lg font-semibold text-black mb-4">Resources</h4>
             <ul className="space-y-3">
               <li>
@@ -89,7 +90,7 @@ const Footer = () => {
           </div>
           
           {/* Quick Links Column */}
-          <div>
+          <div className="lg:col-span-2">
             <h4 className="text-lg font-semibold text-black mb-4">Quick Links</h4>
             <ul className="space-y-3">
               <li>
@@ -119,9 +120,14 @@ const Footer = () => {
             </ul>
           </div>
           
-          {/* Contact Form Column (Spans 2 columns on lg screens) */}
-          <div className="lg:col-span-2">
+          {/* Contact Form Column */}
+          <div className="lg:col-span-4">
             <FooterContactForm />
+          </div>
+          
+          {/* Tech Support Form Column */}
+          <div className="lg:col-span-3">
+            <FooterTechSupportForm />
           </div>
         </div>
         

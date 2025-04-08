@@ -185,7 +185,7 @@ export default function HowItWorksPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Get Started
+                Continue
               </Link>
             </motion.div>
           </motion.div>
@@ -285,7 +285,7 @@ export default function HowItWorksPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Start Your Project
+              Unlock Home Potential
             </Link>
           </motion.div>
         </div>

@@ -376,7 +376,7 @@ export default function WalnutCreekKitchenRenovationPage() {
                   Let us connect you with top-rated Walnut Creek kitchen renovation experts today.
                 </p>
                 <Link href="/get-started" className="inline-block bg-white text-primary font-medium py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">
-                  Get Started
+                  Plan Your Perfect Remodel
                 </Link>
               </div>
               {/* Background decorative element */}
@@ -393,7 +393,7 @@ export default function WalnutCreekKitchenRenovationPage() {
             Take the first step toward your dream kitchen by connecting with our network of top-rated Walnut Creek contractors.
           </p>
           <Link href="/get-started" className="btn btn-primary">
-            Get Started Today
+            Maximize Your Investment
           </Link>
         </div>
       </div>

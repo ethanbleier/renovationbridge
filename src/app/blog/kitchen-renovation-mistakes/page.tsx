@@ -318,7 +318,7 @@ export default function KitchenRenovationMistakesPage() {
                   Connect with top-rated contractors and make your renovation dreams a reality.
                 </p>
                 <Link href="/get-started" className="inline-block bg-white text-primary font-medium py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">
-                  Get Started
+                  Upgrade Smarter
                 </Link>
               </div>
               {/* Background decorative element */}

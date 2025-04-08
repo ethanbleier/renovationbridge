@@ -10,7 +10,9 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isResourcesOpen, setIsResourcesOpen] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(true)
+  const [mobileHeaderVisible, setMobileHeaderVisible] = useState(true)
   const [isHeaderShrunk, setIsHeaderShrunk] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const lastScrollY = useRef(0)
   const pathname = usePathname()
   
@@ -18,11 +20,30 @@ const Header = () => {
   const isGetStartedPage = pathname === '/get-started'
 
   useEffect(() => {
+    // Check if we're on mobile
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768) // 768px is the md breakpoint in Tailwind by default
+    }
+    
+    // Run once on mount
+    checkIsMobile()
+    
+    // Add resize listener
+    window.addEventListener('resize', checkIsMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkIsMobile)
+    }
+  }, [])
+
+  useEffect(() => {
     // Initialize header visibility
     if (isGetStartedPage) {
       setHeaderVisible(false)
+      setMobileHeaderVisible(false)
     } else {
       setHeaderVisible(true)
+      setMobileHeaderVisible(true)
     }
     
     // Handle scroll events
@@ -33,8 +54,18 @@ const Header = () => {
         // On get-started page, show header when scrolling up, hide when scrolling down
         if (currentScrollY < lastScrollY.current && currentScrollY < 300) {
           setHeaderVisible(true)
+          setMobileHeaderVisible(true)
         } else if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
           setHeaderVisible(false)
+          setMobileHeaderVisible(false)
+        }
+      } else if (isMobile) {
+        // On mobile devices only (except get-started page)
+        // Show header when scrolling up, hide when scrolling down
+        if (currentScrollY < lastScrollY.current) {
+          setMobileHeaderVisible(true)
+        } else if (currentScrollY > 50 && currentScrollY > lastScrollY.current && !isMenuOpen) {
+          setMobileHeaderVisible(false)
         }
       }
       
@@ -52,20 +83,24 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [isGetStartedPage])
+  }, [isGetStartedPage, isMobile, isMenuOpen])
 
   // Handle menu opening - ensure header is visible when menu is open
   const handleMenuToggle = () => {
     const newMenuState = !isMenuOpen
     setIsMenuOpen(newMenuState)
-    if (newMenuState && isGetStartedPage) {
-      setHeaderVisible(true)
+    if (newMenuState) {
+      setMobileHeaderVisible(true)
+      if (isGetStartedPage) {
+        setHeaderVisible(true)
+      }
     }
   }
 
   return (
     <header className={`bg-white shadow-sm sticky top-0 z-50 transition-all duration-300 ${
-      headerVisible ? 'translate-y-0' : '-translate-y-full'
+      isMobile ? (mobileHeaderVisible ? 'translate-y-0' : '-translate-y-full') : 
+      (headerVisible ? 'translate-y-0' : '-translate-y-full')
     } ${isHeaderShrunk ? 'py-1' : 'py-2'}`}>
       <div className={`container-custom ${isHeaderShrunk ? 'py-2' : 'py-4'} pr-3 md:pr-5 lg:pr-8 transition-all duration-300`}>
         <div className="flex items-center justify-between gap-4 lg:gap-8">

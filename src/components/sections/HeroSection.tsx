@@ -9,10 +9,11 @@ import { TypeAnimation } from 'react-type-animation'
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [pillVisible, setPillVisible] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const slides = [
-    '/images/projects/adu-1.jpg',
     '/images/projects/kitchen-2.jpg',
+    '/images/projects/adu-1.jpg',
     '/images/projects/bathroom-2.jpg',
     '/images/projects/backyard-1.jpg'
   ];
@@ -20,12 +21,12 @@ export default function HeroSection() {
   const titles = [
     {
       prefix: "",
-      keyword: "Build Your ADU",
+      keyword: "Renovate Your Kitchen",
       highlight: "with Confidence"
     },
     {
       prefix: "",
-      keyword: "Renovate Your Kitchen",
+      keyword: "Build Your ADU",
       highlight: "with Confidence"
     },
     {
@@ -43,11 +44,15 @@ export default function HeroSection() {
   // Control slide transitions
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+      setCurrentSlide((prev) => {
+        // When moving to next slide, set isInitialLoad to false
+        if (isInitialLoad) setIsInitialLoad(false);
+        return prev === slides.length - 1 ? 0 : prev + 1;
+      });
     }, 5500); // slide change in ms
     
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [slides.length, isInitialLoad]);
 
   // Animation for welcome pill
   useEffect(() => {
@@ -119,7 +124,8 @@ export default function HeroSection() {
                   className="inline-block"
                   repeat={0}
                   cursor={true}
-                  key={currentSlide} // Force re-render when slide changes
+                  key={`${currentSlide}-${isInitialLoad}`} // Force re-render when slide changes or load state changes
+                  preRenderFirstString={isInitialLoad} // Only pre-render on initial load
                 />
               </h1>
               
@@ -133,7 +139,7 @@ export default function HeroSection() {
             
             <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
               <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-sm sm:text-base w-full xs:w-auto" target="_blank" rel="noopener noreferrer">
-                Get Started
+                Explore Home Solutions
               </Link>
               <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all text-sm sm:text-base w-full xs:w-auto">
                 How It Works

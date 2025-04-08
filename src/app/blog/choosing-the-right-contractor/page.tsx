@@ -408,7 +408,7 @@ export default function ChoosingTheRightContractorPage() {
             Ready to find the perfect contractor for your project? Let Renovation Bridge's expert matchmaking service connect you with the right professionals.
           </p>
           <Link href="/get-started" className="btn btn-primary">
-            Get Started
+            Build Your Vision
           </Link>
         </div>
       </div>
