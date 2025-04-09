@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
 import GoogleAdsTracker from '@/components/analytics/GoogleAdsTracker'
 
@@ -594,9 +595,26 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
         // Enable tracking and immediately move to success step
         setTrackConversion(true)
         setTrackGoogleAdsConversion(true)
+        
+        // Track form submission with Vercel Analytics
+        track('GetStartedFormSubmission', {
+          formType: 'get-started',
+          projectTypes: formData.projectTypes,
+          projectSize: formData.size,
+          projectStage: formData.processStage,
+          location: window.location.pathname
+        });
+        
         onNext()
       } catch (err) {
         console.error('Error submitting form:', err);
+        
+        // Track form error with Vercel Analytics
+        track('GetStartedFormError', {
+          formType: 'get-started',
+          error: err instanceof Error ? err.message : 'Unknown error'
+        });
+        
         setError(err instanceof Error ? err.message : 'Failed to submit form');
       } finally {
         setIsSubmitting(false)

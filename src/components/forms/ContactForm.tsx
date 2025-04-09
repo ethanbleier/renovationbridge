@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
 
 type FormValues = {
@@ -99,6 +100,11 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         onSubmit(data);
         setIsSuccess(true);
         setTrackConversion(true);
+        // Track form submission with Vercel Analytics
+        track('ContactFormSubmission', { 
+          formType: 'contact',
+          location: window.location.pathname 
+        });
         reset();
         localStorage.removeItem('contactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -131,6 +137,11 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       
       setIsSuccess(true)
       setTrackConversion(true)
+      // Track form submission with Vercel Analytics
+      track('ContactFormSubmission', { 
+        formType: 'contact',
+        location: window.location.pathname 
+      });
       reset()
       // Clear saved form data after successful submission
       localStorage.removeItem('contactFormData')
@@ -139,6 +150,11 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       setTimeout(() => setIsSuccess(false), 15000)
     } catch (err) {
       console.error('Error submitting form:', err);
+      // Track form error with Vercel Analytics
+      track('ContactFormError', { 
+        formType: 'contact',
+        error: err instanceof Error ? err.message : 'Unknown error'
+      });
       // Check if the error response contains details
       if (err instanceof Error && err.message === 'Validation failed' && 'details' in (err as any)) {
         const details = JSON.stringify((err as any).details);
