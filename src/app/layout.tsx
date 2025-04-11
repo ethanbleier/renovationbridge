@@ -104,7 +104,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
-          <SpeedInsights dsn="ZNga99anB7eSaJjchi9phAZv6n7" mode="auto" />
+          <SpeedInsights dsn="ZNga99anB7eSaJjchi9phAZv6n7" />
           <Analytics />
         </div>
       </body>

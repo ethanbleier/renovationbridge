@@ -63,7 +63,8 @@ export default function PricingCalculator() {
   const [homeValueFormatted, setHomeValueFormatted] = useState(formatCurrencyInput(`$${homeValueNumber}`));
   const [yearlyIncomeFormatted, setYearlyIncomeFormatted] = useState(formatCurrencyInput(`$${yearlyIncomeNumber}`));
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(''); // Raw phone digits
+  const [formattedPhone, setFormattedPhone] = useState(''); // Formatted phone for display
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(false); // State for the toggle
@@ -521,6 +522,26 @@ export default function PricingCalculator() {
   function formatMonths(value: number) {
     return Math.round(value) + " months";
   }
+
+  // Format phone number input like (123) 456-7890
+  const formatPhoneNumber = (value: string): string => {
+    if (!value) return value;
+
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+
+    if (phoneNumberLength < 4) return `(${phoneNumber}`;
+    if (phoneNumberLength < 7) return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
+  // Handler for phone input changes
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/[^\d]/g, '');
+    const truncatedValue = rawValue.slice(0, 10); // Limit to 10 digits
+    setPhone(truncatedValue); // Store raw digits
+    setFormattedPhone(formatPhoneNumber(truncatedValue)); // Store formatted value for display
+  };
 
   const handlePdfFormSubmit = async (data: { first_name: string; last_name: string; email: string }) => {
     if (!results) return;
@@ -1005,9 +1026,9 @@ export default function PricingCalculator() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-1/4">Metric</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-teal-800 uppercase tracking-wider bg-teal-100/50">Basic Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-amber-800 uppercase tracking-wider bg-amber-100/50">Standard Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-800 uppercase tracking-wider bg-blue-100/50">Extensive Budget</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-700 uppercase tracking-wider bg-blue-100/50">Basic Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-primary uppercase tracking-wider bg-primary/20">Standard Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-secondary uppercase tracking-wider bg-secondary/20">Extensive Budget</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -1055,9 +1076,9 @@ export default function PricingCalculator() {
                   </tr>
                   <tr className="border-t border-gray-300">
                     <td className="px-6 py-5 whitespace-nowrap text-base font-bold text-gray-900">Total Budget</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-teal-700 bg-teal-100/50">{formatCurrency(results.low.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-amber-700 bg-amber-100/50">{formatCurrency(results.middle.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-800 bg-blue-100/50">{formatCurrency(results.high.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-700 bg-blue-100/50">{formatCurrency(results.low.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-primary bg-primary/20">{formatCurrency(results.middle.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-secondary bg-secondary/20">{formatCurrency(results.high.totalBudget)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1073,9 +1094,9 @@ export default function PricingCalculator() {
                   height: 300px;
                   max-width: 100%;
                   margin: 0 auto;
-                  --color-1: rgba(20, 184, 166, 0.5);
-                  --color-2: rgba(245, 158, 11, 0.5);
-                  --color-3: rgba(37, 99, 235, 0.5);
+                  --color-1: rgba(96, 165, 250, 0.7);  /* Light blue */
+                  --color-2: rgba(49, 59, 192, 0.7);   /* Primary blue */
+                  --color-3: rgba(0, 44, 102, 0.7);    /* Secondary darker blue */
                 }
                 
                 .charts-css caption {
@@ -1253,19 +1274,19 @@ export default function PricingCalculator() {
                           <th scope="row">{data.month}</th>
                           <td className="tier-low bar-tier" style={{
                             "--size": `calc(${data["Low Tier"]} / ${maxValue})`,
-                            "--color": "rgba(20, 184, 166, 0.6)"
+                            "--color": "rgba(96, 165, 250, 0.7)"  /* Light blue */
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["Low Tier"])}</span>
                           </td>
                           <td className="tier-middle bar-tier" style={{
                             "--size": `calc(${data["Middle Tier"]} / ${maxValue})`,
-                            "--color": "rgba(245, 158, 11, 0.6)"
+                            "--color": "rgba(49, 59, 192, 0.7)"  /* Primary blue */
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["Middle Tier"])}</span>
                           </td>
                           <td className="tier-high bar-tier" style={{
                             "--size": `calc(${data["High Tier"]} / ${maxValue})`,
-                            "--color": "rgba(37, 99, 235, 0.6)"
+                            "--color": "rgba(0, 44, 102, 0.7)"  /* Secondary darker blue */
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["High Tier"])}</span>
                           </td>
@@ -1292,15 +1313,15 @@ export default function PricingCalculator() {
               {/* Chart Legend */}
               <div className="flex justify-center items-center mt-4 space-x-6 chart-legend">
                 <div className="flex items-center chart-legend-item low">
-                  <div className="w-4 h-4 bg-teal-500 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-blue-400 rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">Low Tier</span>
                 </div>
                 <div className="flex items-center chart-legend-item middle">
-                  <div className="w-4 h-4 bg-amber-500 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-primary rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">Middle Tier</span>
                 </div>
                 <div className="flex items-center chart-legend-item high">
-                  <div className="w-4 h-4 bg-blue-600 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-secondary rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">High Tier</span>
                 </div>
               </div>
@@ -1318,7 +1339,7 @@ export default function PricingCalculator() {
                 {/* Low Tier Budget Breakdown */}
                 <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-teal-500 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-blue-400 rounded-full mr-2"></span>
                     Low Tier Budget
                   </h4>
                   <div className="mb-4">
@@ -1329,7 +1350,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`low-initial-${forceUpdate}`}
-                        className="bg-teal-400 h-2.5 rounded-full" 
+                        className="bg-blue-400 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.low.initialBudget / results.low.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1344,7 +1365,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`low-contingency-${forceUpdate}`}
-                        className="bg-teal-600 h-2.5 rounded-full" 
+                        className="bg-blue-600 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.low.contingencyFund / results.low.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1354,7 +1375,7 @@ export default function PricingCalculator() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-teal-600">{formatCurrency(results.low.totalBudget)}</span>
+                      <span className="text-lg font-bold text-blue-700">{formatCurrency(results.low.totalBudget)}</span>
                     </div>
                   </div>
                 </div>
@@ -1362,7 +1383,7 @@ export default function PricingCalculator() {
                 {/* Middle Tier Budget Breakdown */}
                 <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-amber-500 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-primary rounded-full mr-2"></span>
                     Middle Tier Budget
                   </h4>
                   <div className="mb-4">
@@ -1373,7 +1394,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`middle-initial-${forceUpdate}`}
-                        className="bg-amber-400 h-2.5 rounded-full" 
+                        className="bg-primary/80 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.middle.initialBudget / results.middle.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1388,7 +1409,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`middle-contingency-${forceUpdate}`}
-                        className="bg-amber-600 h-2.5 rounded-full" 
+                        className="bg-primary h-2.5 rounded-full" 
                         style={{
                           width: `${(results.middle.contingencyFund / results.middle.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1398,7 +1419,7 @@ export default function PricingCalculator() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-amber-600">{formatCurrency(results.middle.totalBudget)}</span>
+                      <span className="text-lg font-bold text-primary">{formatCurrency(results.middle.totalBudget)}</span>
                     </div>
                   </div>
                 </div>
@@ -1406,7 +1427,7 @@ export default function PricingCalculator() {
                 {/* High Tier Budget Breakdown */}
                 <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-blue-600 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-secondary rounded-full mr-2"></span>
                     High Tier Budget
                   </h4>
                   <div className="mb-4">
@@ -1417,7 +1438,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`high-initial-${forceUpdate}`}
-                        className="bg-blue-400 h-2.5 rounded-full" 
+                        className="bg-secondary/80 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.high.initialBudget / results.high.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1432,7 +1453,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`high-contingency-${forceUpdate}`}
-                        className="bg-blue-700 h-2.5 rounded-full" 
+                        className="bg-secondary h-2.5 rounded-full" 
                         style={{
                           width: `${(results.high.contingencyFund / results.high.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1442,7 +1463,7 @@ export default function PricingCalculator() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-blue-700">{formatCurrency(results.high.totalBudget)}</span>
+                      <span className="text-lg font-bold text-secondary">{formatCurrency(results.high.totalBudget)}</span>
                     </div>
                   </div>
                 </div>
@@ -1458,8 +1479,8 @@ export default function PricingCalculator() {
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
                 <div className="flex items-center mb-3">
-                  <div className="bg-teal-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-blue-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -1471,8 +1492,8 @@ export default function PricingCalculator() {
               </div>
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
                 <div className="flex items-center mb-3">
-                  <div className="bg-amber-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-primary/20 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -1484,8 +1505,8 @@ export default function PricingCalculator() {
               </div>
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
                 <div className="flex items-center mb-3">
-                  <div className="bg-blue-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-secondary/20 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                   </div>
@@ -1569,8 +1590,9 @@ export default function PricingCalculator() {
                       <input
                         type="tel"
                         id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        value={formattedPhone} // Display formatted phone number
+                        onChange={handlePhoneChange} // Use the new handler
+                        maxLength={14} // Max length for (xxx) xxx-xxxx
                         className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
                         placeholder="(123) 456-7890"
                       />
@@ -1589,102 +1611,6 @@ export default function PricingCalculator() {
           </div>
         </div>
       )}
-    </div>
-  );
-} 
-
-// PDF Lead Form Component
-interface PdfLeadFormProps {
-  onSubmit: (data: { first_name: string; last_name: string; email: string }) => void;
-  formTitle: string;
-  onCancel: () => void;
-}
-
-function PdfLeadForm({ onSubmit, formTitle, onCancel }: PdfLeadFormProps) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!firstName || !lastName || !email) return;
-    
-    setIsSubmitting(true);
-    onSubmit({ first_name: firstName, last_name: lastName, email });
-    setIsSubmitting(false);
-  };
-
-  return (
-    <div className="p-6">
-      <h3 className="text-xl font-medium text-gray-900 mb-1">{formTitle}</h3>
-      <p className="text-sm text-gray-500 mb-6">
-        Please enter your information to download the PDF
-      </p>
-      
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
-            <input
-              type="text"
-              id="first_name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <input
-              type="text"
-              id="last_name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="pdf_email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="pdf_email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="mt-6 flex space-x-3">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex-1 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            {isSubmitting ? 'Processing...' : 'Download PDF'}
-          </button>
-          
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
     </div>
   );
 }
