@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import 'charts.css';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { track } from '@vercel/analytics';
 
 // Format currency input with $ and commas
 const formatCurrencyInput = (value: string): string => {
@@ -63,8 +66,16 @@ export default function PricingCalculator() {
   const [phone, setPhone] = useState('');
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
-  const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(false);
+  const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(false); // State for the toggle
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const [initialCalculationDone, setInitialCalculationDone] = useState(false);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
   
+  // PDF download modal state
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [isPdfFormSubmitting, setIsPdfFormSubmitting] = useState(false);
+
   const { register, handleSubmit, setValue, reset, watch, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       homeValue: '',
@@ -205,7 +216,7 @@ export default function PricingCalculator() {
 
   // Real-time calculations when values change
   useEffect(() => {
-    if (isRealTimeEnabled && homeValueNumber >= 50000 && yearlyIncomeNumber >= 8000 && watchProjectType) {
+    if (autoUpdateEnabled && initialCalculationDone && homeValueNumber >= 50000 && yearlyIncomeNumber >= 8000 && watchProjectType) {
       try {
         const calculatedResults = {
           low: calculateTier(homeValueNumber, yearlyIncomeNumber, watchProjectType, 'low'),
@@ -215,11 +226,13 @@ export default function PricingCalculator() {
         
         setResults(calculatedResults);
         setShowResults(true);
+        // Force re-render of bar graphs
+        setForceUpdate(prev => prev + 1);
       } catch (error) {
         console.error('Calculation error:', error);
       }
     }
-  }, [isRealTimeEnabled, homeValueNumber, yearlyIncomeNumber, watchProjectType, calculateTier]);
+  }, [autoUpdateEnabled, homeValueNumber, yearlyIncomeNumber, watchProjectType, calculateTier, initialCalculationDone]);
 
   useEffect(() => {
     if (results && showResults) {
@@ -346,9 +359,6 @@ export default function PricingCalculator() {
         return;
       }
 
-      // Enable real-time calculations after first submit
-      setIsRealTimeEnabled(true);
-
       // Calculate for each tier
       const calculatedResults = {
         low: calculateTier(homeValue, yearlyIncome, projectType, 'low'),
@@ -358,6 +368,7 @@ export default function PricingCalculator() {
 
       setResults(calculatedResults);
       setShowResults(true);
+      setInitialCalculationDone(true);
     } catch (error) {
       console.error('Calculation error:', error);
       alert("An error occurred while calculating. Please check your inputs and try again.");
@@ -372,7 +383,8 @@ export default function PricingCalculator() {
     setYearlyIncomeFormatted(formatCurrencyInput(`$${yearlyIncomeNumber}`));
     setHomeValueNumber(300000);
     setYearlyIncomeNumber(80000);
-    setIsRealTimeEnabled(false);
+    setAutoUpdateEnabled(false); // Reset toggle on form reset
+    setInitialCalculationDone(false); // Reset initial calculation state
   };
 
   // Format chart data from results
@@ -393,6 +405,11 @@ export default function PricingCalculator() {
         "Middle Tier": Math.round(middleROI),
         "High Tier": Math.round(highROI)
       };
+    }).sort((a, b) => {
+      // Extract month numbers for sorting
+      const monthA = parseInt(a.month.split(' ')[1]);
+      const monthB = parseInt(b.month.split(' ')[1]);
+      return monthA - monthB;
     });
   }, [results]);
 
@@ -452,7 +469,7 @@ export default function PricingCalculator() {
         "Deck or Patio Addition": 0.95,
         "Whole House Remodel": 0.8,
         "Window Replacement": 0.8,
-        "Garage Door Replacement": 0.95,
+        "Garage Door Replacement": 0.005,
         "Deck Addition": 0.8,
         "Siding Replacement": 0.8,
         "Room Addition": 0.65,
@@ -466,7 +483,7 @@ export default function PricingCalculator() {
         "Deck or Patio Addition": 1.1,
         "Whole House Remodel": 0.85,
         "Window Replacement": 0.85,
-        "Garage Door Replacement": 1.1,
+        "Garage Door Replacement": 0.0085,
         "Deck Addition": 0.87,
         "Siding Replacement": 0.9,
         "Room Addition": 0.75,
@@ -480,7 +497,7 @@ export default function PricingCalculator() {
         "Deck or Patio Addition": 1.2,
         "Whole House Remodel": 0.95,
         "Window Replacement": 0.95,
-        "Garage Door Replacement": 1.2,
+        "Garage Door Replacement": 0.01,
         "Deck Addition": 0.9,
         "Siding Replacement": 0.9,
         "Room Addition": 0.75,
@@ -504,6 +521,175 @@ export default function PricingCalculator() {
   function formatMonths(value: number) {
     return Math.round(value) + " months";
   }
+
+  const handlePdfFormSubmit = async (data: { first_name: string; last_name: string; email: string }) => {
+    if (!results) return;
+    
+    try {
+      // Store lead data for future reference
+      localStorage.setItem('pdfLeadData', JSON.stringify({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        projectType: results.low.projectType,
+        homeValue: homeValueFormatted,
+        yearlyIncome: yearlyIncomeFormatted,
+        date: new Date().toISOString(),
+        budget: {
+          low: results.low.totalBudget,
+          middle: results.middle.totalBudget,
+          high: results.high.totalBudget
+        }
+      }));
+      
+      // Track lead with analytics
+      track('PdfLeadCapture', { 
+        formType: 'pdf-lead',
+        projectType: results.low.projectType,
+        location: window.location.pathname 
+      });
+      
+      // Close modal and generate PDF
+      setShowPdfModal(false);
+      generatePDF();
+      
+    } catch (err) {
+      console.error('Error handling PDF form submission:', err);
+    }
+  };
+
+  // Replace with direct PDF generation without showing the modal
+  const downloadPDF = async () => {
+    if (!results) return;
+    
+    try {
+      // Store lead data for future reference using contact info from the main form
+      localStorage.setItem('pdfLeadData', JSON.stringify({
+        email: email, // Use email from main form
+        phone: phone, // Use phone from main form
+        projectType: results.low.projectType,
+        homeValue: homeValueFormatted,
+        yearlyIncome: yearlyIncomeFormatted,
+        date: new Date().toISOString(),
+        budget: {
+          low: results.low.totalBudget,
+          middle: results.middle.totalBudget,
+          high: results.high.totalBudget
+        }
+      }));
+      
+      // Track lead with analytics
+      track('PdfLeadCapture', { 
+        formType: 'direct-download',
+        projectType: results.low.projectType,
+        location: window.location.pathname 
+      });
+      
+      // Generate PDF directly
+      generatePDF();
+      
+    } catch (err) {
+      console.error('Error handling direct PDF download:', err);
+    }
+  };
+
+  const generatePDF = async () => {
+    if (!results || !resultsRef.current) return;
+    
+    try {
+      setIsPdfGenerating(true);
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 10;
+      
+      // Add title and project info
+      pdf.setFontSize(18);
+      pdf.setTextColor(33, 33, 33);
+      pdf.text('Renovation Budget Calculator Results', pageWidth / 2, 20, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Project Type: ${results.low.projectType}`, pageWidth / 2, 30, { align: 'center' });
+      pdf.text(`Home Value: ${homeValueFormatted}`, pageWidth / 2, 38, { align: 'center' });
+      pdf.text(`Annual Income: ${yearlyIncomeFormatted}`, pageWidth / 2, 46, { align: 'center' });
+      
+      // Capture results table as image
+      const tableElement = resultsRef.current.querySelector('table');
+      if (tableElement) {
+        const canvas = await html2canvas(tableElement, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        
+        // Calculate image dimensions to fit in PDF
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', margin, 55, imgWidth, imgHeight);
+        
+        // Add explanation for tiers
+        let yPos = 55 + imgHeight + 10;
+        
+        pdf.setFontSize(14);
+        pdf.setTextColor(33, 33, 33);
+        pdf.text('Investment Options Explained', margin, yPos);
+        yPos += 10;
+        
+        pdf.setFontSize(10);
+        pdf.setTextColor(80, 80, 80);
+        
+        // Basic Investment
+        pdf.setTextColor(20, 184, 166);
+        pdf.text('Basic Investment:', margin, yPos);
+        pdf.setTextColor(80, 80, 80);
+        pdf.text(`Total Budget: ${formatCurrency(results.low.totalBudget)}`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`Monthly Savings: ${formatCurrency(results.low.monthlySavings)}`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`ROI: ${results.low.roi.toFixed(1)}%`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`Value Increase: ${formatCurrency(results.low.valueIncrease)}`, margin + 40, yPos);
+        yPos += 10;
+        
+        // Standard Investment
+        pdf.setTextColor(245, 158, 11);
+        pdf.text('Standard Investment:', margin, yPos);
+        pdf.setTextColor(80, 80, 80);
+        pdf.text(`Total Budget: ${formatCurrency(results.middle.totalBudget)}`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`Monthly Savings: ${formatCurrency(results.middle.monthlySavings)}`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`ROI: ${results.middle.roi.toFixed(1)}%`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`Value Increase: ${formatCurrency(results.middle.valueIncrease)}`, margin + 40, yPos);
+        yPos += 10;
+        
+        // Extensive Budget
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('Extensive Budget:', margin, yPos);
+        pdf.setTextColor(80, 80, 80);
+        pdf.text(`Total Budget: ${formatCurrency(results.high.totalBudget)}`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`Monthly Savings: ${formatCurrency(results.high.monthlySavings)}`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`ROI: ${results.high.roi.toFixed(1)}%`, margin + 40, yPos);
+        yPos += 6;
+        pdf.text(`Value Increase: ${formatCurrency(results.high.valueIncrease)}`, margin + 40, yPos);
+        yPos += 15;
+        
+        // Footer
+        pdf.setFontSize(9);
+        pdf.setTextColor(130, 130, 130);
+        pdf.text('Generated by Renovation Bridge - renovationbridge.com', pageWidth / 2, 280, { align: 'center' });
+        
+        // Download the PDF
+        pdf.save(`${results.low.projectType.replace(/\s+/g, '-')}-budget-plan.pdf`);
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setIsPdfGenerating(false);
+    }
+  };
 
   const captureLeadData = async () => {
     if (email && phone && results) {  // Only if user provided contact info
@@ -567,382 +753,319 @@ export default function PricingCalculator() {
       {/* Calculator Form Card */}
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 mb-16">
         {/* Form Header */}
-        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-8 border-b border-gray-200">
-          <h2 className="text-3xl font-bold text-gray-800 mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Enter Your Details</h2>
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm leading-relaxed">
-             Enter your home value and annual income directly or use the sliders to estimate your home value and annual income. We'll help calculate a renovation budget that works for you.
-            </p>
+        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-6 sm:p-8 border-b border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Calculate Your Investment Options</h2>
+              <p className="text-gray-500 text-sm mt-2 leading-relaxed max-w-xl">
+                Enter your home value and annual income directly or use the sliders to estimate your renovation budget.
+              </p>
+            </div>
+            
+            {/* Auto-Update Toggle - Now in header */}            <div className="md:min-w-[220px]">
+              <div className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 transform hover:scale-102`}>
+                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                  <div>
+                    <h3 className="font-medium text-sm text-gray-800">{autoUpdateEnabled ? 'Live Updates On' : 'Enable Live Updates'}</h3>
+                    <p className="text-xs text-gray-500">See results instantly</p>
+                  </div>
+                  
+                  <button
+                    onClick={() => setAutoUpdateEnabled(!autoUpdateEnabled)}
+                    className={`flex items-center justify-center p-2 rounded-full focus:outline-none transition-all duration-300 hover:scale-110 ${
+                      autoUpdateEnabled 
+                        ? 'bg-green-500 text-white hover:bg-green-600' 
+                        : 'bg-white text-gray-500 border-2 border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className={`h-5 w-5 ${autoUpdateEnabled ? 'animate-spin-slow' : 'animate-spin-very-slow'}`} 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor" 
+                      strokeWidth={2}
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Form Body */}
-        <div className="p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-2 col-span-1">
-              <label className="block text-sm font-medium text-gray-700">Estimated Home Value</label>
-              <div className="relative rounded-md shadow-sm">
-                <input 
-                  type="text" 
-                  {...homeValueRef}
-                  className="block w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all"
-                  placeholder="$0"
-                  value={homeValueFormatted}
-                  onChange={handleHomeValueChange}
-                  onFocus={handleInputFocus}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-gray-500 sm:text-sm">USD</span>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  type="range"
-                  min={50000}
-                  max={4000000}
-                  step={10000}
-                  value={homeValueNumber}
-                  onChange={(e) => handleHomeValueSlider(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  style={{
-                    backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%, rgb(229, 231, 235) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%)`,
-                  }}
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>$50K</span>
-                  <span>$4M</span>
-                </div>
-              </div>
-              {errors.homeValue && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
-            </div>
+        <div className="p-5 sm:p-8">
+          {/* Add custom animation class to tailwind styles */}
+          <style jsx global>{`
+            @keyframes spin-slow {
+              from {
+                transform: rotate(0deg);
+              }
+              to {
+                transform: rotate(360deg);
+              }
+            }
+            .animate-spin-slow {
+              animation: spin-slow 3s linear infinite;
+            }
+            .animate-spin-very-slow {
+              animation: spin-slow 12s linear infinite;
+            }
             
-            <div className="space-y-2 col-span-1">
-              <label className="block text-sm font-medium text-gray-700">Annual Income</label>
-              <div className="relative rounded-md shadow-sm">
-                <input 
-                  type="text" 
-                  {...yearlyIncomeRef}
-                  className="block w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all"
-                  placeholder="$0"
-                  value={yearlyIncomeFormatted}
-                  onChange={handleYearlyIncomeChange}
-                  onFocus={handleInputFocus}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-gray-500 sm:text-sm">USD</span>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  type="range"
-                  min={8000}
-                  max={1000000}
-                  step={1000}
-                  value={yearlyIncomeNumber}
-                  onChange={(e) => handleIncomeSlider(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  style={{
-                    backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%, rgb(229, 231, 235) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%)`,
-                  }}
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>$8K</span>
-                  <span>$1M</span>
-                </div>
-              </div>
-              {errors.yearlyIncome && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
-            </div>
+            /* Slider styles */
+            input[type="range"] {
+              -webkit-appearance: none;
+              height: 7px;
+              border-radius: 5px;
+              outline: none;
+            }
             
-            <div className="space-y-2 col-span-1">
-              <label className="block text-sm font-medium text-gray-700">Project Type</label>
-              <select 
-                {...register('projectType', { required: true })}
-                className="form-select"
-              >
-                <option value="">Select a project type</option>
-                {projectTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-              {errors.projectType && <p className="text-red-500 text-xs italic mt-1">This field is required</p>}
-            </div>
-          </div>
+            input[type="range"]::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 18px;
+              height: 18px;
+              background-color: rgb(99, 102, 241);
+              border-radius: 50%;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              border: 2px solid white;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            }
+            
+            input[type="range"]::-moz-range-thumb {
+              width: 18px;
+              height: 18px;
+              background-color: rgb(99, 102, 241);
+              border-radius: 50%;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              border: 2px solid white;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            }
+            
+            input[type="range"]:hover::-webkit-slider-thumb {
+              transform: scale(1.2);
+            }
+            
+            input[type="range"]:hover::-moz-range-thumb {
+              transform: scale(1.2);
+            }
+            
+            /* Show tooltip on hover */
+            input[type="range"]:hover + .slider-tooltip {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          `}</style>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {/* Left Column */}
+            <div className="space-y-8">
+              {/* Home Value Input */}
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">Estimated Home Value</label>
+                <div className="relative rounded-md shadow-sm">
+                  <input 
+                    type="text" 
+                    {...homeValueRef}
+                    className="block w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-400"
+                    placeholder="$0"
+                    value={homeValueFormatted}
+                    onChange={handleHomeValueChange}
+                    onFocus={handleInputFocus}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <span className="text-gray-500 sm:text-sm">USD</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min={50000}
+                    max={4000000}
+                    step={10000}
+                    value={homeValueNumber}
+                    onChange={(e) => handleHomeValueSlider(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer transition-all duration-200"
+                    style={{
+                      backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%, rgb(229, 231, 235) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%)`,
+                    }}
+                  />
+                  <div className="slider-tooltip absolute -top-10 left-0 bg-gray-800 text-white px-2 py-1 rounded text-xs transition-all duration-200 opacity-0 transform translate-x-0 pointer-events-none" style={{ left: `calc(${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}% - 20px)` }}>
+                    {formatCurrencyInput(`$${homeValueNumber}`)}
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-2">
+                    <span>$50K</span>
+                    <span>$4M</span>
+                  </div>
+                </div>
+                {errors.homeValue && <p className="text-red-500 text-xs italic">This field is required</p>}
+              </div>
 
-          <div className="mt-8 flex justify-center space-x-4">
-            <button 
-              onClick={handleSubmit(onSubmit)}
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:scale-105"
-            >
-              Calculate
-            </button>
-            <button 
-              onClick={onReset}
-              className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all"
-            >
-              Reset
-            </button>
+              {/* Annual Income Input */}
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">Annual Income</label>
+                <div className="relative rounded-md shadow-sm">
+                  <input 
+                    type="text" 
+                    {...yearlyIncomeRef}
+                    className="block w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-400"
+                    placeholder="$0"
+                    value={yearlyIncomeFormatted}
+                    onChange={handleYearlyIncomeChange}
+                    onFocus={handleInputFocus}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <span className="text-gray-500 sm:text-sm">USD</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min={8000}
+                    max={1000000}
+                    step={1000}
+                    value={yearlyIncomeNumber}
+                    onChange={(e) => handleIncomeSlider(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer transition-all duration-200"
+                    style={{
+                      backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%, rgb(229, 231, 235) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%)`,
+                    }}
+                  />
+                  <div className="slider-tooltip absolute -top-10 left-0 bg-gray-800 text-white px-2 py-1 rounded text-xs transition-all duration-200 opacity-0 transform translate-x-0 pointer-events-none" style={{ left: `calc(${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}% - 20px)` }}>
+                    {formatCurrencyInput(`$${yearlyIncomeNumber}`)}
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-2">
+                    <span>$8K</span>
+                    <span>$1M</span>
+                  </div>
+                </div>
+                {errors.yearlyIncome && <p className="text-red-500 text-xs italic">This field is required</p>}
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-8">
+              {/* Project Type Input */}
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">Project Type</label>
+                <select 
+                  {...register('projectType', { required: true })}
+                  className="form-select w-full pl-3 pr-12 py-3 border-gray-300 rounded-md focus:ring-primary focus:border-primary transition-all duration-200 hover:border-gray-400"
+                >
+                  <option value="">Select a project type</option>
+                  {projectTypes.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                {errors.projectType && <p className="text-red-500 text-xs italic">This field is required</p>}
+              </div>
+
+              {/* Action Buttons - Now in the right column for better balance */}
+              <div className="flex flex-col gap-4 mt-6">
+                <button 
+                  onClick={handleSubmit(onSubmit)}
+                  className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                >
+                  Calculate Budget
+                </button>
+                <button 
+                  onClick={onReset}
+                  className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-all duration-300 hover:border-gray-400"
+                >
+                  Reset Form
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
       {/* Results Section */}
       {showResults && results && (
-        <div className="max-w-6xl mx-auto transition-all duration-500 animate-fadeIn">
+        <div className="max-w-6xl mx-auto transition-all duration-500 animate-fadeIn" ref={resultsRef}>
           {/* Results Header */}
           <div className="bg-white rounded-t-2xl shadow-lg p-6 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-100">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Renovation Budget Results</h2>
               <p className="text-gray-500">Based on your {results.low.projectType.toLowerCase()} project</p>
             </div>
-            <button 
-              disabled
-              className="mt-4 md:mt-0 flex items-center gap-2 bg-gray-200 text-gray-500 px-4 py-2 rounded-lg opacity-60 cursor-not-allowed relative group"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-              Download PDF
-              <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Coming Soon
-              </span>
-            </button>
           </div>
 
           {/* Results Table */}
-          <div className="bg-white shadow-lg overflow-hidden">
+          <div className="bg-white shadow-lg rounded-b-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead>
+                <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-5 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4"></th>
-                    <th scope="col" className="px-6 py-5 bg-blue-50 text-center text-sm font-medium text-blue-700 uppercase tracking-wider">Low Tier</th>
-                    <th scope="col" className="px-6 py-5 bg-purple-50 text-center text-sm font-medium text-purple-700 uppercase tracking-wider">Middle Tier</th>
-                    <th scope="col" className="px-6 py-5 bg-indigo-50 text-center text-sm font-medium text-indigo-700 uppercase tracking-wider">High Tier</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-1/4">Metric</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-teal-800 uppercase tracking-wider bg-teal-100/50">Basic Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-amber-800 uppercase tracking-wider bg-amber-100/50">Standard Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-800 uppercase tracking-wider bg-blue-100/50">Extensive Budget</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Initial Budget</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.initialBudget)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.initialBudget)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.initialBudget)}</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Initial Budget</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.initialBudget)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.initialBudget)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.initialBudget)}</td>
                   </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Contingency Fund</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.contingencyFund)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.contingencyFund)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.contingencyFund)}</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Contingency Fund</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.contingencyFund)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.contingencyFund)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.contingencyFund)}</td>
                   </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Time To Save</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatMonths(results.low.timeToSave)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatMonths(results.middle.timeToSave)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatMonths(results.high.timeToSave)}</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Time To Save</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.low.timeToSave)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.middle.timeToSave)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.high.timeToSave)}</td>
                   </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Monthly Savings</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.monthlySavings)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.monthlySavings)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.monthlySavings)}</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Monthly Savings</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.monthlySavings)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.monthlySavings)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.monthlySavings)}</td>
                   </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Estimated ROI</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{results.low.roi.toFixed(2)}%</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{results.middle.roi.toFixed(2)}%</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{results.high.roi.toFixed(2)}%</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">Estimated ROI</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.low.roi.toFixed(1)}%</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.middle.roi.toFixed(1)}%</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.high.roi.toFixed(1)}%</td>
                   </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Value Increase</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.valueIncrease)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.valueIncrease)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.valueIncrease)}</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Value Increase</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.valueIncrease)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.valueIncrease)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.valueIncrease)}</td>
                   </tr>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Updated Home Value</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.low.updatedHomeValue)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.middle.updatedHomeValue)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700">{formatCurrency(results.high.updatedHomeValue)}</td>
+                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">Updated Home Value</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.low.updatedHomeValue)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.middle.updatedHomeValue)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.high.updatedHomeValue)}</td>
                   </tr>
-                  <tr>
+                  <tr className="border-t border-gray-300">
                     <td className="px-6 py-5 whitespace-nowrap text-base font-bold text-gray-900">Total Budget</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-center text-blue-600 bg-blue-50">{formatCurrency(results.low.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-center text-purple-600 bg-purple-50">{formatCurrency(results.middle.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-center text-indigo-600 bg-indigo-50">{formatCurrency(results.high.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-teal-700 bg-teal-100/50">{formatCurrency(results.low.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-amber-700 bg-amber-100/50">{formatCurrency(results.middle.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-800 bg-blue-100/50">{formatCurrency(results.high.totalBudget)}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Budget Breakdown Visualization */}
-          <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Budget Breakdown</h3>
-              <p className="text-sm text-gray-500 mt-1">Visual representation of your budget allocation</p>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Low Tier Budget Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                    Low Tier Budget
-                  </h4>
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Initial Budget</span>
-                      <span>{formatCurrency(results.low.initialBudget)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-blue-400 h-2.5 rounded-full" style={{
-                        width: `${(results.low.initialBudget / results.low.totalBudget * 100).toFixed(0)}%`
-                      }}></div>
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Contingency Fund</span>
-                      <span>{formatCurrency(results.low.contingencyFund)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-blue-600 h-2.5 rounded-full" style={{
-                        width: `${(results.low.contingencyFund / results.low.totalBudget * 100).toFixed(0)}%`
-                      }}></div>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-blue-600">{formatCurrency(results.low.totalBudget)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Middle Tier Budget Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
-                    Middle Tier Budget
-                  </h4>
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Initial Budget</span>
-                      <span>{formatCurrency(results.middle.initialBudget)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-purple-400 h-2.5 rounded-full" style={{
-                        width: `${(results.middle.initialBudget / results.middle.totalBudget * 100).toFixed(0)}%`
-                      }}></div>
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Contingency Fund</span>
-                      <span>{formatCurrency(results.middle.contingencyFund)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-purple-600 h-2.5 rounded-full" style={{
-                        width: `${(results.middle.contingencyFund / results.middle.totalBudget * 100).toFixed(0)}%`
-                      }}></div>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-purple-600">{formatCurrency(results.middle.totalBudget)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* High Tier Budget Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>
-                    High Tier Budget
-                  </h4>
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Initial Budget</span>
-                      <span>{formatCurrency(results.high.initialBudget)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-indigo-400 h-2.5 rounded-full" style={{
-                        width: `${(results.high.initialBudget / results.high.totalBudget * 100).toFixed(0)}%`
-                      }}></div>
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Contingency Fund</span>
-                      <span>{formatCurrency(results.high.contingencyFund)}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-indigo-600 h-2.5 rounded-full" style={{
-                        width: `${(results.high.contingencyFund / results.high.totalBudget * 100).toFixed(0)}%`
-                      }}></div>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-indigo-600">{formatCurrency(results.high.totalBudget)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Understanding Your Budget */}
-          <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Understanding Your Budget</h3>
-            </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
-                <div className="flex items-center mb-3">
-                  <div className="bg-blue-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h4 className="font-medium text-gray-900">Total Budget</h4>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Includes both initial budget and contingency fund to cover unexpected expenses during your renovation.
-                </p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
-                <div className="flex items-center mb-3">
-                  <div className="bg-purple-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h4 className="font-medium text-gray-900">Monthly Savings</h4>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Recommended amount to set aside each month based on your income to reach your renovation goal.
-                </p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
-                <div className="flex items-center mb-3">
-                  <div className="bg-indigo-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                  </div>
-                  <h4 className="font-medium text-gray-900">Return on Investment</h4>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Estimated percentage of your investment that may be recouped through increased home value.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* ROI over time */}
-          <div className="bg-white shadow-lg p-6 mb-4 mt-8">
+          <div className="bg-white shadow-lg rounded-lg p-6 mb-4 mt-8">
             <h3 className="text-xl font-bold text-gray-800 mb-4">ROI Over Time</h3>
             <div className="w-full overflow-x-auto">
               <style jsx>{`
@@ -950,9 +1073,9 @@ export default function PricingCalculator() {
                   height: 300px;
                   max-width: 100%;
                   margin: 0 auto;
-                  --color-1: rgba(59, 130, 246, 0.5);
-                  --color-2: rgba(147, 51, 234, 0.5);
-                  --color-3: rgba(79, 70, 229, 0.5);
+                  --color-1: rgba(20, 184, 166, 0.5);
+                  --color-2: rgba(245, 158, 11, 0.5);
+                  --color-3: rgba(37, 99, 235, 0.5);
                 }
                 
                 .charts-css caption {
@@ -1025,6 +1148,13 @@ export default function PricingCalculator() {
                   color: #4b5563;
                 }
                 
+                .axis-labels .y-label-right {
+                  left: auto;
+                  right: -40px;
+                  transform: rotate(90deg) translateX(50%);
+                  transform-origin: right top;
+                }
+                
                 /* Chart annotations */
                 .chart-annotations {
                   position: absolute;
@@ -1041,6 +1171,12 @@ export default function PricingCalculator() {
                   left: -5px;
                   font-size: 0.75rem;
                   color: #6b7280;
+                }
+                
+                .chart-annotations .y-max-right,
+                .chart-annotations .y-min-right {
+                  left: auto;
+                  right: -5px;
                 }
                 
                 .chart-annotations .y-max {
@@ -1097,7 +1233,7 @@ export default function PricingCalculator() {
               `}</style>
               
               <div className="chart-wrapper" id="chart-container">
-                <table className="charts-css column show-primary-axis show-4-secondary-axes show-labels data-spacing-4 reverse-data">
+                <table className="charts-css column show-primary-axis show-4-secondary-axes show-labels data-spacing-4">
                   <caption>Return on Investment Over 12 Months</caption>
                   <thead>
                     <tr>
@@ -1117,19 +1253,19 @@ export default function PricingCalculator() {
                           <th scope="row">{data.month}</th>
                           <td className="tier-low bar-tier" style={{
                             "--size": `calc(${data["Low Tier"]} / ${maxValue})`,
-                            "--color": "rgba(59, 130, 246, 0.5)"
+                            "--color": "rgba(20, 184, 166, 0.6)"
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["Low Tier"])}</span>
                           </td>
                           <td className="tier-middle bar-tier" style={{
                             "--size": `calc(${data["Middle Tier"]} / ${maxValue})`,
-                            "--color": "rgba(147, 51, 234, 0.5)"
+                            "--color": "rgba(245, 158, 11, 0.6)"
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["Middle Tier"])}</span>
                           </td>
                           <td className="tier-high bar-tier" style={{
                             "--size": `calc(${data["High Tier"]} / ${maxValue})`,
-                            "--color": "rgba(79, 70, 229, 0.5)"
+                            "--color": "rgba(37, 99, 235, 0.6)"
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["High Tier"])}</span>
                           </td>
@@ -1141,8 +1277,7 @@ export default function PricingCalculator() {
                 
                 {/* Axis Labels */}
                 <div className="axis-labels">
-                  <div className="x-label">Months</div>
-                  <div className="y-label">Return on Investment ($)</div>
+                  <div className="y-label">ROI ($)</div>
                 </div>
                 
                 {/* Chart Annotations */}
@@ -1157,17 +1292,208 @@ export default function PricingCalculator() {
               {/* Chart Legend */}
               <div className="flex justify-center items-center mt-4 space-x-6 chart-legend">
                 <div className="flex items-center chart-legend-item low">
-                  <div className="w-4 h-4 bg-blue-400 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-teal-500 rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">Low Tier</span>
                 </div>
                 <div className="flex items-center chart-legend-item middle">
-                  <div className="w-4 h-4 bg-purple-400 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-amber-500 rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">Middle Tier</span>
                 </div>
                 <div className="flex items-center chart-legend-item high">
-                  <div className="w-4 h-4 bg-indigo-400 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-blue-600 rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">High Tier</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Budget Breakdown Visualization */}
+          <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Budget Breakdown</h3>
+              <p className="text-sm text-gray-500 mt-1">Visual representation of your budget allocation</p>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Low Tier Budget Breakdown */}
+                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                    <span className="w-3 h-3 bg-teal-500 rounded-full mr-2"></span>
+                    Low Tier Budget
+                  </h4>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Initial Budget</span>
+                      <span>{formatCurrency(results.low.initialBudget)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        key={`low-initial-${forceUpdate}`}
+                        className="bg-teal-400 h-2.5 rounded-full" 
+                        style={{
+                          width: `${(results.low.initialBudget / results.low.totalBudget * 100).toFixed(0)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Contingency Fund</span>
+                      <span>{formatCurrency(results.low.contingencyFund)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        key={`low-contingency-${forceUpdate}`}
+                        className="bg-teal-600 h-2.5 rounded-full" 
+                        style={{
+                          width: `${(results.low.contingencyFund / results.low.totalBudget * 100).toFixed(0)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Total Budget</span>
+                      <span className="text-lg font-bold text-teal-600">{formatCurrency(results.low.totalBudget)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Middle Tier Budget Breakdown */}
+                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                    <span className="w-3 h-3 bg-amber-500 rounded-full mr-2"></span>
+                    Middle Tier Budget
+                  </h4>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Initial Budget</span>
+                      <span>{formatCurrency(results.middle.initialBudget)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        key={`middle-initial-${forceUpdate}`}
+                        className="bg-amber-400 h-2.5 rounded-full" 
+                        style={{
+                          width: `${(results.middle.initialBudget / results.middle.totalBudget * 100).toFixed(0)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Contingency Fund</span>
+                      <span>{formatCurrency(results.middle.contingencyFund)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        key={`middle-contingency-${forceUpdate}`}
+                        className="bg-amber-600 h-2.5 rounded-full" 
+                        style={{
+                          width: `${(results.middle.contingencyFund / results.middle.totalBudget * 100).toFixed(0)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Total Budget</span>
+                      <span className="text-lg font-bold text-amber-600">{formatCurrency(results.middle.totalBudget)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* High Tier Budget Breakdown */}
+                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                    <span className="w-3 h-3 bg-blue-600 rounded-full mr-2"></span>
+                    High Tier Budget
+                  </h4>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Initial Budget</span>
+                      <span>{formatCurrency(results.high.initialBudget)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        key={`high-initial-${forceUpdate}`}
+                        className="bg-blue-400 h-2.5 rounded-full" 
+                        style={{
+                          width: `${(results.high.initialBudget / results.high.totalBudget * 100).toFixed(0)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Contingency Fund</span>
+                      <span>{formatCurrency(results.high.contingencyFund)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        key={`high-contingency-${forceUpdate}`}
+                        className="bg-blue-700 h-2.5 rounded-full" 
+                        style={{
+                          width: `${(results.high.contingencyFund / results.high.totalBudget * 100).toFixed(0)}%`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Total Budget</span>
+                      <span className="text-lg font-bold text-blue-700">{formatCurrency(results.high.totalBudget)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Understanding Your Budget */}
+          <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Understanding Your Budget</h3>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
+                <div className="flex items-center mb-3">
+                  <div className="bg-teal-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-medium text-gray-900">Total Budget</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Includes both initial budget and contingency fund to cover unexpected expenses during your renovation.
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
+                <div className="flex items-center mb-3">
+                  <div className="bg-amber-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-medium text-gray-900">Monthly Savings</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Recommended amount to set aside each month based on your income to reach your renovation goal.
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
+                <div className="flex items-center mb-3">
+                  <div className="bg-blue-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <h4 className="font-medium text-gray-900">Return on Investment</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Estimated percentage of your investment that may be recouped through increased home value.
+                </p>
               </div>
             </div>
           </div>
@@ -1176,15 +1502,49 @@ export default function PricingCalculator() {
           <div className="bg-white rounded-lg shadow-lg mt-8 mb-8 overflow-hidden">
             <div className="px-6 py-5 border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">Save Your Results</h3>
-              <p className="mt-1 text-sm text-gray-500">Enter your contact information to save these results and receive additional renovation insights.</p>
+              <p className="mt-1 text-sm text-gray-500">Enter your contact information to save these results and receive a downloadable PDF of your renovation budget.</p>
             </div>
             <div className="p-6">
               {leadSubmitted ? (
-                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md flex items-center">
-                  <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <p className="text-green-700">Thank you! Your results have been saved.</p>
+                <div className="space-y-4">
+                  <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md flex items-center">
+                    <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p className="text-green-700">Thank you! Your results have been saved.</p>
+                  </div>
+                  
+                  <button 
+                    onClick={downloadPDF}
+                    disabled={isPdfGenerating}
+                    className={`flex items-center justify-center gap-3 px-5 py-3 rounded-lg font-medium shadow-md transition-all duration-300 ${
+                      isPdfGenerating 
+                        ? 'bg-gray-200 text-gray-500 cursor-wait w-full' 
+                        : 'bg-gradient-to-r from-primary to-indigo-600 text-white hover:shadow-lg hover:scale-105 active:scale-100 w-full'
+                    }`}
+                  >
+                    {isPdfGenerating ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Generating PDF...
+                      </>
+                    ) : (
+                      <>
+                        <span className="relative group">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-0" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                          </svg>
+                          <span className="absolute inset-0 h-full w-full bg-white opacity-0 group-hover:opacity-20 rounded-full transition-opacity duration-300"></span>
+                        </span>
+                        <span className="relative after:absolute after:bottom-0 after:left-0 after:bg-white after:h-[2px] after:w-0 after:transition-all after:duration-300 group-hover:after:w-full">
+                          Download Your Budget PDF
+                        </span>
+                      </>
+                    )}
+                  </button>
                 </div>
               ) : (
                 <div>
@@ -1232,3 +1592,99 @@ export default function PricingCalculator() {
     </div>
   );
 } 
+
+// PDF Lead Form Component
+interface PdfLeadFormProps {
+  onSubmit: (data: { first_name: string; last_name: string; email: string }) => void;
+  formTitle: string;
+  onCancel: () => void;
+}
+
+function PdfLeadForm({ onSubmit, formTitle, onCancel }: PdfLeadFormProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firstName || !lastName || !email) return;
+    
+    setIsSubmitting(true);
+    onSubmit({ first_name: firstName, last_name: lastName, email });
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="p-6">
+      <h3 className="text-xl font-medium text-gray-900 mb-1">{formTitle}</h3>
+      <p className="text-sm text-gray-500 mb-6">
+        Please enter your information to download the PDF
+      </p>
+      
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="first_name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="last_name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="pdf_email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="pdf_email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="mt-6 flex space-x-3">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex-1 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            {isSubmitting ? 'Processing...' : 'Download PDF'}
+          </button>
+          
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

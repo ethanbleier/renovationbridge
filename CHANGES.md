@@ -367,3 +367,19 @@ Added a dedicated tech support form in the footer for website assistance:
 
 **Usage Example**:
 Users experiencing issues with the website can fill out a simple form with their name, email, and issue description. The form sends an immediate email notification to the support team while providing a prominent support phone number for urgent assistance.
+
+### PDF Lead Form Tag Update for GHL Pricing Integration
+
+Enhanced PDF lead and calculator submissions to GoHighLevel for improved lead tracking:
+
+- **What Changed**: Updated GoHighLevel tag configuration for PDF lead and calculator submissions to include the 'pricing' tag
+- **Files Modified**:
+  - `src/lib/utils/formSubmission.ts` - Added 'pricing' tag to the PDF lead and calculator form types
+- **Implementation Details**:
+  - Modified the getFormTags function to include the 'pricing' tag for PDF lead submissions
+  - Added 'pricing' tag to calculator form submissions while maintaining the 'urgent-call' tag
+  - Maintained the existing 'website-lead' tag which is applied by default to all submissions
+  - This ensures both PDF leads and calculator submissions are properly categorized under both the 'pricing' and 'website-lead' tags
+  - No API route changes were needed as the tag handling is centralized in the formSubmission utility
+
+**Benefits**: This change allows for more granular lead tracking in GoHighLevel, ensuring that both PDF lead submissions and calculator form submissions are properly categorized. Marketing and sales teams can now easily segment and prioritize leads based on their interest in pricing information, whether they came through the pricing calculator or downloaded PDF resources.

@@ -1,6 +1,6 @@
 import { getStoredTokens } from '@/utils/ghlAuth';
 
-type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor';
+type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor' | 'pdf-lead';
 
 // Default tags to apply to all submissions
 const DEFAULT_TAGS = ['website-lead', 'renovation-bridge'];
@@ -9,19 +9,34 @@ const DEFAULT_TAGS = ['website-lead', 'renovation-bridge'];
 export function getFormTags(formType: FormType): string[] {
   const tags = [...DEFAULT_TAGS];
   
+  // Base tags by form type
   switch (formType) {
+    case 'contact':
+    case 'get-started':
+      tags.push('urgent-call');
+      break;
     case 'guide':
       tags.push('urgent-guide');
       break;
     case 'contractor':
-      tags.push('contractor-application');
+      tags.push('contractor-app');
+      break;
+    case 'referral':
+      tags.push('referral');
+      break;
+    case 'pdf-lead':
+      tags.push('pdf-download');
+      tags.push('pricing');
+      break;
+    case 'calculator':
+      tags.push('urgent-call');
+      tags.push('pricing');
       break;
     default:
-      tags.push('urgent-call');
       break;
   }
   
-  // Add specific form type tag
+  // Always add the form type as a tag
   tags.push(formType);
   
   return tags;
@@ -68,13 +83,19 @@ export function formatGHLData(formData: any, formType: FormType) {
   return ghlData;
 }
 
+// Interface for GoHighLevel credentials
+interface GHLCredentials {
+  apiKey: string;
+  locationId: string;
+}
+
 // Generic function to submit to GoHighLevel
-export async function submitToGHL(formData: any, formType: FormType) {
+export async function submitToGHL(formData: any, formType: FormType, credentials?: GHLCredentials) {
   try {
-    // Get GoHighLevel API credentials from environment or token storage
+    // Get GoHighLevel API credentials from provided credentials, environment or token storage
     const tokenData = getStoredTokens();
-    const apiKey = tokenData?.accessToken || process.env.GHL_API_KEY;
-    const locationId = tokenData?.locationId || process.env.GHL_LOCATION_ID;
+    const apiKey = credentials?.apiKey || tokenData?.accessToken || process.env.GHL_API_KEY || process.env.NEXT_PUBLIC_GHL_API_KEY;
+    const locationId = credentials?.locationId || tokenData?.locationId || process.env.GHL_LOCATION_ID || process.env.NEXT_PUBLIC_GHL_LOCATION_ID;
     
     if (!apiKey || !locationId) {
       throw new Error('GoHighLevel API credentials not configured');
