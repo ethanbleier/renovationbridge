@@ -638,7 +638,7 @@ export default function PricingCalculator() {
         pdf.setTextColor(80, 80, 80);
         
         // Basic Investment
-        pdf.setTextColor(20, 184, 166);
+        pdf.setTextColor(49, 59, 192); // Primary color
         pdf.text('Basic Investment:', margin, yPos);
         pdf.setTextColor(80, 80, 80);
         pdf.text(`Total Budget: ${formatCurrency(results.low.totalBudget)}`, margin + 40, yPos);
@@ -651,7 +651,7 @@ export default function PricingCalculator() {
         yPos += 10;
         
         // Standard Investment
-        pdf.setTextColor(245, 158, 11);
+        pdf.setTextColor(0, 44, 102); // Secondary color
         pdf.text('Standard Investment:', margin, yPos);
         pdf.setTextColor(80, 80, 80);
         pdf.text(`Total Budget: ${formatCurrency(results.middle.totalBudget)}`, margin + 40, yPos);
@@ -664,7 +664,7 @@ export default function PricingCalculator() {
         yPos += 10;
         
         // Extensive Budget
-        pdf.setTextColor(37, 99, 235);
+        pdf.setTextColor(59, 130, 246); // Blue-500
         pdf.text('Extensive Budget:', margin, yPos);
         pdf.setTextColor(80, 80, 80);
         pdf.text(`Total Budget: ${formatCurrency(results.high.totalBudget)}`, margin + 40, yPos);
@@ -1005,9 +1005,9 @@ export default function PricingCalculator() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-1/4">Metric</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-teal-800 uppercase tracking-wider bg-teal-100/50">Basic Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-amber-800 uppercase tracking-wider bg-amber-100/50">Standard Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-800 uppercase tracking-wider bg-blue-100/50">Extensive Budget</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-indigo-800 uppercase tracking-wider bg-indigo-100/50">Basic Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-900 uppercase tracking-wider bg-blue-200/50">Standard Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-sky-800 uppercase tracking-wider bg-sky-100/50">Extensive Budget</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -1055,9 +1055,9 @@ export default function PricingCalculator() {
                   </tr>
                   <tr className="border-t border-gray-300">
                     <td className="px-6 py-5 whitespace-nowrap text-base font-bold text-gray-900">Total Budget</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-teal-700 bg-teal-100/50">{formatCurrency(results.low.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-amber-700 bg-amber-100/50">{formatCurrency(results.middle.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-800 bg-blue-100/50">{formatCurrency(results.high.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-primary bg-indigo-100/50">{formatCurrency(results.low.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-secondary bg-blue-200/50">{formatCurrency(results.middle.totalBudget)}</td>
+                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-600 bg-sky-100/50">{formatCurrency(results.high.totalBudget)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1073,9 +1073,9 @@ export default function PricingCalculator() {
                   height: 300px;
                   max-width: 100%;
                   margin: 0 auto;
-                  --color-1: rgba(20, 184, 166, 0.5);
-                  --color-2: rgba(245, 158, 11, 0.5);
-                  --color-3: rgba(37, 99, 235, 0.5);
+                  --color-1: rgba(49, 59, 192, 0.5); /* Primary */
+                  --color-2: rgba(0, 44, 102, 0.5); /* Secondary */
+                  --color-3: rgba(59, 130, 246, 0.5); /* Blue-500 */
                 }
                 
                 .charts-css caption {
@@ -1253,19 +1253,19 @@ export default function PricingCalculator() {
                           <th scope="row">{data.month}</th>
                           <td className="tier-low bar-tier" style={{
                             "--size": `calc(${data["Low Tier"]} / ${maxValue})`,
-                            "--color": "rgba(20, 184, 166, 0.6)"
+                            "--color": "rgba(49, 59, 192, 0.6)" /* Primary */
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["Low Tier"])}</span>
                           </td>
                           <td className="tier-middle bar-tier" style={{
                             "--size": `calc(${data["Middle Tier"]} / ${maxValue})`,
-                            "--color": "rgba(245, 158, 11, 0.6)"
+                            "--color": "rgba(0, 44, 102, 0.6)" /* Secondary */
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["Middle Tier"])}</span>
                           </td>
                           <td className="tier-high bar-tier" style={{
                             "--size": `calc(${data["High Tier"]} / ${maxValue})`,
-                            "--color": "rgba(37, 99, 235, 0.6)"
+                            "--color": "rgba(59, 130, 246, 0.6)" /* Blue-500 */
                           } as React.CSSProperties}>
                             <span className="data-tooltip">{formatCurrency(data["High Tier"])}</span>
                           </td>
@@ -1292,15 +1292,15 @@ export default function PricingCalculator() {
               {/* Chart Legend */}
               <div className="flex justify-center items-center mt-4 space-x-6 chart-legend">
                 <div className="flex items-center chart-legend-item low">
-                  <div className="w-4 h-4 bg-teal-500 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-primary rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">Low Tier</span>
                 </div>
                 <div className="flex items-center chart-legend-item middle">
-                  <div className="w-4 h-4 bg-amber-500 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-secondary rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">Middle Tier</span>
                 </div>
                 <div className="flex items-center chart-legend-item high">
-                  <div className="w-4 h-4 bg-blue-600 rounded-sm mr-2"></div>
+                  <div className="w-4 h-4 bg-blue-500 rounded-sm mr-2"></div>
                   <span className="text-sm text-gray-600">High Tier</span>
                 </div>
               </div>
@@ -1318,7 +1318,7 @@ export default function PricingCalculator() {
                 {/* Low Tier Budget Breakdown */}
                 <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-teal-500 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-primary rounded-full mr-2"></span>
                     Low Tier Budget
                   </h4>
                   <div className="mb-4">
@@ -1329,7 +1329,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`low-initial-${forceUpdate}`}
-                        className="bg-teal-400 h-2.5 rounded-full" 
+                        className="bg-indigo-400 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.low.initialBudget / results.low.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1344,7 +1344,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`low-contingency-${forceUpdate}`}
-                        className="bg-teal-600 h-2.5 rounded-full" 
+                        className="bg-indigo-600 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.low.contingencyFund / results.low.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1354,7 +1354,7 @@ export default function PricingCalculator() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-teal-600">{formatCurrency(results.low.totalBudget)}</span>
+                      <span className="text-lg font-bold text-primary">{formatCurrency(results.low.totalBudget)}</span>
                     </div>
                   </div>
                 </div>
@@ -1362,7 +1362,7 @@ export default function PricingCalculator() {
                 {/* Middle Tier Budget Breakdown */}
                 <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-amber-500 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-secondary rounded-full mr-2"></span>
                     Middle Tier Budget
                   </h4>
                   <div className="mb-4">
@@ -1373,7 +1373,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`middle-initial-${forceUpdate}`}
-                        className="bg-amber-400 h-2.5 rounded-full" 
+                        className="bg-blue-700 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.middle.initialBudget / results.middle.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1388,7 +1388,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`middle-contingency-${forceUpdate}`}
-                        className="bg-amber-600 h-2.5 rounded-full" 
+                        className="bg-blue-900 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.middle.contingencyFund / results.middle.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1398,7 +1398,7 @@ export default function PricingCalculator() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-amber-600">{formatCurrency(results.middle.totalBudget)}</span>
+                      <span className="text-lg font-bold text-secondary">{formatCurrency(results.middle.totalBudget)}</span>
                     </div>
                   </div>
                 </div>
@@ -1406,7 +1406,7 @@ export default function PricingCalculator() {
                 {/* High Tier Budget Breakdown */}
                 <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-4 flex items-center">
-                    <span className="w-3 h-3 bg-blue-600 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
                     High Tier Budget
                   </h4>
                   <div className="mb-4">
@@ -1432,7 +1432,7 @@ export default function PricingCalculator() {
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
                         key={`high-contingency-${forceUpdate}`}
-                        className="bg-blue-700 h-2.5 rounded-full" 
+                        className="bg-blue-600 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.high.contingencyFund / results.high.totalBudget * 100).toFixed(0)}%`
                         }}
@@ -1442,7 +1442,7 @@ export default function PricingCalculator() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
-                      <span className="text-lg font-bold text-blue-700">{formatCurrency(results.high.totalBudget)}</span>
+                      <span className="text-lg font-bold text-blue-600">{formatCurrency(results.high.totalBudget)}</span>
                     </div>
                   </div>
                 </div>
@@ -1458,8 +1458,8 @@ export default function PricingCalculator() {
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
                 <div className="flex items-center mb-3">
-                  <div className="bg-teal-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-indigo-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -1471,8 +1471,8 @@ export default function PricingCalculator() {
               </div>
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
                 <div className="flex items-center mb-3">
-                  <div className="bg-amber-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-blue-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -1484,8 +1484,8 @@ export default function PricingCalculator() {
               </div>
               <div className="bg-gray-50 rounded-xl p-5 shadow-sm transition-transform hover:transform hover:scale-105">
                 <div className="flex items-center mb-3">
-                  <div className="bg-blue-100 p-3 rounded-full mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-sky-100 p-3 rounded-full mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                   </div>
