@@ -50,36 +50,63 @@ export function formatGHLData(formData: any, formType: FormType) {
     ? formData.name.split(' ').slice(1).join(' ') 
     : '');
   
-  // Extract description/message content from various field names
-  let description = '';
-  if (formData.projectDescription) {
-    description = formData.projectDescription;
-  } else if (formData.message) {
-    description = formData.message;
-  } else if (formData.description) {
-    description = formData.description;
-  }
+  // Extract description/message content (prioritize)
+  const description = formData.additional_comments || // Explicit field from get-started
+                     formData.message ||           // Field from contact form
+                     formData.projectDescription || // Field from contact form (legacy variants)
+                     formData.description ||        // Field from contact form (legacy variants)
+                     formData.work_description ||   // Field from contact form (legacy variants)
+                     formData.project_details ||    // Field from contact form (legacy variants)
+                     "No description provided";
+
+  // Extract city (handle different possible field names)
+  const city = formData.city || formData.propertyCity;
   
+  // Fields to exclude from the customField object
+  const standardFields = [
+    'email', 'phone', 'firstName', 'lastName', 'name', 'note',
+    'tags', 'dnd', 'contact', // GHL system fields 
+    // Explicitly handled/mapped fields
+    'message', 'projectDescription', 'description', 'additional_comments',
+    'work_description', 'project_details', 'city', 'propertyCity' 
+  ];
+
+  // Build the customField OBJECT
+  const customFieldObject: { [key: string]: any } = {};
+
+  // Add description using the key GHL expects (based on get-started form)
+  if (description && description !== "No description provided") {
+    customFieldObject['additional_comments'] = description;
+  }
+
+  // Add city using the key GHL might expect (based on get-started form)
+  if (city) {
+    // Using propertyCity as the key, matching get-started form's successful submission key
+    customFieldObject['propertyCity'] = city; 
+  }
+
+  // Add any other non-standard fields from formData
+  Object.entries(formData).forEach(([key, value]) => {
+    if (!standardFields.includes(key) && value !== undefined && value !== '' && value !== null) {
+      customFieldObject[key] = value;
+    }
+  });
+
   // Base data structure for GHL
-  const ghlData = {
+  const ghlData: any = {
     email: formData.email,
     phone: formData.phone,
     firstName,
     lastName,
-    // Add the description to a note field that GHL will display in the dashboard
-    note: description,
-    // Add the project description to the dedicated contact.project_description field
-    contact: {
-      project_description: description
-    },
-    customField: {
-      ...Object.entries(formData)
-        .filter(([key]) => !['email', 'phone', 'firstName', 'lastName', 'name', 'message', 'projectDescription', 'description'].includes(key))
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-    },
+    note: description, // Keep note for quick view in GHL
     tags: getFormTags(formType)
   };
-  
+
+  // Only add customField key if the object is not empty
+  if (Object.keys(customFieldObject).length > 0) {
+    ghlData.customField = customFieldObject;
+  }
+
   return ghlData;
 }
 
@@ -108,13 +135,14 @@ export async function submitToGHL(formData: any, formType: FormType, credentials
     console.log('GHL Request - Form Type:', formType);
     console.log('GHL Request - Formatted Data:', JSON.stringify(ghlData, null, 2));
     
-    // Send the data to GoHighLevel's contact API
-    const ghlResponse = await fetch(`https://rest.gohighlevel.com/v1/contacts/`, {
+    // Send the data back to GoHighLevel's original contact POST API
+    const ghlResponse = await fetch(`https://rest.gohighlevel.com/v1/contacts/`, { // Reverted endpoint
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
+      // Send the ghlData object directly as before
       body: JSON.stringify(ghlData)
     });
     

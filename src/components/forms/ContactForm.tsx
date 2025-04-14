@@ -12,6 +12,7 @@ type FormValues = {
   email: string
   phone: string
   message: string
+  projectDescription: string
 }
 
 // JSON schema for validation
@@ -111,9 +112,21 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         return;
       }
       
+      // Let the message be part of the data object directly 
+      // The formatGHLData function in the backend will handle proper formatting
       const formData = {
-        ...data,
-        projectDescription: data.message
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        city: data.city,
+        message: data.message || "Contact form submission - no description provided",
+        projectDescription: data.message || "Contact form submission - no description provided",
+        // Add additional custom fields that GHL might recognize
+        project_description: data.message || "Contact form submission - no description provided",
+        description: data.message || "Contact form submission - no description provided",
+        // Add a field with a unique name that won't be filtered out
+        work_description: data.message || "Contact form submission - no description provided",
+        project_details: data.message || "Contact form submission - no description provided"
       };
       
       // Send data to our API route that connects to GoHighLevel
@@ -189,7 +202,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       {error ? (
         <div className="bg-red-50 text-red-800 p-4 rounded-md mb-6 border-l-4 border-red-500 flex items-center animate-fadeIn">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
           {error}
         </div>
@@ -343,19 +356,11 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               placeholder="Please describe what you need help with..."
               rows={4}
               className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
-              aria-required="true"
+              aria-required="false"
               aria-invalid={errors.message ? "true" : "false"}
-              {...register('message', { required: true })}
+              {...register('message')}
             ></textarea>
           </div>
-          {errors.message && (
-            <p className="mt-1 text-sm text-red-600 flex items-center" id="message-error">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              Message is required
-            </p>
-          )}
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 pt-3">
