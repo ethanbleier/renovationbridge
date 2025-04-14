@@ -89,7 +89,7 @@ export default function HeroSection() {
               priority={index === 0}
             />
             {/* Overlay to ensure text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-lavender/75 to-white/50 sm:from-lavender/65 sm:to-white/50"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-lavender/30 to-white/20 sm:from-lavender/25 sm:to-white/15"></div>
           </div>
         ))}
       </div>
