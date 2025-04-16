@@ -67,14 +67,14 @@ export default function PricingCalculator() {
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(false); // State for the toggle
-  const [forceUpdate, setForceUpdate] = useState(0);
   const [initialCalculationDone, setInitialCalculationDone] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   
-  // PDF download modal state
-  const [showPdfModal, setShowPdfModal] = useState(false);
-  const [isPdfFormSubmitting, setIsPdfFormSubmitting] = useState(false);
+  const [isLabelCollapsed, setIsLabelCollapsed] = useState(false); // State for chart Y-axis label collapse
+  const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for chart scroll container
+  const [isMetricColumnCollapsed, setIsMetricColumnCollapsed] = useState(false); // State for table metric column collapse
+  const tableScrollContainerRef = useRef<HTMLDivElement>(null); // Ref for table scroll container
 
   const { register, handleSubmit, setValue, reset, watch, formState: { errors } } = useForm<FormData>({
     defaultValues: {
@@ -226,8 +226,6 @@ export default function PricingCalculator() {
         
         setResults(calculatedResults);
         setShowResults(true);
-        // Force re-render of bar graphs
-        setForceUpdate(prev => prev + 1);
       } catch (error) {
         console.error('Calculation error:', error);
       }
@@ -522,77 +520,6 @@ export default function PricingCalculator() {
     return Math.round(value) + " months";
   }
 
-  const handlePdfFormSubmit = async (data: { first_name: string; last_name: string; email: string }) => {
-    if (!results) return;
-    
-    try {
-      // Store lead data for future reference
-      localStorage.setItem('pdfLeadData', JSON.stringify({
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        projectType: results.low.projectType,
-        homeValue: homeValueFormatted,
-        yearlyIncome: yearlyIncomeFormatted,
-        date: new Date().toISOString(),
-        budget: {
-          low: results.low.totalBudget,
-          middle: results.middle.totalBudget,
-          high: results.high.totalBudget
-        }
-      }));
-      
-      // Track lead with analytics
-      track('PdfLeadCapture', { 
-        formType: 'pdf-lead',
-        projectType: results.low.projectType,
-        location: window.location.pathname 
-      });
-      
-      // Close modal and generate PDF
-      setShowPdfModal(false);
-      generatePDF();
-      
-    } catch (err) {
-      console.error('Error handling PDF form submission:', err);
-    }
-  };
-
-  // Replace with direct PDF generation without showing the modal
-  const downloadPDF = async () => {
-    if (!results) return;
-    
-    try {
-      // Store lead data for future reference using contact info from the main form
-      localStorage.setItem('pdfLeadData', JSON.stringify({
-        email: email, // Use email from main form
-        phone: phone, // Use phone from main form
-        projectType: results.low.projectType,
-        homeValue: homeValueFormatted,
-        yearlyIncome: yearlyIncomeFormatted,
-        date: new Date().toISOString(),
-        budget: {
-          low: results.low.totalBudget,
-          middle: results.middle.totalBudget,
-          high: results.high.totalBudget
-        }
-      }));
-      
-      // Track lead with analytics
-      track('PdfLeadCapture', { 
-        formType: 'direct-download',
-        projectType: results.low.projectType,
-        location: window.location.pathname 
-      });
-      
-      // Generate PDF directly
-      generatePDF();
-      
-    } catch (err) {
-      console.error('Error handling direct PDF download:', err);
-    }
-  };
-
   const generatePDF = async () => {
     if (!results || !resultsRef.current) return;
     
@@ -726,6 +653,88 @@ export default function PricingCalculator() {
     }
   };
 
+  // Effect to handle scroll-based label collapsing
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+
+    const handleScroll = () => {
+      if (container) {
+        if (container.scrollLeft > 10) {
+          setIsLabelCollapsed(true);
+        } else {
+          setIsLabelCollapsed(false);
+        }
+      }
+    };
+
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
+
+    // Cleanup listener on component unmount
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [showResults]); // Re-run if results visibility changes
+
+  // Effect to handle table metric column collapsing
+  useEffect(() => {
+    const container = tableScrollContainerRef.current;
+
+    const handleTableScroll = () => {
+      if (container) {
+        if (container.scrollLeft > 10) {
+          setIsMetricColumnCollapsed(true);
+        } else {
+          setIsMetricColumnCollapsed(false);
+        }
+      }
+    };
+
+    if (container) {
+      container.addEventListener('scroll', handleTableScroll);
+    }
+
+    // Cleanup listener on component unmount or when results hide
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleTableScroll);
+      }
+      // Reset collapse state when results hide
+      setIsMetricColumnCollapsed(false);
+    };
+  }, [showResults]); // Re-run if results visibility changes
+
+  // Format phone number input
+  const formatPhoneNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const digits = value.replace(/\D/g, '');
+    
+    // Limit to 10 digits
+    const trimmedDigits = digits.slice(0, 10);
+    
+    // Apply formatting based on the number of digits
+    const match = trimmedDigits.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+    if (match) {
+      let formatted = '';
+      if (match[1]) {
+        formatted += `(${match[1]}`;
+      }
+      if (match[2]) {
+        formatted += `) ${match[2]}`;
+      }
+      if (match[3]) {
+        formatted += `-${match[3]}`;
+      }
+      return formatted;
+    }
+    
+    // Return raw digits if regex fails (shouldn't happen)
+    return trimmedDigits;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative">
       {/* Back Button */}
@@ -753,7 +762,7 @@ export default function PricingCalculator() {
       {/* Calculator Form Card */}
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 mb-16">
         {/* Form Header */}
-        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-6 sm:p-8 border-b border-gray-200">
+        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-4 sm:p-5 border-b border-gray-200">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Calculate Your Investment Options</h2>
@@ -764,7 +773,7 @@ export default function PricingCalculator() {
             
             {/* Auto-Update Toggle - Now in header */}            <div className="md:min-w-[220px]">
               <div className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 transform hover:scale-102`}>
-                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center justify-between gap-3 px-2 py-1">
                   <div>
                     <h3 className="font-medium text-sm text-gray-800">{autoUpdateEnabled ? 'Live Updates On' : 'Enable Live Updates'}</h3>
                     <p className="text-xs text-gray-500">See results instantly</p>
@@ -800,7 +809,7 @@ export default function PricingCalculator() {
         </div>
 
         {/* Form Body */}
-        <div className="p-5 sm:p-8">
+        <div className="p-4 sm:p-5">
           {/* Add custom animation class to tailwind styles */}
           <style jsx global>{`
             @keyframes spin-slow {
@@ -864,11 +873,11 @@ export default function PricingCalculator() {
               transform: translateY(0);
             }
           `}</style>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
             {/* Left Column */}
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-5">
               {/* Home Value Input */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">Estimated Home Value</label>
                 <div className="relative rounded-md shadow-sm">
                   <input 
@@ -909,7 +918,7 @@ export default function PricingCalculator() {
               </div>
 
               {/* Annual Income Input */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">Annual Income</label>
                 <div className="relative rounded-md shadow-sm">
                   <input 
@@ -951,9 +960,9 @@ export default function PricingCalculator() {
             </div>
 
             {/* Right Column */}
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-5">
               {/* Project Type Input */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">Project Type</label>
                 <select 
                   {...register('projectType', { required: true })}
@@ -1000,61 +1009,117 @@ export default function PricingCalculator() {
 
           {/* Results Table */}
           <div className="bg-white shadow-lg rounded-b-2xl overflow-hidden">
-            <div className="overflow-x-auto">
+            <div ref={tableScrollContainerRef} className="overflow-x-auto relative"> {/* Added ref and relative positioning */}
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-1/4">Metric</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-indigo-800 uppercase tracking-wider bg-indigo-100/50">Basic Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-900 uppercase tracking-wider bg-blue-200/50">Standard Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-sky-800 uppercase tracking-wider bg-sky-100/50">Extensive Budget</th>
+                    <th 
+                      scope="col" 
+                      className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-50 z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Metric
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-indigo-800 uppercase tracking-wider bg-indigo-100/50 whitespace-nowrap">Basic Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-900 uppercase tracking-wider bg-blue-200/50 whitespace-nowrap">Standard Investment</th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-sky-800 uppercase tracking-wider bg-sky-100/50 whitespace-nowrap">Extensive Budget</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
+                  {/* Moved hover effect to tr */}
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Initial Budget</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Initial Budget
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.initialBudget)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.initialBudget)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.initialBudget)}</td>
                   </tr>
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Contingency Fund</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Contingency Fund
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.contingencyFund)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.contingencyFund)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.contingencyFund)}</td>
                   </tr>
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Time To Save</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Time To Save
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.low.timeToSave)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.middle.timeToSave)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.high.timeToSave)}</td>
                   </tr>
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Monthly Savings</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Monthly Savings
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.monthlySavings)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.monthlySavings)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.monthlySavings)}</td>
                   </tr>
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">Estimated ROI</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-semibold text-gray-800 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Estimated ROI
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.low.roi.toFixed(1)}%</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.middle.roi.toFixed(1)}%</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.high.roi.toFixed(1)}%</td>
                   </tr>
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">Value Increase</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Value Increase
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.valueIncrease)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.valueIncrease)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.valueIncrease)}</td>
                   </tr>
                   <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">Updated Home Value</td>
+                    <td 
+                      className={`px-6 py-4 text-sm font-semibold text-gray-800 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Updated Home Value
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.low.updatedHomeValue)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.middle.updatedHomeValue)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.high.updatedHomeValue)}</td>
                   </tr>
-                  <tr className="border-t border-gray-300">
-                    <td className="px-6 py-5 whitespace-nowrap text-base font-bold text-gray-900">Total Budget</td>
+                  <tr className="border-t border-gray-300 hover:bg-gray-50/70 transition-colors duration-150">
+                    <td 
+                      className={`px-6 py-5 text-base font-bold text-gray-900 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                      }`}
+                    >
+                      Total Budget
+                    </td>
                     <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-primary bg-indigo-100/50">{formatCurrency(results.low.totalBudget)}</td>
                     <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-secondary bg-blue-200/50">{formatCurrency(results.middle.totalBudget)}</td>
                     <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-600 bg-sky-100/50">{formatCurrency(results.high.totalBudget)}</td>
@@ -1065,9 +1130,15 @@ export default function PricingCalculator() {
           </div>
 
           {/* ROI over time */}
-          <div className="bg-white shadow-lg rounded-lg p-6 mb-4 mt-8">
+          <div className="bg-white shadow-lg rounded-lg p-6 mb-4 mt-8 relative"> {/* Added relative */} 
             <h3 className="text-xl font-bold text-gray-800 mb-4">ROI Over Time</h3>
-            <div className="w-full overflow-x-auto">
+
+            {/* Moved Y-axis Label outside the scrollable div and positioned absolutely */}
+            <div className={`absolute left-2 top-1/2 transform -translate-y-1/2 -rotate-90 origin-center pointer-events-none z-10 transition-all duration-300 ease-in-out overflow-hidden ${isLabelCollapsed ? 'w-0 opacity-0 scale-x-0' : 'w-auto opacity-100 scale-x-100'}`}> {/* Animated collapse */}
+              <span className="text-sm font-medium text-gray-600 whitespace-nowrap">ROI ($)</span>
+            </div>
+
+            <div ref={scrollContainerRef} className="w-full overflow-x-auto pl-8"> {/* Added pl-8 for label space AND ref */} 
               <style jsx>{`
                 .charts-css {
                   height: 300px;
@@ -1089,9 +1160,10 @@ export default function PricingCalculator() {
                 }
                 
                 .charts-css tbody tr th {
-                  font-size: 0.75rem;
+                  font-size: 0.65rem; /* Reduced from 0.75rem */
                   color: #6b7280;
                   font-weight: 400;
+                  white-space: nowrap; /* Prevent wrapping */
                 }
                 
                 .charts-css .data-tooltip {
@@ -1122,7 +1194,7 @@ export default function PricingCalculator() {
                 .chart-wrapper {
                   max-width: 800px;
                   margin: 0 auto;
-                  padding: 1rem 2rem 2rem 3rem;
+                  padding: 1rem 2rem 2rem 1rem; /* Reduced left padding */
                   position: relative;
                 }
                 
@@ -1135,24 +1207,6 @@ export default function PricingCalculator() {
                   font-size: 0.875rem;
                   font-weight: 500;
                   color: #4b5563;
-                }
-                
-                .axis-labels .y-label {
-                  position: absolute;
-                  left: -40px;
-                  top: 50%;
-                  transform: rotate(-90deg) translateX(-50%);
-                  transform-origin: left top;
-                  font-size: 0.875rem;
-                  font-weight: 500;
-                  color: #4b5563;
-                }
-                
-                .axis-labels .y-label-right {
-                  left: auto;
-                  right: -40px;
-                  transform: rotate(90deg) translateX(50%);
-                  transform-origin: right top;
                 }
                 
                 /* Chart annotations */
@@ -1169,7 +1223,7 @@ export default function PricingCalculator() {
                 .chart-annotations .y-min {
                   position: absolute;
                   left: -5px;
-                  font-size: 0.75rem;
+                  font-size: 0.65rem; /* Reduced font size */
                   color: #6b7280;
                 }
                 
@@ -1232,7 +1286,7 @@ export default function PricingCalculator() {
                 }
               `}</style>
               
-              <div className="chart-wrapper" id="chart-container">
+              <div className="chart-wrapper min-w-[700px]" id="chart-container">
                 <table className="charts-css column show-primary-axis show-4-secondary-axes show-labels data-spacing-4">
                   <caption>Return on Investment Over 12 Months</caption>
                   <thead>
@@ -1275,11 +1329,6 @@ export default function PricingCalculator() {
                   </tbody>
                 </table>
                 
-                {/* Axis Labels */}
-                <div className="axis-labels">
-                  <div className="y-label">ROI ($)</div>
-                </div>
-                
                 {/* Chart Annotations */}
                 <div className="chart-annotations">
                   <div className="y-max">{formatCurrency(Math.max(
@@ -1309,26 +1358,25 @@ export default function PricingCalculator() {
 
           {/* Budget Breakdown Visualization */}
           <div className="bg-white rounded-lg shadow-lg mt-8 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-200">
+            <div className="px-4 sm:px-6 py-5 border-b border-gray-200"> {/* Adjusted horizontal padding */}
               <h3 className="text-lg font-medium text-gray-900">Budget Breakdown</h3>
               <p className="text-sm text-gray-500 mt-1">Visual representation of your budget allocation</p>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-4 sm:p-6"> {/* Adjusted overall padding */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8"> {/* Adjusted gap */}
                 {/* Low Tier Budget Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="bg-gray-50 rounded-xl p-4 sm:p-5 shadow-sm"> {/* Adjusted internal card padding */}
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center"> {/* Adjusted margin */}
                     <span className="w-3 h-3 bg-primary rounded-full mr-2"></span>
                     Low Tier Budget
                   </h4>
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Adjusted margin */}
                     <div className="flex justify-between text-sm mb-1">
                       <span>Initial Budget</span>
                       <span>{formatCurrency(results.low.initialBudget)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        key={`low-initial-${forceUpdate}`}
                         className="bg-indigo-400 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.low.initialBudget / results.low.totalBudget * 100).toFixed(0)}%`
@@ -1336,14 +1384,13 @@ export default function PricingCalculator() {
                       ></div>
                     </div>
                   </div>
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Adjusted margin */}
                     <div className="flex justify-between text-sm mb-1">
                       <span>Contingency Fund</span>
                       <span>{formatCurrency(results.low.contingencyFund)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        key={`low-contingency-${forceUpdate}`}
                         className="bg-indigo-600 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.low.contingencyFund / results.low.totalBudget * 100).toFixed(0)}%`
@@ -1351,7 +1398,7 @@ export default function PricingCalculator() {
                       ></div>
                     </div>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-3 pt-3 border-t border-gray-200"> {/* Adjusted margin */}
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
                       <span className="text-lg font-bold text-primary">{formatCurrency(results.low.totalBudget)}</span>
@@ -1360,19 +1407,18 @@ export default function PricingCalculator() {
                 </div>
 
                 {/* Middle Tier Budget Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="bg-gray-50 rounded-xl p-4 sm:p-5 shadow-sm"> {/* Adjusted internal card padding */}
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center"> {/* Adjusted margin */}
                     <span className="w-3 h-3 bg-secondary rounded-full mr-2"></span>
                     Middle Tier Budget
                   </h4>
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Adjusted margin */}
                     <div className="flex justify-between text-sm mb-1">
                       <span>Initial Budget</span>
                       <span>{formatCurrency(results.middle.initialBudget)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        key={`middle-initial-${forceUpdate}`}
                         className="bg-blue-700 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.middle.initialBudget / results.middle.totalBudget * 100).toFixed(0)}%`
@@ -1380,14 +1426,13 @@ export default function PricingCalculator() {
                       ></div>
                     </div>
                   </div>
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Adjusted margin */}
                     <div className="flex justify-between text-sm mb-1">
                       <span>Contingency Fund</span>
                       <span>{formatCurrency(results.middle.contingencyFund)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        key={`middle-contingency-${forceUpdate}`}
                         className="bg-blue-900 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.middle.contingencyFund / results.middle.totalBudget * 100).toFixed(0)}%`
@@ -1395,7 +1440,7 @@ export default function PricingCalculator() {
                       ></div>
                     </div>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-3 pt-3 border-t border-gray-200"> {/* Adjusted margin */}
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
                       <span className="text-lg font-bold text-secondary">{formatCurrency(results.middle.totalBudget)}</span>
@@ -1404,19 +1449,18 @@ export default function PricingCalculator() {
                 </div>
 
                 {/* High Tier Budget Breakdown */}
-                <div className="bg-gray-50 rounded-xl p-5 shadow-sm">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="bg-gray-50 rounded-xl p-4 sm:p-5 shadow-sm"> {/* Adjusted internal card padding */}
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center"> {/* Adjusted margin */}
                     <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
                     High Tier Budget
                   </h4>
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Adjusted margin */}
                     <div className="flex justify-between text-sm mb-1">
                       <span>Initial Budget</span>
                       <span>{formatCurrency(results.high.initialBudget)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        key={`high-initial-${forceUpdate}`}
                         className="bg-blue-400 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.high.initialBudget / results.high.totalBudget * 100).toFixed(0)}%`
@@ -1424,14 +1468,13 @@ export default function PricingCalculator() {
                       ></div>
                     </div>
                   </div>
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* Adjusted margin */}
                     <div className="flex justify-between text-sm mb-1">
                       <span>Contingency Fund</span>
                       <span>{formatCurrency(results.high.contingencyFund)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        key={`high-contingency-${forceUpdate}`}
                         className="bg-blue-600 h-2.5 rounded-full" 
                         style={{
                           width: `${(results.high.contingencyFund / results.high.totalBudget * 100).toFixed(0)}%`
@@ -1439,7 +1482,7 @@ export default function PricingCalculator() {
                       ></div>
                     </div>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-3 pt-3 border-t border-gray-200"> {/* Adjusted margin */}
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Total Budget</span>
                       <span className="text-lg font-bold text-blue-600">{formatCurrency(results.high.totalBudget)}</span>
@@ -1515,7 +1558,7 @@ export default function PricingCalculator() {
                   </div>
                   
                   <button 
-                    onClick={downloadPDF}
+                    onClick={generatePDF}
                     disabled={isPdfGenerating}
                     className={`flex items-center justify-center gap-3 px-5 py-3 rounded-lg font-medium shadow-md transition-all duration-300 ${
                       isPdfGenerating 
@@ -1570,7 +1613,7 @@ export default function PricingCalculator() {
                         type="tel"
                         id="phone"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
                         className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
                         placeholder="(123) 456-7890"
                       />
@@ -1592,99 +1635,3 @@ export default function PricingCalculator() {
     </div>
   );
 } 
-
-// PDF Lead Form Component
-interface PdfLeadFormProps {
-  onSubmit: (data: { first_name: string; last_name: string; email: string }) => void;
-  formTitle: string;
-  onCancel: () => void;
-}
-
-function PdfLeadForm({ onSubmit, formTitle, onCancel }: PdfLeadFormProps) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!firstName || !lastName || !email) return;
-    
-    setIsSubmitting(true);
-    onSubmit({ first_name: firstName, last_name: lastName, email });
-    setIsSubmitting(false);
-  };
-
-  return (
-    <div className="p-6">
-      <h3 className="text-xl font-medium text-gray-900 mb-1">{formTitle}</h3>
-      <p className="text-sm text-gray-500 mb-6">
-        Please enter your information to download the PDF
-      </p>
-      
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
-            <input
-              type="text"
-              id="first_name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <input
-              type="text"
-              id="last_name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="pdf_email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="pdf_email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="mt-6 flex space-x-3">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex-1 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            {isSubmitting ? 'Processing...' : 'Download PDF'}
-          </button>
-          
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
