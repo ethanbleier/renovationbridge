@@ -31,6 +31,142 @@ const formatCurrencyInput = (value: string): string => {
   return formatted;
 };
 
+// Debounce utility
+function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<F>): void => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => func(...args), waitFor);
+  };
+}
+
+const projectTypeCoefficients = {
+  low: {
+    "Kitchen Renovation": 0.085,
+    "Bathroom Renovation": 0.025,
+    "Deck or Patio Addition": 0.02,
+    "Whole House Remodel": 0.0625,
+    "Window Replacement": 0.0325,
+    "Garage Door Replacement": 0.015,
+    "Deck Addition": 0.02,
+    "Siding Replacement": 0.045,
+    "Room Addition": 0.15,
+    "Accessory Dwelling Unit (ADU)": 0.225,
+    "Landscaping": 0.075,
+    "Solar Panel Installation": 0.075
+  },
+  middle: {
+    "Kitchen Renovation": 0.135,
+    "Bathroom Renovation": 0.0625,
+    "Deck or Patio Addition": 0.04,
+    "Whole House Remodel": 0.1,
+    "Window Replacement": 0.0325,
+    "Garage Door Replacement": 0.015,
+    "Deck Addition": 0.04,
+    "Siding Replacement": 0.045,
+    "Room Addition": 0.15,
+    "Accessory Dwelling Unit (ADU)": 0.225,
+    "Landscaping": 0.075,
+    "Solar Panel Installation": 0.075
+  },
+  high: {
+    "Kitchen Renovation": 0.18,
+    "Bathroom Renovation": 0.1,
+    "Deck or Patio Addition": 0.06,
+    "Whole House Remodel": 0.15,
+    "Window Replacement": 0.05,
+    "Garage Door Replacement": 0.02,
+    "Deck Addition": 0.06,
+    "Siding Replacement": 0.07,
+    "Room Addition": 0.2,
+    "Accessory Dwelling Unit (ADU)": 0.3,
+    "Landscaping": 0.1,
+    "Solar Panel Installation": 0.1
+  }
+} as const;
+
+const roiCoefficients = {
+  low: {
+    "Kitchen Renovation": 0.9,
+    "Bathroom Renovation": 0.8,
+    "Deck or Patio Addition": 0.95,
+    "Whole House Remodel": 0.8,
+    "Window Replacement": 0.8,
+    // Note: ROI for Garage Door Replacement seems low, verify if correct.
+    "Garage Door Replacement": 0.005,
+    "Deck Addition": 0.8,
+    "Siding Replacement": 0.8,
+    "Room Addition": 0.65,
+    "Accessory Dwelling Unit (ADU)": 1.05,
+    "Landscaping": 0.85,
+    "Solar Panel Installation": 0.85
+  },
+  middle: {
+    "Kitchen Renovation": 1.05,
+    "Bathroom Renovation": 0.9,
+    "Deck or Patio Addition": 1.1,
+    "Whole House Remodel": 0.85,
+    "Window Replacement": 0.85,
+    "Garage Door Replacement": 0.0085,
+    "Deck Addition": 0.87,
+    "Siding Replacement": 0.9,
+    "Room Addition": 0.75,
+    "Accessory Dwelling Unit (ADU)": 1.05,
+    "Landscaping": 0.85,
+    "Solar Panel Installation": 0.85
+  },
+  high: {
+    "Kitchen Renovation": 1.2,
+    "Bathroom Renovation": 1,
+    "Deck or Patio Addition": 1.2,
+    "Whole House Remodel": 0.95,
+    "Window Replacement": 0.95,
+    "Garage Door Replacement": 0.01,
+    "Deck Addition": 0.9,
+    "Siding Replacement": 0.9,
+    "Room Addition": 0.75,
+    "Accessory Dwelling Unit (ADU)": 1.05,
+    "Landscaping": 0.85,
+    "Solar Panel Installation": 0.85
+  }
+} as const;
+
+const contingencyRates = {
+  low: 0.1,
+  middle: 0.15,
+  high: 0.25
+};
+
+const monthlySavingRates = {
+  low: 0.2,
+  middle: 0.25,
+  high: 0.3
+};
+
+function getProjectCoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
+  return projectTypeCoefficients[tier][projectType as keyof typeof projectTypeCoefficients[typeof tier]] ?? 0;
+}
+
+function getROICoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
+  return roiCoefficients[tier][projectType as keyof typeof roiCoefficients[typeof tier]] ?? 0;
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
+function formatMonths(value: number) {
+  return Math.round(value) + " months";
+}
+
 type FormData = {
   homeValue: string;
   yearlyIncome: string;
@@ -70,7 +206,9 @@ export default function PricingCalculator() {
   const [initialCalculationDone, setInitialCalculationDone] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
-  
+  const [formError, setFormError] = useState<string | null>(null); // State for form errors
+  const [pdfError, setPdfError] = useState<string | null>(null); // State for PDF errors
+
   const [isLabelCollapsed, setIsLabelCollapsed] = useState(false); // State for chart Y-axis label collapse
   const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for chart scroll container
   const [isMetricColumnCollapsed, setIsMetricColumnCollapsed] = useState(false); // State for table metric column collapse
@@ -84,46 +222,18 @@ export default function PricingCalculator() {
     }
   });
 
-  // Move calculateTier declaration here, before it's used in useEffect
-  const calculateTier = useCallback((homeValue: number, yearlyIncome: number, projectType: string, tier: 'low' | 'middle' | 'high') => {
-    // Project coefficient
+  // Calculate tier based on inputs
+  const calculateTier = useCallback((homeValue: number, yearlyIncome: number, projectType: string, tier: 'low' | 'middle' | 'high'): TierResult => {
     const coefficient = getProjectCoefficient(projectType, tier);
-    
-    // Initial Budget
     const initialBudget = homeValue * coefficient;
-    
-    const contingencyRates = {
-      low: 0.1,
-      middle: 0.15,
-      high: 0.25
-    };
-    
-    const monthlySavingRates = {
-      low: 0.2,
-      middle: 0.25,
-      high: 0.3
-    };
-
-    // Calculate contingency fund
     const contingencyFund = initialBudget * contingencyRates[tier];
-    
-    // Calculate monthly savings
     const monthlyIncome = yearlyIncome / 12;
     const monthlySavings = monthlyIncome * monthlySavingRates[tier];
-    
-    // Total budget
     const totalBudget = initialBudget + contingencyFund;
-    
-    // Time to save
-    const timeToSave = totalBudget / monthlySavings;
-    
-    // Get ROI coefficient
+    // Prevent division by zero if monthlySavings is 0
+    const timeToSave = monthlySavings > 0 ? totalBudget / monthlySavings : Infinity;
     const roiCoefficient = getROICoefficient(projectType, tier);
-    
-    // Calculate value increase
     const valueIncrease = totalBudget * roiCoefficient;
-    
-    // Updated home value
     const updatedHomeValue = homeValue + valueIncrease;
 
     return {
@@ -216,8 +326,10 @@ export default function PricingCalculator() {
 
   // Real-time calculations when values change
   useEffect(() => {
-    if (autoUpdateEnabled && initialCalculationDone && homeValueNumber >= 50000 && yearlyIncomeNumber >= 8000 && watchProjectType) {
+    // Auto-update if enabled, inputs are valid, and project type is selected
+    if (autoUpdateEnabled && homeValueNumber >= 50000 && yearlyIncomeNumber >= 8000 && watchProjectType) {
       try {
+        setFormError(null); // Clear previous errors
         const calculatedResults = {
           low: calculateTier(homeValueNumber, yearlyIncomeNumber, watchProjectType, 'low'),
           middle: calculateTier(homeValueNumber, yearlyIncomeNumber, watchProjectType, 'middle'),
@@ -227,10 +339,11 @@ export default function PricingCalculator() {
         setResults(calculatedResults);
         setShowResults(true);
       } catch (error) {
-        console.error('Calculation error:', error);
+        console.error('Auto-calculation error:', error);
+        setFormError('An error occurred during automatic calculation.');
       }
     }
-  }, [autoUpdateEnabled, homeValueNumber, yearlyIncomeNumber, watchProjectType, calculateTier, initialCalculationDone]);
+  }, [autoUpdateEnabled, homeValueNumber, yearlyIncomeNumber, watchProjectType, calculateTier]); // Removed initialCalculationDone
 
   useEffect(() => {
     if (results && showResults) {
@@ -340,6 +453,7 @@ export default function PricingCalculator() {
   }, [results, showResults]);
 
   const onSubmit = (data: FormData) => {
+    setFormError(null); // Clear previous errors
     try {
       // Clean the input values by removing currency symbols and commas
       const cleanHomeValue = data.homeValue.replace(/[$,]/g, '');
@@ -353,7 +467,13 @@ export default function PricingCalculator() {
       // Validate inputs
       if (!homeValue || !yearlyIncome || !projectType || 
           homeValue < 50000 || yearlyIncome < 8000) {
-        alert("Please check your inputs:\n• Home value must be at least $50,000\n• Yearly income must be at least $8,000\n• Project type must be selected");
+        // Replace alert with setting formError state
+        const errorMessages = [];
+        if (homeValue < 50000) errorMessages.push('Home value must be at least $50,000');
+        if (yearlyIncome < 8000) errorMessages.push('Yearly income must be at least $8,000');
+        if (!projectType) errorMessages.push('Project type must be selected');
+        setFormError(`Please check your inputs: ${errorMessages.join(', ')}.`);
+        console.error('Form validation failed:', errorMessages);
         return;
       }
 
@@ -368,8 +488,9 @@ export default function PricingCalculator() {
       setShowResults(true);
       setInitialCalculationDone(true);
     } catch (error) {
-      console.error('Calculation error:', error);
-      alert("An error occurred while calculating. Please check your inputs and try again.");
+      console.error('Calculation submission error:', error);
+      // Replace alert with setting formError state
+      setFormError("An error occurred while calculating. Please check your inputs and try again.");
     }
   };
 
@@ -383,6 +504,8 @@ export default function PricingCalculator() {
     setYearlyIncomeNumber(80000);
     setAutoUpdateEnabled(false); // Reset toggle on form reset
     setInitialCalculationDone(false); // Reset initial calculation state
+    setFormError(null); // Clear errors on reset
+    setPdfError(null);
   };
 
   // Format chart data from results
@@ -411,117 +534,10 @@ export default function PricingCalculator() {
     });
   }, [results]);
 
-  function getProjectCoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
-    const coefficients = {
-      low: {
-        "Kitchen Renovation": 0.085,
-        "Bathroom Renovation": 0.025,
-        "Deck or Patio Addition": 0.02,
-        "Whole House Remodel": 0.0625,
-        "Window Replacement": 0.0325,
-        "Garage Door Replacement": 0.015,
-        "Deck Addition": 0.02,
-        "Siding Replacement": 0.045,
-        "Room Addition": 0.15,
-        "Accessory Dwelling Unit (ADU)": 0.225,
-        "Landscaping": 0.075,
-        "Solar Panel Installation": 0.075
-      },
-      middle: {
-        "Kitchen Renovation": 0.135,
-        "Bathroom Renovation": 0.0625,
-        "Deck or Patio Addition": 0.04,
-        "Whole House Remodel": 0.1,
-        "Window Replacement": 0.0325,
-        "Garage Door Replacement": 0.015,
-        "Deck Addition": 0.04,
-        "Siding Replacement": 0.045,
-        "Room Addition": 0.15,
-        "Accessory Dwelling Unit (ADU)": 0.225,
-        "Landscaping": 0.075,
-        "Solar Panel Installation": 0.075
-      },
-      high: {
-        "Kitchen Renovation": 0.18,
-        "Bathroom Renovation": 0.1,
-        "Deck or Patio Addition": 0.06,
-        "Whole House Remodel": 0.15,
-        "Window Replacement": 0.05,
-        "Garage Door Replacement": 0.02,
-        "Deck Addition": 0.06,
-        "Siding Replacement": 0.07,
-        "Room Addition": 0.2,
-        "Accessory Dwelling Unit (ADU)": 0.3,
-        "Landscaping": 0.1,
-        "Solar Panel Installation": 0.1
-      }
-    } as const;
-    return coefficients[tier][projectType as keyof typeof coefficients[typeof tier]];
-  }
-
-  function getROICoefficient(projectType: string, tier: 'low' | 'middle' | 'high') {
-    const coefficients = {
-      low: {
-        "Kitchen Renovation": 0.9,
-        "Bathroom Renovation": 0.8,
-        "Deck or Patio Addition": 0.95,
-        "Whole House Remodel": 0.8,
-        "Window Replacement": 0.8,
-        "Garage Door Replacement": 0.005,
-        "Deck Addition": 0.8,
-        "Siding Replacement": 0.8,
-        "Room Addition": 0.65,
-        "Accessory Dwelling Unit (ADU)": 1.05,
-        "Landscaping": 0.85,
-        "Solar Panel Installation": 0.85
-      },
-      middle: {
-        "Kitchen Renovation": 1.05,
-        "Bathroom Renovation": 0.9,
-        "Deck or Patio Addition": 1.1,
-        "Whole House Remodel": 0.85,
-        "Window Replacement": 0.85,
-        "Garage Door Replacement": 0.0085,
-        "Deck Addition": 0.87,
-        "Siding Replacement": 0.9,
-        "Room Addition": 0.75,
-        "Accessory Dwelling Unit (ADU)": 1.05,
-        "Landscaping": 0.85,
-        "Solar Panel Installation": 0.85
-      },
-      high: {
-        "Kitchen Renovation": 1.2,
-        "Bathroom Renovation": 1,
-        "Deck or Patio Addition": 1.2,
-        "Whole House Remodel": 0.95,
-        "Window Replacement": 0.95,
-        "Garage Door Replacement": 0.01,
-        "Deck Addition": 0.9,
-        "Siding Replacement": 0.9,
-        "Room Addition": 0.75,
-        "Accessory Dwelling Unit (ADU)": 1.05,
-        "Landscaping": 0.85,
-        "Solar Panel Installation": 0.85
-      }
-    } as const;
-    return coefficients[tier][projectType as keyof typeof coefficients[typeof tier]];
-  }
-
-  function formatCurrency(value: number) {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 
-    }).format(value);
-  }
-
-  function formatMonths(value: number) {
-    return Math.round(value) + " months";
-  }
-
+  // --- PDF Generation ---
   const generatePDF = async () => {
     if (!results || !resultsRef.current) return;
+    setPdfError(null); // Clear previous PDF errors
     
     try {
       setIsPdfGenerating(true);
@@ -541,10 +557,10 @@ export default function PricingCalculator() {
       pdf.text(`Home Value: ${homeValueFormatted}`, pageWidth / 2, 38, { align: 'center' });
       pdf.text(`Annual Income: ${yearlyIncomeFormatted}`, pageWidth / 2, 46, { align: 'center' });
       
-      // Capture results table as image
-      const tableElement = resultsRef.current.querySelector('table');
-      if (tableElement) {
-        const canvas = await html2canvas(tableElement, { scale: 2 });
+      // Capture results table as image - target the wrapper div
+      const tableCaptureElement = resultsRef.current.querySelector<HTMLElement>('#results-table-capture');
+      if (tableCaptureElement) {
+        const canvas = await html2canvas(tableCaptureElement, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
         
         // Calculate image dimensions to fit in PDF
@@ -610,9 +626,12 @@ export default function PricingCalculator() {
         
         // Download the PDF
         pdf.save(`${results.low.projectType.replace(/\s+/g, '-')}-budget-plan.pdf`);
+      } else {
+        throw new Error('Could not find element #results-table-capture to generate PDF.');
       }
     } catch (error) {
       console.error('Error generating PDF:', error);
+      setPdfError('Sorry, there was an error generating the PDF. Please try again.');
     } finally {
       setIsPdfGenerating(false);
     }
@@ -657,7 +676,8 @@ export default function PricingCalculator() {
   useEffect(() => {
     const container = scrollContainerRef.current;
 
-    const handleScroll = () => {
+    // Debounced scroll handler
+    const debouncedHandleScroll = debounce(() => {
       if (container) {
         if (container.scrollLeft > 10) {
           setIsLabelCollapsed(true);
@@ -665,16 +685,16 @@ export default function PricingCalculator() {
           setIsLabelCollapsed(false);
         }
       }
-    };
+    }, 100); // Debounce by 100ms
 
     if (container) {
-      container.addEventListener('scroll', handleScroll);
+      container.addEventListener('scroll', debouncedHandleScroll);
     }
 
     // Cleanup listener on component unmount
     return () => {
       if (container) {
-        container.removeEventListener('scroll', handleScroll);
+        container.removeEventListener('scroll', debouncedHandleScroll);
       }
     };
   }, [showResults]); // Re-run if results visibility changes
@@ -683,7 +703,8 @@ export default function PricingCalculator() {
   useEffect(() => {
     const container = tableScrollContainerRef.current;
 
-    const handleTableScroll = () => {
+    // Debounced scroll handler for table
+    const debouncedHandleTableScroll = debounce(() => {
       if (container) {
         if (container.scrollLeft > 10) {
           setIsMetricColumnCollapsed(true);
@@ -691,16 +712,16 @@ export default function PricingCalculator() {
           setIsMetricColumnCollapsed(false);
         }
       }
-    };
+    }, 100); // Debounce by 100ms
 
     if (container) {
-      container.addEventListener('scroll', handleTableScroll);
+      container.addEventListener('scroll', debouncedHandleTableScroll);
     }
 
     // Cleanup listener on component unmount or when results hide
     return () => {
       if (container) {
-        container.removeEventListener('scroll', handleTableScroll);
+        container.removeEventListener('scroll', debouncedHandleTableScroll);
       }
       // Reset collapse state when results hide
       setIsMetricColumnCollapsed(false);
@@ -772,20 +793,21 @@ export default function PricingCalculator() {
             </div>
             
             {/* Auto-Update Toggle - Now in header */}            <div className="md:min-w-[220px]">
-              <div className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 transform hover:scale-102`}>
-                <div className="flex items-center justify-between gap-3 px-2 py-1">
+              <div className={`bg-gray-50 rounded-xl shadow border border-gray-200 overflow-hidden transition-all duration-300 transform hover:scale-[1.03] hover:shadow-md`}>
+                <div className="flex items-center justify-between gap-3 px-3 py-2"> {/* Increased padding slightly */}
                   <div>
-                    <h3 className="font-medium text-sm text-gray-800">{autoUpdateEnabled ? 'Live Updates On' : 'Enable Live Updates'}</h3>
-                    <p className="text-xs text-gray-500">See results instantly</p>
+                    <h3 className="font-semibold text-sm text-gray-800">{autoUpdateEnabled ? 'Live Updates On' : 'Enable Live Updates'}</h3>
+                    <p className="text-xs text-gray-500">Click button to toggle</p> {/* Added explicit text */}
                   </div>
                   
                   <button
                     onClick={() => setAutoUpdateEnabled(!autoUpdateEnabled)}
-                    className={`flex items-center justify-center p-2 rounded-full focus:outline-none transition-all duration-300 hover:scale-110 ${
+                    className={`flex items-center justify-center p-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 hover:scale-110 ${ // Increased padding, added focus ring
                       autoUpdateEnabled 
                         ? 'bg-green-500 text-white hover:bg-green-600' 
-                        : 'bg-white text-gray-500 border-2 border-gray-300 hover:border-gray-400'
+                        : 'bg-white text-gray-500 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50' // Added hover bg for disabled state
                     }`}
+                    aria-label={autoUpdateEnabled ? "Disable live updates" : "Enable live updates"} // Added aria-label
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
@@ -810,6 +832,13 @@ export default function PricingCalculator() {
 
         {/* Form Body */}
         <div className="p-4 sm:p-5">
+          {/* Display Form Errors */}
+          {formError && (
+            <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-md" role="alert">
+              <p className="font-bold">Error</p>
+              <p>{formError}</p>
+            </div>
+          )}
           {/* Add custom animation class to tailwind styles */}
           <style jsx global>{`
             @keyframes spin-slow {
@@ -905,6 +934,11 @@ export default function PricingCalculator() {
                     style={{
                       backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%, rgb(229, 231, 235) ${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}%)`,
                     }}
+                    aria-label="Estimated Home Value Slider"
+                    aria-valuemin={50000}
+                    aria-valuemax={4000000}
+                    aria-valuenow={homeValueNumber}
+                    aria-valuetext={homeValueFormatted}
                   />
                   <div className="slider-tooltip absolute -top-10 left-0 bg-gray-800 text-white px-2 py-1 rounded text-xs transition-all duration-200 opacity-0 transform translate-x-0 pointer-events-none" style={{ left: `calc(${((homeValueNumber - 50000) / (4000000 - 50000)) * 100}% - 20px)` }}>
                     {formatCurrencyInput(`$${homeValueNumber}`)}
@@ -946,6 +980,11 @@ export default function PricingCalculator() {
                     style={{
                       backgroundImage: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%, rgb(229, 231, 235) ${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}%)`,
                     }}
+                    aria-label="Annual Income Slider"
+                    aria-valuemin={8000}
+                    aria-valuemax={1000000}
+                    aria-valuenow={yearlyIncomeNumber}
+                    aria-valuetext={yearlyIncomeFormatted}
                   />
                   <div className="slider-tooltip absolute -top-10 left-0 bg-gray-800 text-white px-2 py-1 rounded text-xs transition-all duration-200 opacity-0 transform translate-x-0 pointer-events-none" style={{ left: `calc(${((yearlyIncomeNumber - 8000) / (1000000 - 8000)) * 100}% - 20px)` }}>
                     {formatCurrencyInput(`$${yearlyIncomeNumber}`)}
@@ -998,7 +1037,11 @@ export default function PricingCalculator() {
       
       {/* Results Section */}
       {showResults && results && (
-        <div className="max-w-6xl mx-auto transition-all duration-500 animate-fadeIn" ref={resultsRef}>
+        <div 
+          className="max-w-6xl mx-auto transition-all duration-500 animate-fadeIn"
+          ref={resultsRef}
+          aria-live="polite" // Announce changes politely for screen readers
+        >
           {/* Results Header */}
           <div className="bg-white rounded-t-2xl shadow-lg p-6 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-100">
             <div>
@@ -1007,131 +1050,134 @@ export default function PricingCalculator() {
             </div>
           </div>
 
-          {/* Results Table */}
-          <div className="bg-white shadow-lg rounded-b-2xl overflow-hidden">
-            <div ref={tableScrollContainerRef} className="overflow-x-auto relative"> {/* Added ref and relative positioning */}
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th 
-                      scope="col" 
-                      className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-50 z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Metric
-                    </th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-indigo-800 uppercase tracking-wider bg-indigo-100/50 whitespace-nowrap">Basic Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-900 uppercase tracking-wider bg-blue-200/50 whitespace-nowrap">Standard Investment</th>
-                    <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-sky-800 uppercase tracking-wider bg-sky-100/50 whitespace-nowrap">Extensive Budget</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {/* Moved hover effect to tr */}
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Initial Budget
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.initialBudget)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.initialBudget)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.initialBudget)}</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Contingency Fund
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.contingencyFund)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.contingencyFund)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.contingencyFund)}</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Time To Save
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.low.timeToSave)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.middle.timeToSave)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.high.timeToSave)}</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Monthly Savings
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.monthlySavings)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.monthlySavings)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.monthlySavings)}</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-semibold text-gray-800 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Estimated ROI
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.low.roi.toFixed(1)}%</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.middle.roi.toFixed(1)}%</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.high.roi.toFixed(1)}%</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Value Increase
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.valueIncrease)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.valueIncrease)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.valueIncrease)}</td>
-                  </tr>
-                  <tr className="hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-4 text-sm font-semibold text-gray-800 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Updated Home Value
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.low.updatedHomeValue)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.middle.updatedHomeValue)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.high.updatedHomeValue)}</td>
-                  </tr>
-                  <tr className="border-t border-gray-300 hover:bg-gray-50/70 transition-colors duration-150">
-                    <td 
-                      className={`px-6 py-5 text-base font-bold text-gray-900 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
-                        isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
-                      }`}
-                    >
-                      Total Budget
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-primary bg-indigo-100/50">{formatCurrency(results.low.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-secondary bg-blue-200/50">{formatCurrency(results.middle.totalBudget)}</td>
-                    <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-600 bg-sky-100/50">{formatCurrency(results.high.totalBudget)}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {/* Results Table Wrapper for PDF Capture */}
+          <div id="results-table-capture">
+            <div className="bg-white shadow-lg rounded-b-2xl overflow-hidden">
+              <div ref={tableScrollContainerRef} className="overflow-x-auto relative"> {/* Added ref and relative positioning */}
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th 
+                        scope="col" 
+                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider sticky left-0 bg-gray-50 z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Metric
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-indigo-800 uppercase tracking-wider bg-indigo-100/50 whitespace-nowrap">Basic Investment</th>
+                      <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-blue-900 uppercase tracking-wider bg-blue-200/50 whitespace-nowrap">Standard Investment</th>
+                      <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-sky-800 uppercase tracking-wider bg-sky-100/50 whitespace-nowrap">Extensive Budget</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {/* Moved hover effect to tr */}
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Initial Budget
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.initialBudget)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.initialBudget)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.initialBudget)}</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Contingency Fund
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.contingencyFund)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.contingencyFund)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.contingencyFund)}</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Time To Save
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.low.timeToSave)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.middle.timeToSave)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatMonths(results.high.timeToSave)}</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Monthly Savings
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.monthlySavings)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.monthlySavings)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.monthlySavings)}</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-semibold text-gray-800 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Estimated ROI
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.low.roi.toFixed(1)}%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.middle.roi.toFixed(1)}%</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{results.high.roi.toFixed(1)}%</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-medium text-gray-700 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Value Increase
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.low.valueIncrease)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.middle.valueIncrease)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-800">{formatCurrency(results.high.valueIncrease)}</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-4 text-sm font-semibold text-gray-800 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Updated Home Value
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.low.updatedHomeValue)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.middle.updatedHomeValue)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{formatCurrency(results.high.updatedHomeValue)}</td>
+                    </tr>
+                    <tr className="border-t border-gray-300 hover:bg-gray-50/70 transition-colors duration-150">
+                      <td 
+                        className={`px-6 py-5 text-base font-bold text-gray-900 sticky left-0 bg-white z-10 transition-all duration-300 ease-in-out whitespace-nowrap ${
+                          isMetricColumnCollapsed ? 'w-0 opacity-0 scale-x-0 px-0' : 'w-1/4'
+                        }`}
+                      >
+                        Total Budget
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-primary bg-indigo-100/50">{formatCurrency(results.low.totalBudget)}</td>
+                      <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-secondary bg-blue-200/50">{formatCurrency(results.middle.totalBudget)}</td>
+                      <td className="px-6 py-5 whitespace-nowrap text-lg font-bold text-right text-blue-600 bg-sky-100/50">{formatCurrency(results.high.totalBudget)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
           {/* ROI over time */}
           <div className="bg-white shadow-lg rounded-lg p-6 mb-4 mt-8 relative"> {/* Added relative */} 
             <h3 className="text-xl font-bold text-gray-800 mb-4">ROI Over Time</h3>
+            <p className="text-sm text-gray-500 mb-4">*This chart shows an illustrative linear projection of potential ROI over 12 months.</p>
 
             {/* Moved Y-axis Label outside the scrollable div and positioned absolutely */}
             <div className={`absolute left-2 top-1/2 transform -translate-y-1/2 -rotate-90 origin-center pointer-events-none z-10 transition-all duration-300 ease-in-out overflow-hidden ${isLabelCollapsed ? 'w-0 opacity-0 scale-x-0' : 'w-auto opacity-100 scale-x-100'}`}> {/* Animated collapse */}
@@ -1548,6 +1594,13 @@ export default function PricingCalculator() {
               <p className="mt-1 text-sm text-gray-500">Enter your contact information to save these results and receive a downloadable PDF of your renovation budget.</p>
             </div>
             <div className="p-6">
+              {/* Display PDF Errors */}
+              {pdfError && (
+                <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-md" role="alert">
+                  <p className="font-bold">PDF Error</p>
+                  <p>{pdfError}</p>
+                </div>
+              )}
               {leadSubmitted ? (
                 <div className="space-y-4">
                   <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md flex items-center">
