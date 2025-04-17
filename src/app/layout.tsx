@@ -93,8 +93,9 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            ${GA_MEASUREMENT_ID ? `gtag('config', '${GA_MEASUREMENT_ID}');` : ''}
-            gtag('config', 'AW-16912546121');
+            // Initialize GA without sending a page view - we'll track conversions on form submission only
+            ${GA_MEASUREMENT_ID ? `gtag('config', '${GA_MEASUREMENT_ID}', { 'send_page_view': false });` : ''}
+            gtag('config', 'AW-16912546121', { 'send_page_view': false });
           `}
         </Script>
         
