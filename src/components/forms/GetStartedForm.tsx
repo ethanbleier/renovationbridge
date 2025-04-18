@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
-import GoogleAdsTracker from '@/components/analytics/GoogleAdsTracker'
+import { sendFacebookEvent } from '@/lib/fbEvents'
+import { motion } from 'framer-motion'
 
 // Step components
 const ProjectTypeStep = ({ onNext }: { onNext: (formData: any) => void }) => {
@@ -487,7 +488,6 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [trackConversion, setTrackConversion] = useState(false)
-  const [trackGoogleAdsConversion, setTrackGoogleAdsConversion] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -594,7 +594,6 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
         
         // Enable tracking and immediately move to success step
         setTrackConversion(true)
-        setTrackGoogleAdsConversion(true)
         
         // Track form submission with Vercel Analytics
         track('GetStartedFormSubmission', {
@@ -603,6 +602,28 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
           projectSize: formData.size,
           projectStage: formData.processStage,
           location: window.location.pathname
+        });
+        
+        // Send event to Facebook Conversions API
+        sendFacebookEvent({
+          event_name: 'Lead',
+          user_data: {
+            email: contactData.email,
+            phone: contactData.phone,
+            firstName: contactData.name.split(' ')[0],
+            lastName: contactData.name.includes(' ') ? contactData.name.split(' ').slice(1).join(' ') : ''
+          },
+          custom_data: {
+            form_type: 'get_started',
+            location: window.location.pathname,
+            projectTypes: formData.projectTypes,
+            projectSize: formData.size,
+            projectStage: formData.processStage,
+            propertyAddress: contactData.address,
+            propertyCity: contactData.city,
+            propertyState: contactData.state,
+            projectDescription: projectSummary
+          }
         });
         
         onNext()
@@ -647,7 +668,6 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
   return (
     <div className="animate-fadeIn">
       {trackConversion && <ConversionTracker conversionType="get_started_form" value={1.0} />}
-      {trackGoogleAdsConversion && <GoogleAdsTracker conversionLabel="form_submission" conversionValue={1.0} />}
       
       <div className="flex items-center mb-6">
         <div className="bg-lavender/30 p-3 rounded-full mr-4">
