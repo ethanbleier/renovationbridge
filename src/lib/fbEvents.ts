@@ -28,6 +28,7 @@ export async function sendFacebookEvent(eventData: EventData): Promise<boolean> 
     
     // Get Facebook tracking parameters
     const fbParams = getFacebookTrackingParams();
+    console.log('Facebook tracking parameters:', fbParams);
     
     // Add Facebook tracking parameters to user data if not already present
     const enrichedUserData = {
@@ -36,18 +37,22 @@ export async function sendFacebookEvent(eventData: EventData): Promise<boolean> 
       fbp: eventData.user_data.fbp || fbParams.fbp || undefined,
     };
     
+    const payload = {
+      event_name: eventData.event_name,
+      event_time: eventData.event_time || Math.floor(Date.now() / 1000),
+      user_data: enrichedUserData,
+      custom_data: eventData.custom_data || {},
+      test_event_code: eventData.test_event_code,
+    };
+    
+    console.log('Sending payload to API:', JSON.stringify(payload, null, 2));
+    
     const response = await fetch('/api/fb-events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        event_name: eventData.event_name,
-        event_time: eventData.event_time || Math.floor(Date.now() / 1000),
-        user_data: enrichedUserData,
-        custom_data: eventData.custom_data || {},
-        test_event_code: eventData.test_event_code,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const responseData = await response.json();

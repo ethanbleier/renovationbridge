@@ -8,7 +8,7 @@ export default function TestFacebookEvents() {
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [testEventCode, setTestEventCode] = useState('TEST26583'); // Use the test code you provided
-  const [useClientLib, setUseClientLib] = useState(false);
+  const [useClientLib, setUseClientLib] = useState(true);
   
   const handleTestEvent = async (formType: string) => {
     setLoading(true);

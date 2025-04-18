@@ -4,7 +4,10 @@ import { headers } from 'next/headers';
 
 export async function POST(req: Request) {
   try {
-    const { event_name, event_time, user_data, custom_data, test_event_code } = await req.json();
+    const body = await req.json();
+    console.log('Received event request body:', JSON.stringify(body, null, 2));
+    
+    const { event_name, event_time, user_data, custom_data, test_event_code } = body;
     
     // Get request headers for IP and user agent
     const headersList = headers();
@@ -25,6 +28,10 @@ export async function POST(req: Request) {
     const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
     if (!FB_ACCESS_TOKEN || !FB_PIXEL_ID) {
+      console.error('Facebook API credentials missing:', {
+        hasAccessToken: !!FB_ACCESS_TOKEN,
+        hasPixelId: !!FB_PIXEL_ID
+      });
       return NextResponse.json(
         { error: 'Facebook API credentials not configured' },
         { status: 500 }
