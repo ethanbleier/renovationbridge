@@ -13,7 +13,8 @@ export default function ThankYouPage() {
     <div className="container mx-auto max-w-4xl px-4 py-16">
       {/* Track conversion when thank-you page loads */}
       <ConversionTracker conversionType="form_submission" value={1.0} />
-      {/* Track Google Ads conversion */}
+      {/* Track Google Ads conversion - includes both labels */}
+      <GoogleAdsTracker conversionLabel="form_submission" conversionValue={1.0} />
       <GoogleAdsTracker conversionLabel="fFdBCL7U-7QaEMnyw4A_" conversionValue={1.0} />
       
       <div className="bg-white shadow-md rounded-lg p-8 text-center">

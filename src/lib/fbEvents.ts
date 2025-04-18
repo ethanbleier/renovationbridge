@@ -63,33 +63,4 @@ export async function sendFacebookEvent(eventData: EventData): Promise<boolean> 
     console.error('Error sending Facebook event:', error);
     return false;
   }
-}
-
-/**
- * Send a form submission event to Facebook
- * @param formType The type of form (e.g., 'contact', 'quote')
- * @param userData User data from the form
- * @param formData Additional form data
- * @param testEventCode Optional test event code for testing in Facebook Events Manager
- */
-export async function sendFormSubmissionEvent(
-  formType: string,
-  userData: UserData,
-  formData: Record<string, any> = {},
-  testEventCode?: string
-): Promise<boolean> {
-  // Include current URL in form data if not already present
-  if (!formData.location && typeof window !== 'undefined') {
-    formData.location = window.location.pathname;
-  }
-  
-  return await sendFacebookEvent({
-    event_name: 'Lead',
-    user_data: userData,
-    custom_data: {
-      form_type: formType,
-      ...formData,
-    },
-    test_event_code: testEventCode,
-  });
 } 

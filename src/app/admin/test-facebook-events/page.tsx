@@ -1,20 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { sendFormSubmissionEvent } from '@/lib/fbEvents';
-import { getFacebookTrackingParams } from '@/lib/fbTracking';
+import React, { useState } from 'react';
+import { sendFacebookEvent } from '@/lib/fbEvents';
 
 export default function TestFacebookEvents() {
   const [result, setResult] = useState<string>('');
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [testEventCode, setTestEventCode] = useState('TEST26583'); // Use the test code you provided
-  const [fbParams, setFbParams] = useState<{fbc: string | null, fbp: string | null}>({ fbc: null, fbp: null });
-  
-  // Get FB tracking parameters on page load
-  useEffect(() => {
-    setFbParams(getFacebookTrackingParams());
-  }, []);
+  const [useClientLib, setUseClientLib] = useState(false);
   
   const handleTestEvent = async (formType: string) => {
     setLoading(true);
@@ -27,10 +21,7 @@ export default function TestFacebookEvents() {
         email: 'test@example.com',
         phone: '5555555555',
         firstName: 'Test',
-        lastName: 'User',
-        // Include Facebook tracking parameters if available
-        fbc: fbParams.fbc || undefined,
-        fbp: fbParams.fbp || undefined
+        lastName: 'User'
       };
       
       // Create test form data based on form type
@@ -52,31 +43,50 @@ export default function TestFacebookEvents() {
         formData.city = 'Test City';
       }
       
-      // Direct API call for better debugging
-      const response = await fetch('/api/fb-events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      if (useClientLib) {
+        // Use the client-side library function
+        const success = await sendFacebookEvent({
           event_name: 'Lead',
-          event_time: Math.floor(Date.now() / 1000),
           user_data: userData,
           custom_data: {
             form_type: formType,
             ...formData,
           },
           test_event_code: testEventCode,
-        }),
-      });
-      
-      const responseData = await response.json();
-      setResponse(responseData);
-      
-      if (response.ok) {
-        setResult(`Successfully sent test event for ${formType} form with test code ${testEventCode}`);
+        });
+        
+        if (success) {
+          setResult(`Successfully sent test event using client library for ${formType} form with test code ${testEventCode}`);
+        } else {
+          setResult(`Error sending test event using client library`);
+        }
       } else {
-        setResult(`Error sending test event: ${responseData.error || 'Unknown error'}`);
+        // Direct API call for better debugging
+        const response = await fetch('/api/fb-events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            event_name: 'Lead',
+            event_time: Math.floor(Date.now() / 1000),
+            user_data: userData,
+            custom_data: {
+              form_type: formType,
+              ...formData,
+            },
+            test_event_code: testEventCode,
+          }),
+        });
+        
+        const responseData = await response.json();
+        setResponse(responseData);
+        
+        if (response.ok) {
+          setResult(`Successfully sent test event via direct API call for ${formType} form with test code ${testEventCode}`);
+        } else {
+          setResult(`Error sending test event: ${responseData.error || 'Unknown error'}`);
+        }
       }
     } catch (error) {
       setResult(`Error sending test event: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -104,15 +114,19 @@ export default function TestFacebookEvents() {
         </p>
       </div>
       
-      <div className="mb-6 p-4 bg-blue-50 rounded-md">
-        <h2 className="font-semibold mb-2">Facebook Tracking Parameters</h2>
-        <div className="text-sm">
-          <p><span className="font-medium">Facebook Click ID (fbc):</span> {fbParams.fbc || '(not found)'}</p>
-          <p><span className="font-medium">Facebook Browser ID (fbp):</span> {fbParams.fbp || '(not found)'}</p>
-        </div>
-        <p className="text-xs text-gray-500 mt-2">
-          These parameters are automatically included in events to improve match quality.
-          The fbp cookie is set by the Facebook pixel, and fbc is captured when users click on Facebook ads.
+      <div className="mb-4">
+        <label className="inline-flex items-center">
+          <input
+            type="checkbox"
+            checked={useClientLib}
+            onChange={(e) => setUseClientLib(e.target.checked)}
+            className="mr-2"
+          />
+          <span className="text-sm">Use client-side library (like real forms do)</span>
+        </label>
+        <p className="text-xs text-gray-500 ml-5">
+          When checked, uses the sendFacebookEvent() function that real forms use.
+          When unchecked, makes a direct API call for debugging.
         </p>
       </div>
       
@@ -155,7 +169,7 @@ export default function TestFacebookEvents() {
         </div>
       )}
       
-      {response && (
+      {!useClientLib && response && (
         <div className="mb-6">
           <h3 className="font-semibold mb-2">API Response:</h3>
           <pre className="bg-gray-100 p-4 rounded overflow-auto max-h-64 text-xs">
@@ -184,6 +198,7 @@ export default function TestFacebookEvents() {
           <li>Check that the test_event_code is current (they expire after a while)</li>
           <li>Verify that all required parameters (event_name, event_time, client_ip_address, client_user_agent) are included</li>
           <li>Make sure user data is properly hashed according to Facebook's requirements</li>
+          <li>Try toggling between direct API calls and the client library to isolate issues</li>
         </ul>
       </div>
     </div>

@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
-import { sendFormSubmissionEvent } from '@/lib/fbEvents'
-
+import { sendFacebookEvent } from '@/lib/fbEvents'
+  
 type FormValues = {
   name: string
   city: string
@@ -109,15 +109,20 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         });
         
         // Send event to Facebook Conversions API
-        sendFormSubmissionEvent('contact', {
-          email: data.email,
-          phone: data.phone,
-          firstName: data.name.split(' ')[0],
-          lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-        }, {
-          location: window.location.pathname,
-          city: data.city,
-          message: data.message || "Contact form submission - no description provided",
+        sendFacebookEvent({
+          event_name: 'Lead',
+          user_data: {
+            email: data.email,
+            phone: data.phone,
+            firstName: data.name.split(' ')[0],
+            lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
+          },
+          custom_data: {
+            form_type: 'contact',
+            location: window.location.pathname,
+            city: data.city,
+            message: data.message || "Contact form submission - no description provided",
+          }
         });
         
         reset();
@@ -171,15 +176,20 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       });
       
       // Send event to Facebook Conversions API
-      sendFormSubmissionEvent('contact', {
-        email: data.email,
-        phone: data.phone,
-        firstName: data.name.split(' ')[0],
-        lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-      }, {
-        location: window.location.pathname,
-        city: data.city,
-        message: data.message || "Contact form submission - no description provided",
+      sendFacebookEvent({
+        event_name: 'Lead',
+        user_data: {
+          email: data.email,
+          phone: data.phone,
+          firstName: data.name.split(' ')[0],
+          lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
+        },
+        custom_data: {
+          form_type: 'contact',
+          location: window.location.pathname,
+          city: data.city,
+          message: data.message || "Contact form submission - no description provided",
+        }
       });
       
       reset()
