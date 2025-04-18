@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
 import GoogleAdsTracker from '@/components/analytics/GoogleAdsTracker'
+import { sendFormSubmissionEvent } from '@/lib/fbEvents'
 
 // Step components
 const ProjectTypeStep = ({ onNext }: { onNext: (formData: any) => void }) => {
@@ -603,6 +604,23 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
           projectSize: formData.size,
           projectStage: formData.processStage,
           location: window.location.pathname
+        });
+        
+        // Send event to Facebook Conversions API
+        sendFormSubmissionEvent('get_started', {
+          email: contactData.email,
+          phone: contactData.phone,
+          firstName: contactData.name.split(' ')[0],
+          lastName: contactData.name.includes(' ') ? contactData.name.split(' ').slice(1).join(' ') : ''
+        }, {
+          location: window.location.pathname,
+          projectTypes: formData.projectTypes,
+          projectSize: formData.size,
+          projectStage: formData.processStage,
+          propertyAddress: contactData.address,
+          propertyCity: contactData.city,
+          propertyState: contactData.state,
+          projectDescription: projectSummary
         });
         
         onNext()

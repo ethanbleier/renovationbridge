@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
+import { sendFormSubmissionEvent } from '@/lib/fbEvents'
 
 type FormValues = {
   name: string
@@ -97,6 +98,18 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
         onSubmit(data);
         setIsSuccess(true);
         setTrackConversion(true);
+        
+        // Send event to Facebook Conversions API
+        sendFormSubmissionEvent('footer_contact', {
+          email: data.email,
+          phone: data.phone,
+          firstName: data.name.split(' ')[0],
+          lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
+        }, {
+          location: window.location.pathname,
+          message: data.message || "Footer form submission - no description provided",
+        });
+        
         reset();
         localStorage.removeItem('footerContactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -130,6 +143,18 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
       
       setIsSuccess(true)
       setTrackConversion(true)
+      
+      // Send event to Facebook Conversions API
+      sendFormSubmissionEvent('footer_contact', {
+        email: data.email,
+        phone: data.phone,
+        firstName: data.name.split(' ')[0],
+        lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
+      }, {
+        location: window.location.pathname,
+        message: data.message || "Footer form submission - no description provided",
+      });
+      
       reset()
       // Clear saved form data after successful submission
       localStorage.removeItem('footerContactFormData')
