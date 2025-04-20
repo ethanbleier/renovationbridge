@@ -16,6 +16,8 @@ export default function ThankYouPage() {
       {/* Track Google Ads conversion - includes both labels */}
       <GoogleAdsTracker conversionLabel="form_submission" conversionValue={1.0} />
       <GoogleAdsTracker conversionLabel="fFdBCL7U-7QaEMnyw4A_" conversionValue={1.0} />
+      {/* Track Lead Form Submit conversion */}
+      <GoogleAdsTracker conversionLabel="e9deCOfXlLsaEMnyw4A" conversionValue={1.0} />
       
       <div className="bg-white shadow-md rounded-lg p-8 text-center">
         <div className="mb-6">
