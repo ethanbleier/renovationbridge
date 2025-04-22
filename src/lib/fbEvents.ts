@@ -17,6 +17,15 @@ type EventData = {
   test_event_code?: string;
 };
 
+// Define the payload type to match what we're sending to the API
+type FacebookEventPayload = {
+  event_name: string;
+  event_time: number;
+  user_data: UserData;
+  custom_data: Record<string, any>;
+  test_event_code?: string;
+};
+
 /**
  * Send an event to Facebook Conversions API
  * @param eventData The event data to send
@@ -28,7 +37,6 @@ export async function sendFacebookEvent(eventData: EventData): Promise<boolean> 
     
     // Get Facebook tracking parameters
     const fbParams = getFacebookTrackingParams();
-    console.log('Facebook tracking parameters:', fbParams);
     
     // Add Facebook tracking parameters to user data if not already present
     const enrichedUserData = {
@@ -37,16 +45,22 @@ export async function sendFacebookEvent(eventData: EventData): Promise<boolean> 
       fbp: eventData.user_data.fbp || fbParams.fbp || undefined,
     };
     
-    const payload = {
+    // Create timestamp if not provided
+    const eventTime = eventData.event_time || Math.floor(Date.now() / 1000);
+    
+    const payload: FacebookEventPayload = {
       event_name: eventData.event_name,
-      event_time: eventData.event_time || Math.floor(Date.now() / 1000),
+      event_time: eventTime,
       user_data: enrichedUserData,
       custom_data: eventData.custom_data || {},
-      test_event_code: eventData.test_event_code,
     };
     
-    console.log('Sending payload to API:', JSON.stringify(payload, null, 2));
+    // Only add test_event_code if it's provided and valid (not "forced")
+    if (eventData.test_event_code && eventData.test_event_code !== "forced") {
+      payload.test_event_code = eventData.test_event_code;
+    }
     
+    // Send to API endpoint
     const response = await fetch('/api/fb-events', {
       method: 'POST',
       headers: {

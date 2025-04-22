@@ -18,7 +18,7 @@ const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" }),
   phone: z.string().min(1, { message: "Phone number is required" }),
-  message: z.string().optional()
+  message: z.string().min(1, { message: "Description of work is required" })
 })
 
 interface FooterContactFormProps {
@@ -99,22 +99,6 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
         setIsSuccess(true);
         setTrackConversion(true);
         
-        // Send event to Facebook Conversions API
-        sendFacebookEvent({
-          event_name: 'Lead',
-          user_data: {
-            email: data.email,
-            phone: data.phone,
-            firstName: data.name.split(' ')[0],
-            lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-          },
-          custom_data: {
-            form_type: 'footer_contact',
-            location: window.location.pathname,
-            message: data.message || "Footer form submission - no description provided",
-          }
-        });
-        
         reset();
         localStorage.removeItem('footerContactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -148,22 +132,6 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
       
       setIsSuccess(true)
       setTrackConversion(true)
-      
-      // Send event to Facebook Conversions API
-      sendFacebookEvent({
-        event_name: 'Lead',
-        user_data: {
-          email: data.email,
-          phone: data.phone,
-          firstName: data.name.split(' ')[0],
-          lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-        },
-        custom_data: {
-          form_type: 'footer_contact',
-          location: window.location.pathname,
-          message: data.message || "Footer form submission - no description provided",
-        }
-      });
       
       reset()
       // Clear saved form data after successful submission

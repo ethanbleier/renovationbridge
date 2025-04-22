@@ -41,10 +41,20 @@ export function getFacebookBrowserId(): string | null {
   // Try to get from cookie
   const fbp = getCookie(FBP_COOKIE_NAME);
   
-  // If not found and we're in a browser, we could generate one, but
-  // typically the Facebook pixel script sets this
+  if (fbp) {
+    return fbp;
+  }
   
-  return fbp;
+  // If not found, generate a fallback fbp
+  // Format: fb.1.{timestamp}.{random}
+  const timestamp = Date.now();
+  const randomValue = Math.floor(Math.random() * 1000000000);
+  const generatedFbp = `fb.1.${timestamp}.${randomValue}`;
+  
+  // Store the generated fbp in a cookie
+  setCookie(FBP_COOKIE_NAME, generatedFbp, 7);
+  
+  return generatedFbp;
 }
 
 /**

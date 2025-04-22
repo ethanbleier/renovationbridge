@@ -1,4 +1,5 @@
 import { getStoredTokens } from '@/utils/ghlAuth';
+import { sendFacebookEvent } from '@/lib/fbEvents';
 
 type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor' | 'pdf-lead';
 
@@ -116,9 +117,84 @@ interface GHLCredentials {
   locationId: string;
 }
 
+// Simplified function to track form submission in Facebook - server-side only
+function trackFacebookFormSubmission(formData: any, formType: FormType) {
+  try {
+    // Only use server-side events since they're reliably working
+    console.log('Tracking Facebook conversion with server-side event');
+    
+    // Enhanced extraction of user data with better fallbacks
+    const firstName = formData.firstName || 
+                     (formData.name ? formData.name.split(' ')[0] : '') ||
+                     (formData.fullName ? formData.fullName.split(' ')[0] : '');
+                     
+    const lastName = formData.lastName || 
+                    (formData.name && formData.name.includes(' ') ? formData.name.split(' ').slice(1).join(' ') : '') ||
+                    (formData.fullName && formData.fullName.includes(' ') ? formData.fullName.split(' ').slice(1).join(' ') : '');
+      
+    // Enhanced message extraction with more fallbacks
+    const message = formData.message || 
+                   formData.additional_comments || 
+                   formData.projectDescription || 
+                   formData.description ||
+                   formData.comments ||
+                   formData.project_details ||
+                   formData.work_description ||
+                   formData.details ||
+                   '';
+                   
+    // Enhanced city extraction with more fallbacks
+    const city = formData.city || 
+                formData.propertyCity ||
+                formData.location ||
+                formData.propertyLocation ||
+                formData.userCity ||
+                '';
+    
+    // Ensure email and phone are properly extracted even with different field names
+    const email = formData.email || formData.userEmail || '';
+    const phone = formData.phone || formData.phoneNumber || formData.userPhone || formData.contactPhone || '';
+    
+    // Add debugging for tracking issues
+    console.log('FB Server Event - Form Type:', formType);
+    console.log('FB Server Event - Data:', {
+      email,
+      phone,
+      firstName,
+      lastName,
+      city,
+      message: message.substring(0, 50) + (message.length > 50 ? '...' : '') // Truncate for logs
+    });
+    
+    return sendFacebookEvent({
+      event_name: 'Lead',
+      user_data: {
+        email,
+        phone,
+        firstName,
+        lastName
+      },
+      custom_data: {
+        form_type: formType,
+        location: typeof window !== 'undefined' ? window.location.pathname : '/', // Safe server-side handling
+        city,
+        message
+      }
+      // No test_event_code here - this avoids the "forced" test code issues
+    });
+  } catch (error) {
+    console.error('Error tracking Facebook form submission:', error);
+    // Don't throw - we don't want to block the form submission
+    return Promise.resolve(false);
+  }
+}
+
 // Generic function to submit to GoHighLevel
 export async function submitToGHL(formData: any, formType: FormType, credentials?: GHLCredentials) {
   try {
+    // Track form submission in Facebook (server-side only)
+    const fbPromise = trackFacebookFormSubmission(formData, formType);
+    
     // Get GoHighLevel API credentials from provided credentials, environment or token storage
     const tokenData = getStoredTokens();
     const apiKey = credentials?.apiKey || tokenData?.accessToken || process.env.GHL_API_KEY || process.env.NEXT_PUBLIC_GHL_API_KEY;
@@ -157,6 +233,9 @@ export async function submitToGHL(formData: any, formType: FormType, credentials
       console.error('GoHighLevel API error:', responseData);
       throw new Error('Failed to submit to GoHighLevel');
     }
+    
+    // Wait for FB tracking to complete, but don't block on it
+    await fbPromise.catch(e => console.error('FB tracking failed but form submission succeeded:', e));
     
     return { success: true, data: responseData };
   } catch (error) {

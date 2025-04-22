@@ -10,6 +10,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/structured-data'
 import { sarabun } from '@/lib/fonts'
 import Script from 'next/script'
+import FacebookPixel from '@/components/analytics/FacebookPixel'
 
 const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID;
 
@@ -97,6 +98,9 @@ export default function RootLayout({
             gtag('config', 'AW-16912546121');
           `}
         </Script>
+        
+        {/* Facebook Pixel */}
+        <FacebookPixel />
         
         <div className="min-h-screen flex flex-col">
           <Header />

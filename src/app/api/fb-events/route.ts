@@ -5,9 +5,23 @@ import { headers } from 'next/headers';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('Received event request body:', JSON.stringify(body, null, 2));
     
     const { event_name, event_time, user_data, custom_data, test_event_code } = body;
+    
+    // Validate required fields
+    if (!event_name) {
+      return NextResponse.json(
+        { error: 'Missing required field: event_name' },
+        { status: 400 }
+      );
+    }
+    
+    if (!user_data) {
+      return NextResponse.json(
+        { error: 'Missing required field: user_data' },
+        { status: 400 }
+      );
+    }
     
     // Get request headers for IP and user agent
     const headersList = headers();
@@ -28,10 +42,7 @@ export async function POST(req: Request) {
     const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
     if (!FB_ACCESS_TOKEN || !FB_PIXEL_ID) {
-      console.error('Facebook API credentials missing:', {
-        hasAccessToken: !!FB_ACCESS_TOKEN,
-        hasPixelId: !!FB_PIXEL_ID
-      });
+      console.error('Facebook API credentials missing');
       return NextResponse.json(
         { error: 'Facebook API credentials not configured' },
         { status: 500 }
@@ -69,7 +80,7 @@ export async function POST(req: Request) {
       hashedUserData.external_id = [hashData(user_data.email)];
     }
 
-    // Create the payload with test_event_code at the top level
+    // Create the payload 
     const payload: any = {
       data: [
         {
@@ -82,17 +93,15 @@ export async function POST(req: Request) {
             client_ip_address: clientIp,
             client_user_agent: userAgent,
           },
-          custom_data,
+          custom_data: custom_data || {},
         },
       ],
     };
 
-    // Add test_event_code if provided - at the top level
-    if (test_event_code) {
+    // Add test_event_code if provided and not "forced"
+    if (test_event_code && test_event_code !== "forced") {
       payload.test_event_code = test_event_code;
     }
-
-    console.log('Sending Facebook event payload:', JSON.stringify(payload, null, 2));
 
     // Send to Facebook
     const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events?access_token=${FB_ACCESS_TOKEN}`;
@@ -104,11 +113,17 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     
-    // Log full response for debugging
-    console.log('Facebook API response:', JSON.stringify(data, null, 2));
+    // Check for Facebook API errors
+    if (data.error) {
+      console.error('Facebook API error:', data.error);
+      return NextResponse.json(
+        { error: data.error.message || 'Facebook API error' },
+        { status: 400 }
+      );
+    }
     
     // Log success for test events
-    if (test_event_code) {
+    if (test_event_code && test_event_code !== "forced") {
       console.log(`Facebook test event sent with code: ${test_event_code}`);
     }
 

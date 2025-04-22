@@ -22,7 +22,7 @@ const formSchema = z.object({
   city: z.string().min(1, { message: "City is required" }),
   email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" }),
   phone: z.string().min(1, { message: "Phone number is required" }),
-  message: z.string().optional()
+  message: z.string().min(1, { message: "Description of work is required" })
 })
 
 interface ContactFormProps {
@@ -108,23 +108,6 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
           location: window.location.pathname 
         });
         
-        // Send event to Facebook Conversions API
-        sendFacebookEvent({
-          event_name: 'Lead',
-          user_data: {
-            email: data.email,
-            phone: data.phone,
-            firstName: data.name.split(' ')[0],
-            lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-          },
-          custom_data: {
-            form_type: 'contact',
-            location: window.location.pathname,
-            city: data.city,
-            message: data.message || "Contact form submission - no description provided",
-          }
-        });
-        
         reset();
         localStorage.removeItem('contactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -173,23 +156,6 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       track('ContactFormSubmission', { 
         formType: 'contact',
         location: window.location.pathname 
-      });
-      
-      // Send event to Facebook Conversions API
-      sendFacebookEvent({
-        event_name: 'Lead',
-        user_data: {
-          email: data.email,
-          phone: data.phone,
-          firstName: data.name.split(' ')[0],
-          lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-        },
-        custom_data: {
-          form_type: 'contact',
-          location: window.location.pathname,
-          city: data.city,
-          message: data.message || "Contact form submission - no description provided",
-        }
       });
       
       reset()
@@ -382,7 +348,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         
         <div className="space-y-1">
           <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-            Description of work
+            Description of work <span className="text-red-500"></span>
           </label>
           <div className="relative group">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-4 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -393,11 +359,19 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               placeholder="Please describe what you need help with..."
               rows={4}
               className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
-              aria-required="false"
+              aria-required="true"
               aria-invalid={errors.message ? "true" : "false"}
-              {...register('message')}
+              {...register('message', { required: true })}
             ></textarea>
           </div>
+          {errors.message && (
+            <p className="mt-1 text-sm text-red-600 flex items-center" id="message-error">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Description of work is required
+            </p>
+          )}
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 pt-3">
