@@ -123,31 +123,60 @@ function trackFacebookFormSubmission(formData: any, formType: FormType) {
     // Only use server-side events since they're reliably working
     console.log('Tracking Facebook conversion with server-side event');
     
-    // Extract user data
-    const firstName = formData.firstName || (formData.name ? formData.name.split(' ')[0] : '');
-    const lastName = formData.lastName || (formData.name && formData.name.includes(' ') 
-      ? formData.name.split(' ').slice(1).join(' ') 
-      : '');
+    // Enhanced extraction of user data with better fallbacks
+    const firstName = formData.firstName || 
+                     (formData.name ? formData.name.split(' ')[0] : '') ||
+                     (formData.fullName ? formData.fullName.split(' ')[0] : '');
+                     
+    const lastName = formData.lastName || 
+                    (formData.name && formData.name.includes(' ') ? formData.name.split(' ').slice(1).join(' ') : '') ||
+                    (formData.fullName && formData.fullName.includes(' ') ? formData.fullName.split(' ').slice(1).join(' ') : '');
       
+    // Enhanced message extraction with more fallbacks
     const message = formData.message || 
                    formData.additional_comments || 
                    formData.projectDescription || 
-                   formData.description || 
+                   formData.description ||
+                   formData.comments ||
+                   formData.project_details ||
+                   formData.work_description ||
+                   formData.details ||
                    '';
                    
-    const city = formData.city || formData.propertyCity || '';
+    // Enhanced city extraction with more fallbacks
+    const city = formData.city || 
+                formData.propertyCity ||
+                formData.location ||
+                formData.propertyLocation ||
+                formData.userCity ||
+                '';
+    
+    // Ensure email and phone are properly extracted even with different field names
+    const email = formData.email || formData.userEmail || '';
+    const phone = formData.phone || formData.phoneNumber || formData.userPhone || formData.contactPhone || '';
+    
+    // Add debugging for tracking issues
+    console.log('FB Server Event - Form Type:', formType);
+    console.log('FB Server Event - Data:', {
+      email,
+      phone,
+      firstName,
+      lastName,
+      city,
+      message: message.substring(0, 50) + (message.length > 50 ? '...' : '') // Truncate for logs
+    });
     
     return sendFacebookEvent({
       event_name: 'Lead',
       user_data: {
-        email: formData.email,
-        phone: formData.phone,
+        email,
+        phone,
         firstName,
         lastName
       },
       custom_data: {
         form_type: formType,
-        location: typeof window !== 'undefined' ? window.location.pathname : '/',
+        location: typeof window !== 'undefined' ? window.location.pathname : '/', // Safe server-side handling
         city,
         message
       }

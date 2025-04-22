@@ -108,23 +108,6 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
           location: window.location.pathname 
         });
         
-        // Send event to Facebook Conversions API
-        sendFacebookEvent({
-          event_name: 'Lead',
-          user_data: {
-            email: data.email,
-            phone: data.phone,
-            firstName: data.name.split(' ')[0],
-            lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-          },
-          custom_data: {
-            form_type: 'contact',
-            location: window.location.pathname,
-            city: data.city,
-            message: data.message || "Contact form submission - no description provided",
-          }
-        });
-        
         reset();
         localStorage.removeItem('contactFormData');
         setTimeout(() => setIsSuccess(false), 15000);
@@ -173,23 +156,6 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       track('ContactFormSubmission', { 
         formType: 'contact',
         location: window.location.pathname 
-      });
-      
-      // Send event to Facebook Conversions API
-      sendFacebookEvent({
-        event_name: 'Lead',
-        user_data: {
-          email: data.email,
-          phone: data.phone,
-          firstName: data.name.split(' ')[0],
-          lastName: data.name.includes(' ') ? data.name.split(' ').slice(1).join(' ') : ''
-        },
-        custom_data: {
-          form_type: 'contact',
-          location: window.location.pathname,
-          city: data.city,
-          message: data.message || "Contact form submission - no description provided",
-        }
       });
       
       reset()

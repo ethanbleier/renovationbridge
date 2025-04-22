@@ -604,28 +604,6 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
           location: window.location.pathname
         });
         
-        // Send event to Facebook Conversions API
-        sendFacebookEvent({
-          event_name: 'Lead',
-          user_data: {
-            email: contactData.email,
-            phone: contactData.phone,
-            firstName: contactData.name.split(' ')[0],
-            lastName: contactData.name.includes(' ') ? contactData.name.split(' ').slice(1).join(' ') : ''
-          },
-          custom_data: {
-            form_type: 'get_started',
-            location: window.location.pathname,
-            projectTypes: formData.projectTypes,
-            projectSize: formData.size,
-            projectStage: formData.processStage,
-            propertyAddress: contactData.address,
-            propertyCity: contactData.city,
-            propertyState: contactData.state,
-            projectDescription: projectSummary
-          }
-        });
-        
         onNext()
       } catch (err) {
         console.error('Error submitting form:', err);
