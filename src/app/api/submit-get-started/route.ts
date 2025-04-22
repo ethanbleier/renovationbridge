@@ -7,6 +7,7 @@ import { getStartedFormSchema } from '@/lib/utils/validation';
 export async function POST(request: Request) {
   try {
     console.log('--- GET STARTED FORM SUBMISSION ---');
+    console.log('Timestamp:', new Date().toISOString());
     
     // Parse the incoming request body
     const formData = await request.json();
@@ -23,10 +24,14 @@ export async function POST(request: Request) {
     }
     
     console.log('Validation successful!');
+    console.log('Processing form submission...');
     
     // Submit to GoHighLevel with the 'get-started' form type (which will add urgent-call tag)
+    // This also handles Facebook event tracking internally
+    console.log('Calling submitToGHL with form type: get-started');
     const ghlResult = await submitToGHL(validationResult.data, 'get-started');
     console.log('GHL submission result:', JSON.stringify(ghlResult, null, 2));
+    console.log('Form processing completed successfully');
     
     return NextResponse.json({ success: true });
   } catch (error) {

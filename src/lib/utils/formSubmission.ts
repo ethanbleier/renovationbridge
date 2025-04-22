@@ -118,7 +118,7 @@ interface GHLCredentials {
 }
 
 // Simplified function to track form submission in Facebook - server-side only
-function trackFacebookFormSubmission(formData: any, formType: FormType) {
+async function trackFacebookFormSubmission(formData: any, formType: FormType) {
   try {
     // Only use server-side events since they're reliably working
     console.log('Tracking Facebook conversion with server-side event');
@@ -166,34 +166,166 @@ function trackFacebookFormSubmission(formData: any, formType: FormType) {
       message: message.substring(0, 50) + (message.length > 50 ? '...' : '') // Truncate for logs
     });
     
-    return sendFacebookEvent({
-      event_name: 'Lead',
-      user_data: {
-        email,
-        phone,
-        firstName,
-        lastName
-      },
-      custom_data: {
-        form_type: formType,
-        location: typeof window !== 'undefined' ? window.location.pathname : '/', // Safe server-side handling
-        city,
-        message
+    // Get Facebook API credentials
+    const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
+    const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+
+    if (!FB_ACCESS_TOKEN || !FB_PIXEL_ID) {
+      console.error('Facebook API credentials missing:', {
+        hasAccessToken: !!FB_ACCESS_TOKEN,
+        hasPixelId: !!FB_PIXEL_ID
+      });
+      return false;
+    }
+    
+    // Try to use the existing server API endpoint first
+    try {
+      console.log('Attempting to use server API endpoint for Facebook tracking');
+      
+      // Create a minimal payload for the server API
+      const serverPayload = {
+        event_name: 'Lead',
+        user_data: {
+          email,
+          phone,
+          firstName,
+          lastName
+        },
+        custom_data: {
+          form_type: formType,
+          city,
+          message: message.substring(0, 255) // Truncate message to reasonable length
+        }
+      };
+      
+      // Use an absolute URL for the API endpoint
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://renovationbridge.com';
+      const apiUrl = new URL('/api/fb-events', baseUrl).toString();
+      
+      console.log('Sending FB event to API endpoint:', apiUrl);
+      
+      const serverResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(serverPayload)
+      });
+      
+      if (serverResponse.ok) {
+        const serverData = await serverResponse.json();
+        console.log('Facebook server API response:', serverData);
+        return true;
+      } else {
+        console.error('Facebook server API error:', {
+          status: serverResponse.status,
+          statusText: serverResponse.statusText
+        });
+        // Fall back to direct API call
       }
-      // No test_event_code here - this avoids the "forced" test code issues
-    });
+    } catch (serverError) {
+      console.error('Error using server API for Facebook tracking, falling back to direct API:', serverError);
+      // Continue to direct API call
+    }
+    
+    // Hash user data for Facebook
+    console.log('Falling back to direct Facebook API call');
+    
+    try {
+      const crypto = require('crypto');
+      
+      // Hash user data for Facebook
+      const hashedUserData: any = {};
+      
+      if (email) {
+        hashedUserData.em = [crypto.createHash('sha256').update(email.toLowerCase().trim()).digest('hex')];
+        hashedUserData.external_id = [crypto.createHash('sha256').update(email.toLowerCase().trim()).digest('hex')];
+      }
+      
+      if (phone) {
+        // Remove all non-numeric characters
+        const cleanPhone = phone.replace(/\D/g, '');
+        hashedUserData.ph = [crypto.createHash('sha256').update(cleanPhone).digest('hex')];
+      }
+      
+      if (firstName) {
+        hashedUserData.fn = [crypto.createHash('sha256').update(firstName.toLowerCase().trim()).digest('hex')];
+      }
+      
+      if (lastName) {
+        hashedUserData.ln = [crypto.createHash('sha256').update(lastName.toLowerCase().trim()).digest('hex')];
+      }
+      
+      // Create the payload 
+      const payload: any = {
+        data: [
+          {
+            event_name: 'Lead',
+            event_time: Math.floor(Date.now() / 1000),
+            action_source: 'website',
+            user_data: hashedUserData,
+            custom_data: {
+              form_type: formType,
+              city,
+              message: message.substring(0, 255) // Truncate message to reasonable length
+            },
+          },
+        ],
+      };
+
+      // Send directly to Facebook
+      const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events?access_token=${FB_ACCESS_TOKEN}`;
+      console.log('Sending FB event directly to Facebook API');
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        console.error('Facebook API response not OK:', {
+          status: response.status,
+          statusText: response.statusText
+        });
+      }
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        console.error('Facebook API error:', data.error);
+        return false;
+      }
+      
+      console.log('Facebook event sent successfully:', data);
+      return true;
+    } catch (directApiError) {
+      console.error('Error in direct Facebook API call:', directApiError);
+      return false;
+    }
   } catch (error) {
     console.error('Error tracking Facebook form submission:', error);
     // Don't throw - we don't want to block the form submission
-    return Promise.resolve(false);
+    return false;
   }
+}
+
+// Helper function to hash data according to Facebook requirements
+function hashData(data: string): string {
+  if (!data) return '';
+  
+  const crypto = require('crypto');
+  return crypto
+    .createHash('sha256')
+    .update(data.trim().toLowerCase())
+    .digest('hex');
 }
 
 // Generic function to submit to GoHighLevel
 export async function submitToGHL(formData: any, formType: FormType, credentials?: GHLCredentials) {
   try {
     // Track form submission in Facebook (server-side only)
-    const fbPromise = trackFacebookFormSubmission(formData, formType);
+    // Important: await this directly to ensure it completes before proceeding
+    const fbSuccess = await trackFacebookFormSubmission(formData, formType);
+    console.log('Facebook tracking result:', fbSuccess ? 'Success' : 'Failed');
     
     // Get GoHighLevel API credentials from provided credentials, environment or token storage
     const tokenData = getStoredTokens();
@@ -233,9 +365,6 @@ export async function submitToGHL(formData: any, formType: FormType, credentials
       console.error('GoHighLevel API error:', responseData);
       throw new Error('Failed to submit to GoHighLevel');
     }
-    
-    // Wait for FB tracking to complete, but don't block on it
-    await fbPromise.catch(e => console.error('FB tracking failed but form submission succeeded:', e));
     
     return { success: true, data: responseData };
   } catch (error) {
