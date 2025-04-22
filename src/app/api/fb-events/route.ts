@@ -78,6 +78,9 @@ export async function POST(req: Request) {
     const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
     const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
 
+    // Log the actual Pixel ID being used
+    console.log('Using Facebook Pixel ID:', FB_PIXEL_ID);
+
     if (!FB_ACCESS_TOKEN || !FB_PIXEL_ID) {
       console.error('Facebook API credentials missing:', {
         hasAccessToken: !!FB_ACCESS_TOKEN,
@@ -153,10 +156,10 @@ export async function POST(req: Request) {
       }
 
       console.log('Prepared Facebook Conversions API payload (sample):', {
+        event_source_url: payload.data[0].event_source_url,
         event_name: payload.data[0].event_name,
         event_time: payload.data[0].event_time,
         action_source: payload.data[0].action_source,
-        event_source_url: payload.data[0].event_source_url,
         has_user_data: !!payload.data[0].user_data,
         has_custom_data: !!payload.data[0].custom_data
       });

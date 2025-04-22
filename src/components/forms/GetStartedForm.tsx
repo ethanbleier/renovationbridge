@@ -865,9 +865,9 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
 
           <div className="md:col-span-2 transition-all duration-300 transform hover:translate-y-[-2px]">
             <label htmlFor="comments" className="block text-xs font-medium text-gray-700 mb-1">
-              Additional Comments (Optional)
+              Additional Comments <span className="text-red-500">*</span>
             </label>
-            <div className="relative rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary/30">
+            <div className={`relative rounded-lg overflow-hidden transition-all duration-300 ${shouldShowError('comments') ? 'ring-2 ring-red-500' : 'focus-within:ring-2 focus-within:ring-primary/30'}`}>
               <div className="absolute top-3 left-3 flex items-start pointer-events-none">
                 <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -880,8 +880,12 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
                 onChange={handleChange}
                 className="w-full p-3 pl-10 text-sm border border-gray/30 rounded-lg focus:outline-none h-16 md:h-24"
                 placeholder="Tell us more about your project requirements..."
+                required
               />
             </div>
+            {shouldShowError('comments') && (
+              <p className="text-red-500 text-xs mt-1 animate-fadeIn">Please provide additional comments about your project</p>
+            )}
           </div>
         </div>
         

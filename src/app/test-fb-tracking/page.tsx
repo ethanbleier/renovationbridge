@@ -78,10 +78,15 @@ export default function TestFacebookTrackingPage() {
   const testServerEvent = async () => {
     addResult('Testing server-side event...');
     try {
+      // Define a test event code
+      const testCode = `TEST${Math.floor(Date.now() / 1000)}`;
+      addResult(`Using test code: ${testCode}`);
+
       const result = await sendFacebookEvent({
         event_name: 'TestEvent',
         user_data: userData,
-        custom_data: { source: 'test-page', test_type: 'server' }
+        custom_data: { source: 'test-page', test_type: 'server' },
+        test_event_code: testCode
       });
       
       addResult(`Server event result: ${result ? 'Success' : 'Failed'}`);
