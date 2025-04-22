@@ -4,15 +4,6 @@ import { useState, useEffect } from 'react';
 import { sendFacebookEvent } from '@/lib/fbEvents';
 import FacebookEventTracker from '@/components/analytics/FacebookEventTracker';
 
-// Extend Window interface to include our custom functions
-declare global {
-  interface Window {
-    trackFBEvent?: (eventName: string, params: any) => boolean;
-    debugFbq?: (...args: any[]) => void;
-    forceConsoleLog?: (...args: any[]) => void;
-  }
-}
-
 export default function TestFacebookTrackingPage() {
   const [testResults, setTestResults] = useState<string[]>([]);
   const [showTracker, setShowTracker] = useState(false);
@@ -41,22 +32,22 @@ export default function TestFacebookTrackingPage() {
     
     // Check if fbq is available
     const checkFbq = () => {
-      const available = typeof window !== 'undefined' && !!window.fbq;
+      const available = typeof window !== 'undefined' && !!(window as any).fbq;
       setFbqAvailable(available);
       addResult(`fbq ${available ? 'is' : 'is NOT'} available on page load`);
       
       if (available) {
         // Check if it's callable
         try {
-          console.error('Testing fbq function type:', typeof window.fbq);
-          addResult(`fbq function type: ${typeof window.fbq}`);
+          console.error('Testing fbq function type:', typeof (window as any).fbq);
+          addResult(`fbq function type: ${typeof (window as any).fbq}`);
         } catch (error) {
           addResult(`Error checking fbq: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       
       // Check for our custom global tracking function
-      if (window.trackFBEvent) {
+      if ((window as any).trackFBEvent) {
         addResult('Custom tracking function is available');
       } else {
         addResult('Custom tracking function is NOT available');
@@ -77,8 +68,8 @@ export default function TestFacebookTrackingPage() {
     console.error(`Test result: ${message}`);
     
     // Also use forced logging if available
-    if (window.forceConsoleLog) {
-      window.forceConsoleLog(`Test result: ${message}`);
+    if ((window as any).forceConsoleLog) {
+      (window as any).forceConsoleLog(`Test result: ${message}`);
     }
     
     setTestResults(prev => [...prev, `${new Date().toISOString()}: ${message}`]);
@@ -109,9 +100,9 @@ export default function TestFacebookTrackingPage() {
     }
     
     // Try the custom tracking function first if available
-    if (window.trackFBEvent) {
+    if ((window as any).trackFBEvent) {
       addResult('Using custom tracking function');
-      const result = window.trackFBEvent('TestEvent', { 
+      const result = (window as any).trackFBEvent('TestEvent', { 
         source: 'test-page', 
         test_type: 'browser-custom'
       });
@@ -119,18 +110,18 @@ export default function TestFacebookTrackingPage() {
       return;
     }
     
-    if (!window.fbq) {
+    if (!((window as any).fbq)) {
       addResult('Browser event failed: fbq is not available');
       return;
     }
     
     try {
       console.error('About to call fbq - before call');
-      addResult(`fbq type: ${typeof window.fbq}`);
+      addResult(`fbq type: ${typeof ((window as any).fbq)}`);
       
       // Directly try to log fbq to see its content
       try {
-        console.error('fbq function:', window.fbq.toString().substring(0, 100) + '...');
+        console.error('fbq function:', ((window as any).fbq).toString().substring(0, 100) + '...');
         addResult('fbq function logged to console');
       } catch (e) {
         addResult(`Error logging fbq: ${e instanceof Error ? e.message : String(e)}`);
@@ -138,7 +129,7 @@ export default function TestFacebookTrackingPage() {
       
       // Track event in a try-catch
       try {
-        window.fbq('track', 'TestEvent', { source: 'test-page', test_type: 'browser' });
+        ((window as any).fbq)('track', 'TestEvent', { source: 'test-page', test_type: 'browser' });
         console.error('fbq track called successfully');
         addResult('Browser event triggered via fbq');
       } catch (e) {

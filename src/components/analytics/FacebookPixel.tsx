@@ -99,7 +99,8 @@ export default function FacebookPixel() {
           forceConsoleLog('FB Pixel init - Creating fbq function');
           window.fbq = function() {
             // Debug log every call
-            debugFbq(...arguments);
+            const args = Array.from(arguments);
+            debugFbq(...args);
             
             // Standard fbq implementation
             // @ts-ignore
@@ -113,7 +114,8 @@ export default function FacebookPixel() {
           // Wrap the existing function
           window.fbq = function() {
             // Debug log
-            debugFbq(...arguments);
+            const args = Array.from(arguments);
+            debugFbq(...args);
             
             // Call original
             if (originalFbq) {
