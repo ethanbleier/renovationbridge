@@ -1,4 +1,5 @@
 import { getStoredTokens } from '@/utils/ghlAuth';
+import { sendFacebookEvent } from '@/lib/fbEvents';
 
 type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor' | 'pdf-lead';
 
@@ -116,9 +117,55 @@ interface GHLCredentials {
   locationId: string;
 }
 
+// Simplified function to track form submission in Facebook - server-side only
+function trackFacebookFormSubmission(formData: any, formType: FormType) {
+  try {
+    // Only use server-side events since they're reliably working
+    console.log('Tracking Facebook conversion with server-side event');
+    
+    // Extract user data
+    const firstName = formData.firstName || (formData.name ? formData.name.split(' ')[0] : '');
+    const lastName = formData.lastName || (formData.name && formData.name.includes(' ') 
+      ? formData.name.split(' ').slice(1).join(' ') 
+      : '');
+      
+    const message = formData.message || 
+                   formData.additional_comments || 
+                   formData.projectDescription || 
+                   formData.description || 
+                   '';
+                   
+    const city = formData.city || formData.propertyCity || '';
+    
+    return sendFacebookEvent({
+      event_name: 'Lead',
+      user_data: {
+        email: formData.email,
+        phone: formData.phone,
+        firstName,
+        lastName
+      },
+      custom_data: {
+        form_type: formType,
+        location: typeof window !== 'undefined' ? window.location.pathname : '/',
+        city,
+        message
+      }
+      // No test_event_code here - this avoids the "forced" test code issues
+    });
+  } catch (error) {
+    console.error('Error tracking Facebook form submission:', error);
+    // Don't throw - we don't want to block the form submission
+    return Promise.resolve(false);
+  }
+}
+
 // Generic function to submit to GoHighLevel
 export async function submitToGHL(formData: any, formType: FormType, credentials?: GHLCredentials) {
   try {
+    // Track form submission in Facebook (server-side only)
+    const fbPromise = trackFacebookFormSubmission(formData, formType);
+    
     // Get GoHighLevel API credentials from provided credentials, environment or token storage
     const tokenData = getStoredTokens();
     const apiKey = credentials?.apiKey || tokenData?.accessToken || process.env.GHL_API_KEY || process.env.NEXT_PUBLIC_GHL_API_KEY;
@@ -157,6 +204,9 @@ export async function submitToGHL(formData: any, formType: FormType, credentials
       console.error('GoHighLevel API error:', responseData);
       throw new Error('Failed to submit to GoHighLevel');
     }
+    
+    // Wait for FB tracking to complete, but don't block on it
+    await fbPromise.catch(e => console.error('FB tracking failed but form submission succeeded:', e));
     
     return { success: true, data: responseData };
   } catch (error) {
