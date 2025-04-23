@@ -168,7 +168,7 @@ export async function POST(req: Request) {
       });
 
       // Send to Facebook - access token is now in the body
-      const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events`;
+      const url = `https://graph.facebook.com/v23.0/${FB_PIXEL_ID}/events`;
       console.log('Sending request to Facebook API');
       
       const response = await fetch(url, {
