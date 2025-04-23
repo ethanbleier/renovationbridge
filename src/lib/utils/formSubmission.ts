@@ -55,6 +55,7 @@ export function formatGHLData(formData: any, formType: FormType) {
   const description = formData.additional_comments || // Explicit field from get-started
                      formData.message ||           // Field from contact form
                      formData.projectDescription || // Field from contact form (legacy variants)
+                     formData.project_description || // Field from contact form (legacy variants)
                      formData.description ||        // Field from contact form (legacy variants)
                      formData.work_description ||   // Field from contact form (legacy variants)
                      formData.project_details ||    // Field from contact form (legacy variants)
@@ -169,6 +170,7 @@ async function trackFacebookFormSubmission(formData: any, formType: FormType) {
     // Get Facebook API credentials
     const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
     const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+    const FB_APP_ID = process.env.FB_APP_ID; // Get the App ID
 
     if (!FB_ACCESS_TOKEN || !FB_PIXEL_ID) {
       console.error('Facebook API credentials missing:', {
@@ -254,7 +256,7 @@ async function trackFacebookFormSubmission(formData: any, formType: FormType) {
         hashedUserData.ln = [crypto.createHash('sha256').update(lastName.toLowerCase().trim()).digest('hex')];
       }
       
-      // Create the payload 
+      // Create the payload with data, access_token, and optionally app_id
       const payload: any = {
         data: [
           {
@@ -269,10 +271,12 @@ async function trackFacebookFormSubmission(formData: any, formType: FormType) {
             },
           },
         ],
+        access_token: FB_ACCESS_TOKEN,
+        ...(FB_APP_ID && { app_id: FB_APP_ID })
       };
 
-      // Send directly to Facebook
-      const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events?access_token=${FB_ACCESS_TOKEN}`;
+      // Send directly to Facebook - access token is now in the body
+      const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events`;
       console.log('Sending FB event directly to Facebook API');
       
       const response = await fetch(url, {
