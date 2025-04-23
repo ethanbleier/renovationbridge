@@ -77,6 +77,7 @@ export async function POST(req: Request) {
     // Check for Facebook API credentials
     const FB_ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
     const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+    const FB_APP_ID = process.env.FB_APP_ID;
 
     // Log the actual Pixel ID being used
     console.log('Using Facebook Pixel ID:', FB_PIXEL_ID);
@@ -132,7 +133,7 @@ export async function POST(req: Request) {
         hashedUserData.external_id = [hashData(user_data.email)];
       }
 
-      // Create the payload 
+      // Create the payload with data, access_token, and app_id
       const payload: any = {
         data: [
           {
@@ -148,6 +149,8 @@ export async function POST(req: Request) {
             custom_data: custom_data || {},
           },
         ],
+        access_token: FB_ACCESS_TOKEN,
+        ...(FB_APP_ID && { app_id: FB_APP_ID })
       };
 
       // Add test_event_code if provided and not "forced"
@@ -164,8 +167,8 @@ export async function POST(req: Request) {
         has_custom_data: !!payload.data[0].custom_data
       });
 
-      // Send to Facebook
-      const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events?access_token=${FB_ACCESS_TOKEN}`;
+      // Send to Facebook - access token is now in the body
+      const url = `https://graph.facebook.com/v18.0/${FB_PIXEL_ID}/events`;
       console.log('Sending request to Facebook API');
       
       const response = await fetch(url, {

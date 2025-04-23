@@ -123,10 +123,8 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         city: data.city,
         message: data.message || "Contact form submission - no description provided",
         projectDescription: data.message || "Contact form submission - no description provided",
-        // Add additional custom fields that GHL might recognize
         project_description: data.message || "Contact form submission - no description provided",
         description: data.message || "Contact form submission - no description provided",
-        // Add a field with a unique name that won't be filtered out
         work_description: data.message || "Contact form submission - no description provided",
         project_details: data.message || "Contact form submission - no description provided"
       };
