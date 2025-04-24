@@ -62,15 +62,15 @@ export function formatGHLData(formData: any, formType: FormType) {
                      "No description provided";
 
   // Extract city (handle different possible field names)
-  const city = formData.city || formData.propertyCity;
+  const cityOrLocation = formData.city || formData.propertyCity || formData.location;
   
   // Fields to exclude from the customField object
   const standardFields = [
     'email', 'phone', 'firstName', 'lastName', 'name', 'note',
-    'tags', 'dnd', 'contact', // GHL system fields 
+    'tags', 'dnd', 'contact', 'city',// GHL system fields 
     // Explicitly handled/mapped fields
     'message', 'projectDescription', 'description', 'additional_comments',
-    'work_description', 'project_details', 'city', 'propertyCity' 
+    'work_description', 'project_details', 'location', 'propertyCity' 
   ];
 
   // Build the customField OBJECT
@@ -81,10 +81,10 @@ export function formatGHLData(formData: any, formType: FormType) {
     customFieldObject['additional_comments'] = description;
   }
 
-  // Add city using the key GHL might expect (based on get-started form)
-  if (city) {
-    // Using propertyCity as the key, matching get-started form's successful submission key
-    customFieldObject['propertyCity'] = city; 
+  // Add city using the new 'location' key expected by GHL
+  if (cityOrLocation) {
+    // Map the extracted value to the 'location' custom field key
+    customFieldObject['location'] = cityOrLocation; 
   }
 
   // Add any other non-standard fields from formData
