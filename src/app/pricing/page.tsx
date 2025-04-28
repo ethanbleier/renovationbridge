@@ -8,6 +8,7 @@ import 'charts.css';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { track } from '@vercel/analytics';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 // Format currency input with $ and commas
 const formatCurrencyInput = (value: string): string => {
@@ -199,7 +200,9 @@ export default function PricingCalculator() {
   const [homeValueFormatted, setHomeValueFormatted] = useState(formatCurrencyInput(`$${homeValueNumber}`));
   const [yearlyIncomeFormatted, setYearlyIncomeFormatted] = useState(formatCurrencyInput(`$${yearlyIncomeNumber}`));
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(false); // State for the toggle
@@ -208,6 +211,7 @@ export default function PricingCalculator() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [formError, setFormError] = useState<string | null>(null); // State for form errors
   const [pdfError, setPdfError] = useState<string | null>(null); // State for PDF errors
+  const [phoneError, setPhoneError] = useState<string | null>(null); // State for phone validation errors
 
   const [isLabelCollapsed, setIsLabelCollapsed] = useState(false); // State for chart Y-axis label collapse
   const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for chart scroll container
@@ -638,37 +642,57 @@ export default function PricingCalculator() {
   };
 
   const captureLeadData = async () => {
-    if (email && phone && results) {  // Only if user provided contact info
-      try {
-        setIsLeadSubmitting(true);
-        
-        const response = await fetch('/api/submit-calculator', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            homeValue: homeValueFormatted,
-            yearlyIncome: yearlyIncomeFormatted,
-            projectType: results.low.projectType,
-            results: {
-              lowBudget: results.low.totalBudget,
-              middleBudget: results.middle.totalBudget,
-              highBudget: results.high.totalBudget
-            },
-            email,
-            phone
-          }),
-        });
-        
-        if (response.ok) {
-          setLeadSubmitted(true);
-        }
-      } catch (error) {
-        console.error('Error capturing lead:', error);
-      } finally {
-        setIsLeadSubmitting(false);
+    // Check if all required fields are filled
+    if (!name || !email || !phone || !city || !results) {
+      // Set appropriate error messages for missing fields
+      if (!name) setFormError('Name is required');
+      else if (!email) setFormError('Email address is required');
+      else if (!phone) setPhoneError('Phone number is required');
+      else if (!city) setFormError('City is required');
+      return;
+    }
+    
+    try {
+      // Validate phone number using libphonenumber-js
+      setPhoneError(null);
+      const phoneInput = phone.replace(/\D/g, '');
+      const formattedPhone = `+1${phoneInput}`; // Assuming US phone numbers
+      
+      if (!isValidPhoneNumber(formattedPhone, 'US')) {
+        setPhoneError('Please enter a valid phone number');
+        return;
       }
+      
+      setIsLeadSubmitting(true);
+      
+      const response = await fetch('/api/submit-calculator', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          homeValue: homeValueFormatted,
+          yearlyIncome: yearlyIncomeFormatted,
+          projectType: results.low.projectType,
+          results: {
+            lowBudget: results.low.totalBudget,
+            middleBudget: results.middle.totalBudget,
+            highBudget: results.high.totalBudget
+          },
+          email,
+          phone,
+          city
+        }),
+      });
+      
+      if (response.ok) {
+        setLeadSubmitted(true);
+      }
+    } catch (error) {
+      console.error('Error capturing lead:', error);
+    } finally {
+      setIsLeadSubmitting(false);
     }
   };
 
@@ -1601,6 +1625,15 @@ export default function PricingCalculator() {
                   <p>{pdfError}</p>
                 </div>
               )}
+              
+              {/* Display Phone Validation Error */}
+              {phoneError && (
+                <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-md" role="alert">
+                  <p className="font-bold">Validation Error</p>
+                  <p>{phoneError}</p>
+                </div>
+              )}
+              
               {leadSubmitted ? (
                 <div className="space-y-4">
                   <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md flex items-center">
@@ -1646,6 +1679,19 @@ export default function PricingCalculator() {
                 <div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Your Name"
+                      />
+                    </div>
+                    <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                         Email Address
                       </label>
@@ -1666,15 +1712,31 @@ export default function PricingCalculator() {
                         type="tel"
                         id="phone"
                         value={phone}
-                        onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                        onChange={(e) => {
+                          setPhone(formatPhoneNumber(e.target.value));
+                          setPhoneError(null); // Clear error on change
+                        }}
                         className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
                         placeholder="(123) 456-7890"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        id="city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="San Francisco"
                       />
                     </div>
                   </div>
                   <button
                     onClick={captureLeadData}
-                    disabled={!email || !phone || isLeadSubmitting}
+                    disabled={!name || !email || !phone || !city || isLeadSubmitting}
                     className="w-full md:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isLeadSubmitting ? 'Saving...' : 'Save My Results'}

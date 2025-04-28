@@ -15,7 +15,6 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/kitchen-remodel-1.jpg',
     views: 3542,
-    comments: 0,
     categories: ['Kitchen', 'Tips'],
   },
   {
@@ -27,7 +26,6 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/contractor-selection.jpg',
     views: 2875,
-    comments: 0,
     categories: ['Contractor', 'Guide'],
   },
   {
@@ -39,7 +37,6 @@ const blogPosts = [
     readTime: '3 min read',
     coverImage: '/images/blog/guide.png',
     views: 4218,
-    comments: 0,
     categories: ['Tools', 'Budgeting'],
   },
   {
@@ -51,7 +48,6 @@ const blogPosts = [
     readTime: '3 min read',
     coverImage: '/images/blog/kim.jpeg',
     views: 6742,
-    comments: 0,
     categories: ['Success Story', 'Kitchen'],
   },
   {
@@ -63,7 +59,6 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/kitchen-3.jpg',
     views: 1986,
-    comments: 0,
     categories: ['Kitchen', 'San Jose'],
   },
   {
@@ -75,7 +70,6 @@ const blogPosts = [
     readTime: '2 min read',
     coverImage: '/images/blog/kitchen-2.jpg',
     views: 3127,
-    comments: 0,
     categories: ['Kitchen', 'Walnut Creek'],
   },
 ]

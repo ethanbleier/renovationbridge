@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
 import { sendFacebookEvent } from '@/lib/fbEvents'
-import { motion } from 'framer-motion'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 
 // Step components
 const ProjectTypeStep = ({ onNext }: { onNext: (formData: any) => void }) => {
@@ -532,6 +532,14 @@ const ContactFormStep = ({ onBack, onNext, formData }: { onBack: () => void, onN
       setError(null)
       
       try {
+        // Validate phone number using libphonenumber-js
+        const phoneInput = contactData.phone.replace(/\D/g, '');
+        const formattedPhone = `+1${phoneInput}`; // Assuming US phone numbers
+        
+        if (!isValidPhoneNumber(formattedPhone, 'US')) {
+          throw new Error('Please enter a valid phone number');
+        }
+        
         // Map project types to their full labels
         const projectTypeLabels = formData.projectTypes.map((type: string) => {
           const labels: Record<string, string> = {

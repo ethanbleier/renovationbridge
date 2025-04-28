@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { track } from '@vercel/analytics'
 import ConversionTracker from '@/components/analytics/ConversionTracker'
 import { sendFacebookEvent } from '@/lib/fbEvents'
+import { isValidPhoneNumber } from 'libphonenumber-js'
   
 type FormValues = {
   name: string
@@ -98,6 +99,14 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
     setError(null)
     
     try {
+      // Validate phone number using libphonenumber-js
+      const phoneInput = data.phone.replace(/\D/g, '');
+      const formattedPhone = `+1${phoneInput}`; // Assuming US phone numbers
+      
+      if (!isValidPhoneNumber(formattedPhone, 'US')) {
+        throw new Error('Please enter a valid phone number');
+      }
+      
       if (onSubmit) {
         onSubmit(data);
         setIsSuccess(true);

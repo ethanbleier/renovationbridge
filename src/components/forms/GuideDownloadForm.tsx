@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 
 interface GuideDownloadFormProps {
   guideTitle: string;
@@ -53,6 +54,14 @@ export default function GuideDownloadForm({
     setError('')
     
     try {
+      // Validate phone number using libphonenumber-js
+      const phoneInput = phone.replace(/\D/g, '');
+      const formattedPhone = `+1${phoneInput}`; // Assuming US phone numbers
+      
+      if (!isValidPhoneNumber(formattedPhone, 'US')) {
+        throw new Error('Please enter a valid phone number');
+      }
+      
       // Add guide title as projectDescription
       const formData = {
         name,

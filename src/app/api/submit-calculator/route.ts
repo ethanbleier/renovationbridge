@@ -6,8 +6,10 @@ import { z } from 'zod';
 
 // Calculator specific validation schema
 const calculatorSchema = z.object({
+  name: z.string({ required_error: 'Name is required' }),
   email: z.string().email({ message: 'Invalid email address' }),
-  phone: z.string().optional(),
+  phone: z.string({ required_error: 'Phone number is required' }),
+  city: z.string({ required_error: 'City is required' }),
   homeValue: z.string().or(z.number()),
   yearlyIncome: z.string().or(z.number()),
   projectType: z.string(),
@@ -28,6 +30,15 @@ export async function POST(request: Request) {
       );
     }
     
+    // Map city to location for CRM compatibility
+    const mappedFormData = {
+      ...validationResult.data,
+      location: formData.city || '',
+      propertyCity: formData.city || '',
+      city: formData.city || '',
+      projectDescription: `[System Message] User Calculator Results: ${formData.projectType} - Home Value: ${formData.homeValue}, Income: ${formData.yearlyIncome}`
+    };
+    
     // Get GoHighLevel API credentials directly as a fallback
     const GHL_API_KEY = process.env.GHL_API_KEY || process.env.NEXT_PUBLIC_GHL_API_KEY;
     const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || process.env.NEXT_PUBLIC_GHL_LOCATION_ID;
@@ -37,10 +48,10 @@ export async function POST(request: Request) {
       console.warn('GoHighLevel credentials not found in environment variables');
       
       // Submit anyway and let the submitToGHL function handle the error
-      await submitToGHL(validationResult.data, 'calculator');
+      await submitToGHL(mappedFormData, 'calculator');
     } else {
       // If we have credentials, we can pass them directly to ensure they're used
-      await submitToGHL(validationResult.data, 'calculator', {
+      await submitToGHL(mappedFormData, 'calculator', {
         apiKey: GHL_API_KEY,
         locationId: GHL_LOCATION_ID
       });
