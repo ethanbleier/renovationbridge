@@ -1,260 +1,130 @@
-# 🏠 Renovation Bridge
+# [Renovation Bridge](https://renovationbridge.com)
 
-> **Connecting homeowners with quality contractors for seamless renovation experiences**
+> A full-stack web application connecting homeowners with contractors for seamless renovation experiences
 
 <div align="center">
-  <img src="screenshot.png" alt="Renovation Bridge Homepage" width="100%" />
-  <p><em>Modern, responsive homepage designed to convert visitors into leads</em></p>
+  <img src="screenshot-1.png" alt="Renovation Bridge Homepage" style="max-width: 100%; margin-bottom: 20px;" />
   
-  <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
-    <img src="screenshot-2.png" alt="Project Gallery" width="48%" />
-    <img src="screenshot-3.png" alt="Contractor Dashboard" width="48%" />
+  <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+    <img src="screenshot-2.png" alt="Project Gallery" style="max-width: 45%; object-fit: contain;" />
+    <img src="screenshot-3.png" alt="Contractor Dashboard" style="max-width: 45%; object-fit: contain;" />
   </div>
-  <p><em>Project showcase and contractor management interface</em></p>
 </div>
 
-## 🎨 Design System
+## Tech
 
-Our carefully crafted color palette ensures a professional and trustworthy appearance:
+- **Frontend**: React 18, Next.js 14.2+, Tailwind CSS 3.4+, Framer Motion 12.5+
+- **State Management**: React Context API, Custom Hooks
+- **Form Handling**: React Hook Form 7.50+ with validation
+- **Authentication**: JWT implementation with bcrypt.js
+- **Data Fetching**: Custom GraphQL client with GraphQL Request
+- **Testing**: Jest, React Testing Library, Playwright for E2E testing
+- **Performance Optimization**: Incremental Static Regeneration, Image optimization with Sharp
+- **SEO**: Structured data (JSON-LD), Dynamic meta tags, Automated sitemap generation
+- **CI/CD**: GitHub Actions workflows
+- **Deployment**: Vercel integration
 
-- **Primary Blue** `#313bc0` - Trust and professionalism
-- **Secondary Dark Blue** `#002c66` - Depth and stability
-- **Gray** `#717171` - Balance and readability
-- **Black** `#000000` - Contrast and emphasis
-- **Cream** `#f2f0e9` - Warmth and approachability
-- **Lavender** `#e5e4f0` - Softness and sophistication
+## Other Good Stuff
 
-## 🚀 Tech Stack
+- **Modular Architecture** - Implemented feature-based code organization for enhanced maintainability and scalability
+- **Server-Side Rendering** - Utilized Next.js SSR for improved SEO and initial page load performance
+- **Responsive Design System** - Created a custom design system with consistent components and theming
+- **Custom Image Gallery** - Built a responsive image gallery with lightbox functionality from scratch
+- **In-Memory Data Layer** - Developed a custom data layer with UUID-based entity management
+- **SEO Optimization** - Implemented advanced SEO techniques resulting in improved search ranking
+- **Accessibility** - WCAG 2.1 AA compliant with keyboard navigation and screen reader support
 
-- **Framework:** Next.js 14.2+
-- **UI Library:** React 18
-- **Styling:** Tailwind CSS 3.4+
-- **Animations:** Framer Motion 12.5+
-- **Forms:** React Hook Form 7.50+
-- **Icons:** React Icons 5.0+
-- **Authentication:** JWT, bcrypt.js
-- **Data Storage:** In-memory data storage with UUID
-- **Image Processing:** Sharp 0.33+
-- **SEO:** next-sitemap, JSON-LD structured data
-- **HTML Parsing:** jsdom
-- **Testing:** Jest, React Testing Library, Playwright for E2E
-- **Deployment:** Vercel
-- **GraphQL Client:** GraphQL Request
-
-### The project gallery showcases completed renovation projects with the following features:
-
-- **Organized Project Structure**: Each project has its own folder (e.g., `Project-CastroValley`) containing sequential images
-- **Filename Format**: Images follow the naming pattern `[LocationName]-[Number].jpg` (e.g., `CastroValley-1.jpg`)
-- **Responsive Gallery Component**: The `ImageGallery` component displays project images with customizable settings
-- **Lightbox Integration**: Full-screen image viewing capabilities with navigation controls
-
-## 📁 Project Structure
+## 📁 Map
 
 ```
 renovationbridge/
-├── public/                 # Static assets
-│   ├── robots.txt        # Search engine crawling rules
-│   └── sitemap.xml       # Auto-generated sitemap
+├── public/               # Static assets
 ├── src/
-│   ├── app/               # Next.js App Router pages
-│   │   ├── api/          # API routes including revalidation
-│   │   ├── blog/         # Blog posts and articles
-│   │   ├── contractors/  # Contractor-specific pages
-│   │   └── resources/    # Resource and guide pages
+│   ├── app/              # Next.js App Router pages
+│   │   ├── api/          # API routes
+│   │   ├── blog/         # Blog posts
+│   │   ├── resources/    # Resource pages
+│   │   ├── gallery/      # Gallery pages
+│   │   ├── projects/     # Project pages
+│   │   └── ...           # Other page routes
 │   ├── components/       # Reusable UI components
-│   │   ├── forms/       # Form components
-│   │   ├── layout/      # Layout components
-│   │   ├── sections/    # Page sections
-│   │   ├── seo/         # SEO components (JsonLd, PageSeo)
-│   │   └── ui/          # UI elements
-│   ├── lib/             # Core functionality
-│   │   ├── db/         # Database connections
-│   │   ├── models/     # Data models
-│   │   ├── structured-data.ts  # JSON-LD schema generators
-│   │   ├── seo-utils.ts        # SEO utility functions
-│   │   └── utils/      # Utility functions
-│   ├── styles/         # Global styles
-│   └── utils/          # Helper functions
-├── scripts/            # Deployment and utility scripts
-├── secrets/            # Environment secrets
-├── .github/           # GitHub Actions workflows
-├── next-sitemap.config.js  # Sitemap configuration
-└── config files       # Various configuration files
+│   │   ├── forms/        # Form components
+│   │   ├── layout/       # Layout components
+│   │   ├── sections/     # Page sections
+│   │   ├── seo/          # SEO components
+│   │   └── ui/           # UI elements
+│   ├── features/         # Feature-based modules
+│   │   └── gallery/      # Gallery feature module
+│   ├── lib/              # Core functionality
+│   │   ├── db/           # Database related
+│   │   ├── models/       # Data models
+│   │   ├── structured-data.ts # JSON-LD schema
+│   │   └── seo-utils.ts  # SEO utilities
+│   ├── styles/           # Global styles
+│   ├── utils/            # Helper functions
+│   └── __tests__/        # Tests
+├── e2e/                  # End-to-end tests
+├── scripts/              # Utility scripts
+├── next-sitemap.config.js # Sitemap config
+└── other config files
 ```
 
-## 🌟 Key Features
+## Feature example: Gallery Module
 
-- **Smart Lead Generation** - Optimized contact forms and CTAs
-- **In-Memory Data Storage** - No database setup
-- **Project Showcase** - Beautiful gallery of completed renovations including:
-  - Interactive image galleries with lightbox functionality
-  - Detailed project information and specifications
-  - Organized by project type (kitchen, bathroom, full home)
-  - Responsive design for optimal viewing on all devices
-- **Resource Library** - Valuable guides and articles
-- **Mobile-First Design** - Perfect experience on all devices
-- **Advanced SEO** - Complete with:
-  - Automatic sitemap generation
-  - Robots.txt configuration
-  - JSON-LD structured data (Organization, LocalBusiness, Services)
-  - Comprehensive OpenGraph and Twitter card metadata
-  - Canonical URLs
-  - Dynamic meta descriptions
-- **Incremental Static Regeneration** - Fast page loads with dynamic content
-
-## 📈 SEO Implementation
-
-The project includes comprehensive SEO features:
-
-1. **Sitemap Generation**
-   - Automatic sitemap.xml generation using next-sitemap
-   - Custom priority configurations for different page types
-   - Custom change frequency settings
-
-2. **Robots.txt**
-   - Properly configured robots.txt file in public directory
-   - Controls search engine crawling behavior
-
-3. **Structured Data**
-   - JSON-LD implementation for rich search results
-   - Schemas for Organization, LocalBusiness, Service, FAQ, and BreadcrumbList
-   - Reusable structured data components
-
-4. **Meta Tags**
-   - Enhanced metadata in layout.tsx
-   - OpenGraph and Twitter card meta tags
-   - Canonical URL implementation
-   - Dynamic meta descriptions
-
-## 🖼️ Project Gallery
-
-The project showcase gallery features:
-
-- Grid-based showcase of completed projects
-- Filtering by project category
-- Detailed project pages with image galleries
-- Responsive design optimized for all devices
-- Lightbox image gallery with navigation
-- Project metadata including:
-  - Services provided
-  - Project duration
-  - Completion date
-  - Category/type of project
-- Automatic image gallery generation based on available images
-- Image paths follow a consistent pattern:
-  - `public/images/gallery/Project-[ProjectName]/[projectname]-[n].jpg`
-
-### Feature Module Organization
-
-Gallery code is now organized into a feature module structure:
-
-```
-src/features/gallery/
-├── components/    # UI components specific to gallery
-│   ├── ImageGallery.tsx       # Reusable gallery grid with lightbox
-│   └── ProjectGalleryTemplate.tsx  # Project detail layout
-├── hooks/         # Custom hooks for gallery functionality
-│   ├── useGalleryProjects.ts  # Hook for project listing/filtering 
-│   └── useProjectDetails.ts   # Hook for getting project details
-├── services/      # Data services for gallery
-│   ├── galleryDataService.ts  # Project data and metadata
-│   └── galleryImageService.ts # Image path handling
-├── types/         # Type definitions
-│   └── index.ts               # Shared gallery types
-└── index.ts       # Barrel file exporting public API
-```
-
-This modular approach provides:
-- Clear separation of concerns
-- Well-defined interfaces between components
-- Improved maintainability
-- Easier testing
-- Reusable components and hooks
-
-To use gallery components and services, import from the feature module:
+Implemented a modular gallery system demonstrating clean architecture principles:
 
 ```typescript
+// Example usage of the gallery feature module
 import { 
   ImageGallery,
   ProjectGalleryTemplate,
   useGalleryProjects,
   useProjectDetails
 } from '@/features/gallery';
+
+export default function ProjectPage({ params }) {
+  const { projectId } = params;
+  const { project, isLoading } = useProjectDetails(projectId);
+  
+  return (
+    <ProjectGalleryTemplate
+      project={project}
+      isLoading={isLoading}
+      renderGallery={() => <ImageGallery images={project.images} />}
+    />
+  );
+}
 ```
 
-## 🧪 Testing
 
-The project uses a comprehensive testing strategy:
+## Quick Start
 
-1. **Unit and Component Testing**
-   - Jest for test runner and assertions
-   - React Testing Library for component testing
-   - Run tests with:
-     ```bash
-     # Run all tests
-     npm test
-     
-     # Watch mode for development
-     npm run test:watch
-     
-     # Generate test coverage report
-     npm run test:coverage
-     ```
+```bash
+# Install dependencies
+npm install
 
-2. **End-to-End Testing**
-   - Playwright for browser-based end-to-end testing
-   - Tests run against multiple browsers (Chrome, Firefox, Safari)
-   - Mobile device simulation for responsive testing
-   - Enhanced timeout configuration for reliable mobile testing
-   - Run E2E tests with:
-     ```bash
-     # Run all E2E tests
-     npm run test:e2e
-     
-     # Run tests in a specific browser
-     npx playwright test --project=chromium
-     
-     # Run only mobile tests
-     npx playwright test --project="Mobile Chrome" --project="Mobile Safari"
-     
-     # Run tests in UI mode for debugging
-     npx playwright test --ui
-     ```
+# Run development server
+npm run dev
 
-3. **Test Structure**
-   - Unit/component tests in `src/__tests__/`
-   - E2E tests in `e2e/`
-   - Component tests paired with their respective components
-   - Integration tests for key user flows
+# Build for production
+npm run build
 
-4. **Manual Testing Commands**
+# Note: For more fun stuff, use my start.sh script
+# Executable:
+chmod +x scripts/start.sh
 
-    - You can also run these commands directly:
+# Script:
+./scripts/start.sh
 
-      ```bash
-      # Lint the codebase
-      npm run lint
+# Run e2e test
+npm run test:e2e
+```
 
-      # Run unit tests
-      npm test
-
-      # Run unit tests with watch mode
-      npm test -- --watch
-
-      # Run end-to-end tests
-      npm run test:e2e
-
-      # Check TypeScript types
-      npm run type-check
-      ```
-
-### Testing Strategies
-
-- **Unit Tests**: Located in `__tests__` directories alongside the components they test
-- **Integration Tests**: Found in the `tests/integration` directory
-- **End-to-End Tests**: Uses Cypress located in the `cypress` directory
-
-<!-- Always leave this at the bottom of the README -->
+<!-- Contact Information -->
 <div align="center">
-  <p>Built by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
+  <p>Developed by <a href="https://ethanbleier.com">Ethan Bleier</a></p>
+  <p>
+    <a href="https://ethanbleier.com">Personal Website</a> |
+    <a href="mailto:ebleier4@gmail.com">Email</a>
+  </p>
 </div>
