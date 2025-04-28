@@ -1,5 +1,4 @@
 import { getStoredTokens } from '@/utils/ghlAuth';
-import { sendFacebookEvent } from '@/lib/fbEvents';
 
 type FormType = 'contact' | 'get-started' | 'calculator' | 'referral' | 'guide' | 'contractor' | 'pdf-lead';
 

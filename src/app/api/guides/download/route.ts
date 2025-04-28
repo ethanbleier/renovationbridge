@@ -9,6 +9,8 @@ const downloadGuideSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters long' }),
   email: z.string().email({ message: 'Invalid email address' }),
   phone: z.string().optional(),
+  city: z.string().min(1, { message: 'City is required' }),
+  location: z.string().optional(),
   guideTitle: z.string(),
   guideType: z.string().optional(),
   downloadUrl: z.string().optional()

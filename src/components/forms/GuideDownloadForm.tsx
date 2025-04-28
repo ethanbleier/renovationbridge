@@ -22,10 +22,30 @@ export default function GuideDownloadForm({
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [city, setCity] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [actualDownloadUrl, setActualDownloadUrl] = useState(downloadUrl)
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    // Strip all non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+    
+    // Format the phone number as user types
+    let formattedPhone = '';
+    if (digitsOnly.length === 0) {
+      formattedPhone = '';
+    } else if (digitsOnly.length <= 3) {
+      formattedPhone = `(${digitsOnly}`;
+    } else if (digitsOnly.length <= 6) {
+      formattedPhone = `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3)}`;
+    } else {
+      formattedPhone = `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
+    }
+    setPhone(formattedPhone);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,6 +58,9 @@ export default function GuideDownloadForm({
         name,
         email,
         phone,
+        city: city,          // Standard city field
+        location: city,      // Location field for GHL
+        propertyCity: city,  // Additional field used in some places
         guideTitle,
         guideType,
         downloadUrl,
@@ -117,7 +140,7 @@ export default function GuideDownloadForm({
             type="text" 
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your full name" 
+            placeholder="Name" 
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -127,7 +150,17 @@ export default function GuideDownloadForm({
             type="email" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Your email address" 
+            placeholder="Email Address" 
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+        <div>
+          <input 
+            type="city" 
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="City" 
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -136,8 +169,8 @@ export default function GuideDownloadForm({
           <input 
             type="tel" 
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Your phone number" 
+            onChange={handlePhoneChange}
+            placeholder="Phone Number" 
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />

@@ -10,6 +10,7 @@ type FormValues = {
   name: string
   email: string
   phone: string
+  city: string
   message: string
 }
 
@@ -18,6 +19,7 @@ const formSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email address" }),
   phone: z.string().min(1, { message: "Phone number is required" }),
+  city: z.string().min(1, { message: "City is required" }),
   message: z.string().min(1, { message: "Description of work is required" })
 })
 
@@ -109,7 +111,7 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
       const formData = {
         ...data,
         projectDescription: data.message,
-        city: "Unknown" // Adding city with default value since it's not in the footer form
+        location: data.city
       };
       
       // Send data to our API route that connects to GoHighLevel
@@ -251,14 +253,38 @@ const FooterContactForm = ({ onSubmit }: FooterContactFormProps = {}) => {
         </div>
         
         <div className="space-y-1">
+          <input
+            id="footer-city"
+            type="text"
+            autoComplete="address-level2"
+            className={`w-full px-3 py-2 text-sm rounded-md border ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all`}
+            placeholder="City *"
+            aria-required="true"
+            aria-invalid={errors.city ? "true" : "false"}
+            {...register('city', { required: true })}
+          />
+          {errors.city && (
+            <p className="mt-1 text-xs text-red-600" id="city-error">
+              City is required
+            </p>
+          )}
+        </div>
+        
+        <div className="space-y-1">
           <textarea
             id="footer-message"
             placeholder="Describe your project..."
             rows={2}
             className={`w-full px-3 py-2 text-sm rounded-md border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all resize-none`}
+            aria-required="true"
             aria-invalid={errors.message ? "true" : "false"}
-            {...register('message')}
+            {...register('message', { required: true })}
           ></textarea>
+          {errors.message && (
+            <p className="mt-1 text-xs text-red-600" id="message-error">
+              Project description is required
+            </p>
+          )}
         </div>
         
         <div className="flex justify-center">
