@@ -240,4 +240,35 @@
   .animate-fadeIn {
     animation: fadeIn 0.5s ease-out forwards;
   }
+}
+
+/* Liquid Text Effect */
+.liquid-text {
+  background: linear-gradient(
+    90deg,
+    #888888, /* Darker Silver */
+    #a0a0a0, /* Medium Silver */
+    #6a6a6a, /* Darker Gray */
+    #a0a0a0, /* Medium Silver */
+    #888888 /* Darker Silver */
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: liquid-flow 4s linear infinite;
+  /* Add a subtle shadow for legibility on light backgrounds */
+  text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2); 
+  /* Optional: Add a very subtle stroke */
+  /* -webkit-text-stroke: 0.3px rgba(50, 50, 50, 0.2); */
+  display: inline-block; /* Ensures background clipping works correctly */
+}
+
+@keyframes liquid-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
 } 
