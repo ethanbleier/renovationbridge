@@ -50,6 +50,10 @@ const config: Config = {
         'scaleIn': {
           '0%': { transform: 'scale(0)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'dropdown': {
+          '0%': { opacity: '0', transform: 'scaleY(0)', transformOrigin: 'top' },
+          '100%': { opacity: '1', transform: 'scaleY(1)', transformOrigin: 'top' },
         }
       },
       animation: {
@@ -60,6 +64,7 @@ const config: Config = {
         'shine': 'shine 1.5s ease-in-out',
         'fadeIn': 'fadeIn 0.5s ease-out forwards',
         'scaleIn': 'scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+        'dropdown': 'dropdown 0.2s ease-out forwards',
       },
       // 3D Transform utility classes
       transitionProperty: {

@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiMenu, FiX, FiChevronDown, FiBriefcase, FiImage, FiBookOpen, FiHelpCircle, FiFileText, FiDollarSign, FiUsers, FiAward } from 'react-icons/fi'
+import { FiChevronDown, FiBriefcase, FiImage, FiBookOpen, FiHelpCircle, FiFileText, FiDollarSign, FiUsers, FiAward } from 'react-icons/fi'
 import { usePathname } from 'next/navigation'
+import MenuButton from '../ui/MenuButton'
+import CloseButton from '../ui/CloseButton'
 
 // Define menu structure
 interface MenuItem {
@@ -29,13 +31,19 @@ const Header = () => {
   const [mobileHeaderVisible, setMobileHeaderVisible] = useState(true)
   const [isHeaderShrunk, setIsHeaderShrunk] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [menuVisible, setMenuVisible] = useState(false)
   const lastScrollY = useRef(0)
   const pathname = usePathname()
   
   // Check if we're on the get-started page OR home page
   const isGetStartedPage = pathname === '/get-started'
   const isHomePage = pathname === '/home'
-  const hideHeaderInitially = isGetStartedPage || isHomePage
+  const hideHeaderInitially = isHomePage // Only for home page now
+  
+  // If on get-started page, don't render header at all
+  if (isGetStartedPage) {
+    return null
+  }
 
   // Define Navigation Items using the new structure
   const navItems: NavItem[] = [
@@ -75,8 +83,11 @@ const Header = () => {
   useEffect(() => {
     // Initialize header visibility based on page type
     if (hideHeaderInitially) {
-      setHeaderVisible(false)
-      setMobileHeaderVisible(false)
+      if (isMobile) {
+        setMobileHeaderVisible(false)
+      } else {
+        setHeaderVisible(true) // Start visible on desktop for home page
+      }
     } else {
       setHeaderVisible(true)
       setMobileHeaderVisible(true)
@@ -93,13 +104,11 @@ const Header = () => {
         setIsHeaderShrunk(false);
       }
       
-      // Visibility logic
-      if (hideHeaderInitially) { // Apply same logic for home and get-started
+      // Visibility logic for mobile
+      if (hideHeaderInitially && isMobile) {
         if (currentScrollY < lastScrollY.current && currentScrollY < 300) {
-          setHeaderVisible(true)
           setMobileHeaderVisible(true)
         } else if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
-          setHeaderVisible(false)
           setMobileHeaderVisible(false)
         }
       } else if (isMobile) { // Standard mobile logic
@@ -108,11 +117,14 @@ const Header = () => {
         } else if (currentScrollY > 50 && currentScrollY > lastScrollY.current && !isMenuOpen) {
           setMobileHeaderVisible(false)
         }
-      } else { // Standard desktop logic
+      }
+      
+      // Desktop visibility logic (for all pages including home page)
+      if (!isMobile) {
         if (currentScrollY > 150 && currentScrollY > lastScrollY.current) {
-           setHeaderVisible(false)
+          setHeaderVisible(false)
         } else {
-           setHeaderVisible(true)
+          setHeaderVisible(true)
         }
       }
       
@@ -123,37 +135,57 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [hideHeaderInitially, isMobile, isMenuOpen]) // Added hideHeaderInitially to dependency array
+  }, [hideHeaderInitially, isMobile, isMenuOpen])
 
   // Handle menu opening - ensure header is visible when menu is open
   const handleMenuToggle = () => {
     const newMenuState = !isMenuOpen
-    setIsMenuOpen(newMenuState)
+    
+    // Set visibility with a small delay for closing animation
     if (newMenuState) {
+      // For opening: make menu element visible immediately
+      setMenuVisible(true)
+      // Then set menu to open state to trigger animation
+      setTimeout(() => {
+        setIsMenuOpen(true)
+      }, 10) // Small delay to ensure DOM update
+      
+      // Ensure header is visible when opening menu
       setMobileHeaderVisible(true)
-      if (hideHeaderInitially) { // Ensure visibility on home/get-started when menu opens
+      if (hideHeaderInitially && isMobile) { // Only need to set for mobile on home page
         setHeaderVisible(true)
       }
+    } else {
+      // For closing: set menu to closed state first to trigger animation
+      setIsMenuOpen(false)
+      // Then delay hiding the menu element to allow animation to finish
+      setTimeout(() => {
+        setMenuVisible(false)
+      }, 300) // Match this to the animation duration
+      
+      // Close resources dropdown
+      setIsResourcesOpen(false);
     }
-    // Close resources dropdown when main mobile menu closes
-    if (!newMenuState) setIsResourcesOpen(false);
   }
 
   const handleMouseEnter = (itemName: string) => {
-    if (!isMobile) {
+    if (!isMobile && !hideHeaderInitially) {
       setActiveDropdown(itemName);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile) {
+    if (!isMobile && !hideHeaderInitially) {
       setActiveDropdown(null);
     }
   };
 
   // Close mobile menu and dropdowns on link click
   const handleMobileLinkClick = () => {
-    setIsMenuOpen(false);
+    // Only close the menu on mobile or non-home pages
+    if (isMobile || !hideHeaderInitially) {
+      setIsMenuOpen(false);
+    }
     setIsResourcesOpen(false);
   };
 
@@ -166,26 +198,28 @@ const Header = () => {
       // Shrink effect styling
       isHeaderShrunk ? 'bg-white shadow-md py-2' : 'bg-white py-4'
     }`}> 
-      <div className="container-custom">
+      <div className="container-custom relative">
         <div className="flex items-center justify-between gap-4 lg:gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0 group" onClick={handleMobileLinkClick}>
-            <Image 
-              src="/images/logos/logo.png"
-              alt="Renovation Bridge Logo" 
-              width={180} 
-              height={40}
-              className={`transition-all duration-300 ${
-                isHeaderShrunk 
-                  ? 'w-[140px] lg:w-[160px]'
-                  : 'w-[160px] lg:w-[180px]'
-              }`}
-              style={{ height: "auto" }}
-              priority
-            />
+          <Link href="/" className="flex items-center flex-shrink-0 group" onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}>
+            <div className="flex items-center justify-center">
+              <Image 
+                src="/images/logos/logo.png"
+                alt="Renovation Bridge Logo" 
+                width={180} 
+                height={40}
+                className={`transition-all duration-300 ${
+                  isHeaderShrunk 
+                    ? 'w-[140px] lg:w-[160px]'
+                    : 'w-[160px] lg:w-[180px]'
+                }`}
+                style={{ height: "auto" }}
+                priority
+              />
+            </div>
           </Link>
 
-          {/* Desktop Navigation - Hidden on get-started page AND home page */}
+          {/* Desktop Navigation - Hidden on home page */}
           {!hideHeaderInitially && (
             <nav className="hidden lg:flex items-center space-x-1 flex-grow justify-center">
               {navItems.map((item) => (
@@ -260,7 +294,7 @@ const Header = () => {
             </nav>
           )}
 
-          {/* CTA Button - Hidden on get-started page AND home page */}
+          {/* CTA Button - Hidden on home page */}
           {!hideHeaderInitially && (
             <div className="hidden lg:flex items-center flex-shrink-0">
               <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
@@ -273,88 +307,100 @@ const Header = () => {
             </div>
           )}
 
-          {/* Spacer on get-started AND home page for mobile */}
+          {/* Spacer on home page for mobile */}
           {hideHeaderInitially && <div className="flex-grow lg:hidden"></div>}
 
-          {/* Mobile Menu Button - Always visible on mobile, AND on desktop for get-started/home */}
-          <button
-            className={`text-gray-500 hover:text-gray-700 focus:outline-none ${hideHeaderInitially ? 'lg:block' : 'lg:hidden'} flex-shrink-0 ml-auto`}
-            onClick={handleMenuToggle}
-          >
-            {isMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation - Hidden on get-started/home page, but shown when menu is open */} 
-      {isMenuOpen && ( 
-        <div className={`bg-white px-4 pt-2 pb-4 shadow-inner lg:hidden ${hideHeaderInitially ? 'block' : 'block'}`}> {/* Simplified logic, always block when isMenuOpen */}
-          <nav className="flex flex-col space-y-1">
-            {navItems.map((item) => (
-              <div key={item.name}>
-                {item.href && !item.dropdown ? (
-                  <Link
-                    href={item.href}
-                    className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
-                    onClick={handleMobileLinkClick}
-                  >
-                     {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
-                    {item.name}
-                  </Link>
-                ) : item.dropdown ? (
-                  <>
-                    <button
-                      className="flex items-center justify-between w-full text-gray-800 hover:text-primary py-2.5 transition-colors"
-                      onClick={() => setIsResourcesOpen(item.name === 'Resources' ? !isResourcesOpen : false)}
-                    >
-                      <span className="flex items-center">
+          {/* Mobile Menu Button Container */}
+          <div className="relative flex-shrink-0 ml-auto flex items-center">
+            {/* Button */}
+            <button
+              className={`text-gray-500 hover:text-gray-700 focus:outline-none ${hideHeaderInitially ? 'lg:block' : 'lg:hidden'} z-50 flex items-center justify-center`}
+              onClick={handleMenuToggle}
+            >
+              {isMenuOpen ? 
+                <CloseButton size={24} /> : 
+                <MenuButton size={24} />
+              }
+            </button>
+            
+            {/* Dropdown Menu */}
+            <div 
+              className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
+                hideHeaderInitially ? 'block' : 'lg:hidden'
+              } ${
+                isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
+              }`}
+              style={{ display: isMenuOpen || menuVisible ? 'block' : 'none' }}
+            >
+              <nav className="flex flex-col space-y-1">
+                {navItems.map((item) => (
+                  <div key={item.name}>
+                    {item.href && !item.dropdown ? (
+                      <Link
+                        href={item.href}
+                        className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
+                        onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                      >
                          {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
                         {item.name}
-                      </span>
-                      <FiChevronDown className={`h-4 w-4 transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isResourcesOpen && item.name === 'Resources' && (
-                      <div className="pl-5 ml-3 space-y-1 border-l-2 border-primary/30 animate-slideDown overflow-hidden">
-                        {item.dropdown.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            href={subItem.href}
-                            className="flex items-center py-2 text-gray-700 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1"
-                            onClick={handleMobileLinkClick}
-                          >
-                             {subItem.icon && <subItem.icon className="mr-3 h-4 w-4 text-primary/70" />}
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
+                      </Link>
+                    ) : item.dropdown ? (
+                      <>
+                        <button
+                          className="flex items-center justify-between w-full text-gray-800 hover:text-primary py-2.5 transition-colors"
+                          onClick={() => setIsResourcesOpen(item.name === 'Resources' ? !isResourcesOpen : false)}
+                        >
+                          <span className="flex items-center">
+                             {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
+                            {item.name}
+                          </span>
+                          <FiChevronDown className={`h-4 w-4 transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isResourcesOpen && item.name === 'Resources' && (
+                          <div className="pl-5 ml-3 space-y-1 border-l-2 border-primary/30 overflow-hidden transition-all duration-300 ease-in-out transform origin-top">
+                            {item.dropdown.map((subItem, index) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className={`flex items-center py-2 text-gray-700 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 opacity-0 animate-fade-slide-in`}
+                                onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                                style={{ animationDelay: `${index * 50}ms` }}
+                              >
+                                 {subItem.icon && <subItem.icon className="mr-3 h-4 w-4 text-primary/70" />}
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        href={item.href || '#'}
+                        className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
+                        onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                      >
+                         {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
+                        {item.name}
+                      </Link>
                     )}
-                  </>
-                ) : (
-                  <Link
-                    href={item.href || '#'}
-                    className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
-                    onClick={handleMobileLinkClick}
-                  >
-                     {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
-                    {item.name}
-                  </Link>
-                )}
-              </div>
-            ))}
-
-            {/* Mobile CTAs */}
-            <div className="pt-3 flex flex-col space-y-3 border-t border-gray-200 mt-3">
-               <Link
-                 href="/get-started" 
-                 className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2" 
-                 onClick={handleMobileLinkClick}
-               > 
-                 GET STARTED
-               </Link>
+                  </div>
+                ))}
+    
+                {/* Mobile CTAs */}
+                <div className="pt-3 flex flex-col space-y-3 border-t border-gray-200 mt-3">
+                   <Link
+                     href="/get-started" 
+                     className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2" 
+                     onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                   > 
+                     GET STARTED
+                   </Link>
+                </div>
+              </nav>
             </div>
-          </nav>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   )
 }
