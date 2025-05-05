@@ -234,7 +234,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
                 autoComplete="name"
                 autoFocus
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
-                placeholder="Enter your full name"
+                placeholder="Full Name"
                 aria-required="true"
                 aria-invalid={errors.name ? "true" : "false"}
                 {...register('name', { required: true })}
@@ -263,7 +263,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
                 type="text"
                 autoComplete="address-level2"
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
-                placeholder="Enter your city"
+                placeholder="City"
                 aria-required="true"
                 aria-invalid={errors.city ? "true" : "false"}
                 {...register('city', { required: true })}
@@ -294,7 +294,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               type="email"
               autoComplete="email"
               className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
-              placeholder="Enter your email address"
+              placeholder="Email Address"
               aria-required="true"
               aria-invalid={errors.email ? "true" : "false"}
               {...register('email', { 
@@ -355,7 +355,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         
         <div className="space-y-1">
           <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-            Description of work <span className="text-red-500"></span>
+            Project Details <span className="text-red-500"></span>
           </label>
           <div className="relative group">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 absolute left-3 top-4 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
@@ -363,7 +363,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
             </svg>
             <textarea
               id="message"
-              placeholder="Please describe what you need help with..."
+              placeholder="Tell us briefly what you need help with today"
               rows={4}
               className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
               aria-required="true"

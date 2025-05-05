@@ -2,188 +2,276 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { FaCheckCircle, FaHandshake, FaUserClock, FaAward } from 'react-icons/fa'; // Import necessary icons
-import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill } from "react-icons/bs"; // Import Bootstrap numbered icons
-import { motion } from 'framer-motion' // Import for animation
+import { useState, useEffect } from 'react' // Import useState and useEffect
+import useEmblaCarousel from 'embla-carousel-react' // Import Embla hook
+import Autoplay from 'embla-carousel-autoplay' // Import Autoplay plugin
+// Using Heroicons for a more modern feel
+import { ShieldCheckIcon, ScaleIcon, UserGroupIcon, StarIcon, ChevronUpIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline'; // Added icons
+import { motion, AnimatePresence } from 'framer-motion' // Import for animation
+
+// Define interfaces for structured data
+interface Feature {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+}
+
+interface Testimonial {
+  quote: string;
+  author: string;
+  location: string;
+}
+
+interface TrustLogo {
+  name: string;
+  logo: string;
+}
+
+// Define animation variant for the image
+const imageFadeIn = {
+  hidden: { opacity: 0, x: 50 }, // Start off-screen to the right
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+      delay: 0.2 // Delay slightly after text animation
+    },
+  },
+};
+
+// Animation for the 'after' image fade-in/out cycle
+const afterImageCycle = {
+  animate: {
+    opacity: [0, 1, 1, 0, 0], // Sequence: fade in, stay visible, fade out, stay hidden
+    transition: {
+      duration: 6, // Total duration for one cycle (e.g., 6 seconds)
+      ease: "easeInOut",
+      times: [0, 0.25, 0.75, 1, 1], // Timing points for opacity values (0 -> 1 at 25%, 1 -> 0 at 75%-100%)
+      repeat: Infinity,
+      repeatDelay: 2, // Pause for 2 seconds before repeating
+    },
+  },
+};
 
 export default function HomePage() {
-  const trustLogos = [
-    { name: 'ABC', logo: '/images/platforms/abc.png' },
+  const features: Feature[] = [
+    { icon: ShieldCheckIcon, title: 'Verified Contractors', description: 'Only the best, rigorously vetted for quality and reliability.' },
+    { icon: ScaleIcon, title: 'Fair Price Guarantee', description: "We negotiate competitive bids, ensuring you don't overpay." },
+    { icon: UserGroupIcon, title: 'Dedicated Support', description: 'Your personal matchmaker guides you from start to finish.' },
+  ];
+
+  const testimonials: Testimonial[] = [
+    { quote: "The easiest home renovation I've ever done. Found the perfect contractor without the headache.", author: "Alex R.", location: "San Francisco" },
+    { quote: "Renovation Bridge handled everything, from vetting to negotiation. Saved me time and stress.", author: "Samantha B.", location: "Palo Alto" },
+    { quote: "Having a dedicated expert made all the difference. Highly recommend their service!", author: "Michael T.", location: "Mountain View" },
+  ];
+
+  const trustLogos: TrustLogo[] = [
     { name: 'Google', logo: '/images/platforms/google.png' },
     { name: 'Houzz', logo: '/images/platforms/houzz.png' },
-    { name: 'NBC', logo: '/images/platforms/nbc.png' },
     { name: 'Nextdoor', logo: '/images/platforms/nextdoor-2.png' },
-    {name: 'Yelp', logo: '/images/platforms/yelp.png'}
+    { name: 'Yelp', logo: '/images/platforms/yelp.png' },
+    { name: 'ABC', logo: '/images/platforms/abc.png' },
+    { name: 'NBC', logo: '/images/platforms/nbc.png' },
   ];
   
-  // Duration of one full animation cycle (in seconds)
-  const animationDuration = 15;
+  // Setup Embla carousel
+  const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 3000, stopOnInteraction: false })])
+  const [isOfferVisible, setIsOfferVisible] = useState(false); // Initialize as false
+  const [isOfferCollapsed, setIsOfferCollapsed] = useState(false); // State for collapsed/expanded
+
+  // Animation variants for staggering
+  const fadeInStagger = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1, // Stagger effect
+        duration: 0.5,
+      },
+    }),
+  };
+
+  // Animation for the popup card
+  const popupVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+    exit: { opacity: 0, y: 30, scale: 0.98, transition: { duration: 0.3, ease: "easeIn" } },
+  };
+
+  // Animation for the content within the card (fade in/out)
+  const contentVariants = {
+    collapsed: { opacity: 0, height: 0, marginTop: 0, transition: { duration: 0.3, ease: "easeInOut" } },
+    expanded: { opacity: 1, height: "auto", marginTop: '1rem', transition: { duration: 0.3, ease: "easeInOut" } },
+  };
+
+  // Effect to show popup after delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOfferVisible(true);
+    }, 7000); // Changed 3000 to 7000 milliseconds = 7 seconds
+
+    // Cleanup function to clear the timeout if the component unmounts
+    return () => clearTimeout(timer);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
-    <section className="bg-cream py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 lg:px-10">
-      <div className="container-custom relative flex flex-col items-center text-center mx-auto">
-        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-secondary leading-tight mb-4 max-w-4xl">
-          Find Your Perfect Renovation Contractor – Without the Stress.
-        </h1>
+    <section className="bg-gray-50 text-gray-900 font-sans min-h-screen relative"> {/* Added relative positioning */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:py-32">
 
-
-        <div className="text-sm sm:text-base text-gray-700 space-y-1 mb-6 md:mb-8 max-w-3xl">
-          <p>
-            We match you with fully vetted contractors, negotiate on your behalf, and support you through your project- <span className="italic liquid-text"> for free.</span>
-          </p>
-        </div>
-        <div className="mb-8 md:mb-10 w-full max-w-5xl">
-          <h2 className="text-base sm:text-lg md:text-xl font-semibold text-primary mb-4">What is Renovation Bridge?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 lg:gap-8 text-xs sm:text-sm">
-            <div className="flex flex-col items-center p-3 bg-white/60 rounded-lg shadow-md">
-              <div className="flex items-center space-x-2 mb-2">
-                <Bs1CircleFill className="text-lg text-primary flex-shrink-0" />
-                <FaCheckCircle className="text-lg text-green-500 flex-shrink-0" />
-              </div>
-              <span className="font-medium text-center mb-1">Top Vetted Contractors</span>
-              <span className="text-center">Submit your project details.</span>
-            </div>
-            <div className="flex flex-col items-center p-3 bg-white/60 rounded-lg shadow-md">
-              <div className="flex items-center space-x-2 mb-2">
-                <Bs2CircleFill className="text-lg text-primary flex-shrink-0" />
-                <FaHandshake className="text-lg text-blue-500 flex-shrink-0" />
-              </div>
-              <span className="font-medium text-center mb-1">Expert Negotiation Support</span>
-              <span className="text-center">Get matched with top contractors.</span>
-            </div>
-            <div className="flex flex-col items-center p-3 bg-white/60 rounded-lg shadow-md">
-              <div className="flex items-center space-x-2 mb-2">
-                <Bs3CircleFill className="text-lg text-primary flex-shrink-0" />
-                <FaUserClock className="text-lg text-purple-500 flex-shrink-0" />
-              </div>
-              <span className="font-medium text-center mb-1">24/7 Personal Matchmaker</span>
-              <span className="text-center">Renovate with support & confidence.</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-6 md:mb-8">
-            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800 mb-3">Let's build your dream renovation together.</h3>
-            <Link href="/get-started" legacyBehavior>
-                <a className="cta-btn text-sm sm:text-base px-6 py-3 sm:px-8 sm:py-4">
-                    Get Free Contractor Matches
+        {/* Hero Section - Revamped Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center mb-20 sm:mb-24 md:mb-32">
+          {/* Text Content Area */}
+          <div className="text-center md:text-left">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-5 leading-tight"
+            >
+              Your Renovation, Simplified.
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-lg sm:text-xl text-gray-600 mb-10 max-w-xl mx-auto md:mx-0" // Adjusted margins for alignment
+            >
+              Connect with trusted contractors, get fair prices, and expert support—effortlessly and <span className="font-medium">free</span>.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Link href="/get-started" legacyBehavior>
+                <a className="inline-block bg-blue-900 text-white text-base sm:text-lg font-semibold px-8 py-3.5 rounded-lg shadow-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-50 transition-colors duration-300">
+                  Find Your Ideal Contractor
                 </a>
-            </Link>
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Image Area */}
+          <motion.div
+            className="relative h-64 md:h-auto md:min-h-[400px] rounded-lg overflow-hidden shadow-lg order-first md:order-last" // Added rounded corners, shadow, and adjusted height/order
+            variants={imageFadeIn} // Keep initial container animation
+            initial="hidden"
+            animate="visible"
+          >
+            {/* Before Image (Progress) */}
+            <Image
+              src="/images/projects/progress.png"
+              alt="Home renovation in progress"
+              layout="fill" // Use fill to cover the container
+              objectFit="cover" // Cover the area nicely
+              priority // Load the hero image prioritized
+              className="absolute inset-0" // Position absolutely
+            />
+            {/* After Image - Cycles in and out */}
+            <motion.div
+              className="absolute inset-0" // Position absolutely on top
+              variants={afterImageCycle} // Use the cycling animation variant
+              animate="animate" // Start the animation defined in variants
+            >
+              <Image
+                src="/images/projects/after.png"
+                alt="Completed home renovation"
+                layout="fill"
+                objectFit="cover"
+                priority
+              />
+            </motion.div>
+             {/* Optional: Add a subtle overlay if needed for text contrast over image */}
+             {/* <div className="absolute inset-0 bg-black opacity-10"></div> */}
+          </motion.div>
         </div>
 
-        {/* Fixed Positioned Testimonials Card - Center Left */}
-        <div className="fixed top-1/2 left-4 -translate-y-1/2 w-40 xl:w-48 p-8 rounded-lg shadow-xl bg-white/80 backdrop-blur-sm hidden lg:flex flex-col space-y-4 z-10">
-             <h4 className="text-sm font-semibold text-primary mb-1 text-center">What our clients say</h4>
-             <blockquote className="border-l-4 border-secondary pl-3 text-xs italic text-gray-800 mb-4">
-               <p className="mb-1">"I saved so much time - and money - thanks to Renovation Bridge!"</p>
-               <cite className="font-medium not-italic text-xs text-gray-600">- Jason, San Mateo</cite>
-             </blockquote>
-             
-             <blockquote className="border-l-4 border-secondary pl-3 text-xs italic text-gray-800">
-               <p className="mb-1">"They made my renovation stress-free and found me the perfect contractor!"</p>
-               <cite className="font-medium not-italic text-xs text-gray-600">- Kim, Livermore</cite>
-             </blockquote>
-        </div>
-
-        {/* Fixed Positioned CTA Card */}
-        <motion.div 
-            className="fixed bottom-4 left-4 w-60 xl:w-72 p-4 rounded-lg shadow-xl bg-gradient-to-r from-primary to-secondary text-white hidden lg:flex flex-col items-center text-center space-y-2 z-50"
-            whileHover={{ 
-                scale: 1.03, 
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" 
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        >
-            <FaAward className="text-3xl text-yellow-300 flex-shrink-0 mb-1" />
-            <p className="text-sm font-semibold">
-                Complete your form today and receive a FREE $399 Design Consultation!
-            </p>
-             <Link href="/get-started" legacyBehavior>
-               <motion.a 
-                 className="mt-2 inline-block bg-white text-primary text-xs font-semibold px-3 py-1.5 rounded transition-colors"
-                 whileHover={{ 
-                   scale: 1.05,
-                   backgroundColor: "#f9fafb",
-                   boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
-                 }}
-                 transition={{ type: "spring", stiffness: 400, damping: 15 }}
-               >
-                 Continue
-               </motion.a>
-             </Link>
-        </motion.div>
-
-        {/* Trusted By section moved to bottom */}
+        {/* Trust Logos Section */}
         {trustLogos.length > 0 && (
-          <div className="mt-16 w-full max-w-5xl mb-24 lg:mb-32">
-            <p className="text-xs text-gray-600 mb-2">Trusted By:</p>
-            <div className="relative w-full overflow-hidden h-[50px] sm:h-[60px]">
-              {/* Gradient fade on left edge */}
-              <div className="absolute left-0 top-0 bottom-0 w-[50px] sm:w-[100px] z-10 bg-gradient-to-r from-cream to-transparent"></div>
-              
-              <div className="w-full h-full flex items-center relative">
-                {/* Create a continuous animation by duplicating the logos */}
-                <motion.div 
-                  className="flex space-x-8 sm:space-x-16 absolute whitespace-nowrap pl-4 sm:pl-8"
-                  animate={{
-                    x: ["0%", "-10%"]
-                  }}
-                  transition={{
-                    x: {
-                      duration: animationDuration,
-                      repeat: Infinity,
-                      ease: "linear",
-                      repeatType: "loop"
-                    }
-                  }}
-                >
-                  {/* First set of logos */}
-                  {trustLogos.map((logo) => (
-                    <Link
-                      key={logo.name}
-                      href="#"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center w-[80px] sm:w-[100px] h-[40px] sm:h-[50px] opacity-80 hover:opacity-100 transition-opacity duration-200"
-                    >
-                      <Image
-                        src={logo.logo}
-                        alt={`${logo.name} logo`}
-                        width={100}
-                        height={40}
-                        className="object-contain max-h-[40px] sm:max-h-[50px]"
-                      />
-                    </Link>
-                  ))}
-                  
-                  {/* Duplicate logos for continuous flow */}
-                  {trustLogos.map((logo) => (
-                    <Link
-                      key={`${logo.name}-duplicate`}
-                      href="#"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center w-[80px] sm:w-[100px] h-[40px] sm:h-[50px] opacity-80 hover:opacity-100 transition-opacity duration-200"
-                    >
-                      <Image
-                        src={logo.logo}
-                        alt={`${logo.name} logo`}
-                        width={100}
-                        height={40}
-                        className="object-contain max-h-[40px] sm:max-h-[50px]"
-                      />
-                    </Link>
-                  ))}
-                </motion.div>
+          <div className="max-w-4xl mx-auto text-center pt-8 pb-8 sm:pt-12 sm:pb-12">
+            <p className="text-sm font-medium text-gray-500 mb-6">
+              Featured and trusted by users on platforms like
+            </p>
+            {/* Embla Carousel Root */}
+            <div className="overflow-hidden" ref={emblaRef}>
+              {/* Embla Container */}
+              <div className="flex"> {/* Items arranged horizontally */}
+                {trustLogos.map((logo, index) => (
+                  // Embla Slide
+                  <div className="flex-[0_0_33.33%] sm:flex-[0_0_25%] md:flex-[0_0_20%] min-w-0 pl-4" key={index}> {/* Adjust flex-basis for number of visible logos; pl for spacing */}
+                    <Image
+                      src={logo.logo}
+                      alt={`${logo.name} logo`}
+                      width={90}
+                      height={30}
+                      className="object-contain opacity-90 mx-auto"
+                      style={{ maxHeight: '30px' }}
+                    />
+                  </div>
+                ))}
               </div>
-              
-              {/* Gradient fade on right edge */}
-              <div className="absolute right-0 top-0 bottom-0 w-[50px] sm:w-[100px] z-10 bg-gradient-to-l from-cream to-transparent"></div>
             </div>
           </div>
         )}
-
       </div>
+
+      {/* Summer Special Offer Popup */}
+      <AnimatePresence>
+        {isOfferVisible && (
+          <motion.div
+            className="fixed bottom-4 right-4 w-full max-w-sm z-50"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={popupVariants}
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-5 rounded-lg shadow-xl relative overflow-hidden backdrop-blur-md">
+
+              <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOfferCollapsed(!isOfferCollapsed)}>
+                <h4 className="text-lg font-semibold">☀️ Summer Special Offer</h4>
+                <button
+                  className="p-1 rounded-full text-blue-100 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-700 transition-colors"
+                  aria-label={isOfferCollapsed ? "Expand offer" : "Collapse offer"}
+                >
+                  {isOfferCollapsed ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
+                </button>
+              </div>
+
+              {/* Collapsible Content */}
+              <AnimatePresence initial={false}>
+                {!isOfferCollapsed && (
+                  <motion.div
+                    key="content"
+                    initial="collapsed"
+                    animate="expanded"
+                    exit="collapsed"
+                    variants={contentVariants}
+                    className="text-sm mt-4" // Keep margin-top here for spacing when expanded
+                  >
+                    <p className="mb-3">Complete your form now and receive:</p>
+                    <ul className="space-y-1.5 list-disc list-inside text-blue-50 marker:text-yellow-300">
+                      <li>Free design consultation (valued at $399)</li>
+                      <li>Free priority consultations with multiple vetted contractors</li>
+                      <li>24/7 support from a dedicated RB Matchmaker</li>
+                      <li>Contract negotiation and review</li>
+                    </ul>
+                     <Link href="/get-started" legacyBehavior>
+                        <a className="mt-4 inline-block bg-yellow-400 text-blue-900 text-sm font-semibold px-4 py-2 rounded-md shadow hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-blue-700 transition-colors duration-300 w-full text-center">
+                          Get Started Now
+                        </a>
+                      </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </section>
   );
 }
