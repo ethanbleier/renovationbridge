@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -35,34 +36,12 @@ const Header = () => {
   const lastScrollY = useRef(0)
   const pathname = usePathname()
   
-  // Check if we're on the get-started page OR home page
+  // ---> DECLARE VARIABLES NEEDED BY HOOKS FIRST <---
   const isGetStartedPage = pathname === '/get-started'
   const isHomePage = pathname === '/home'
   const hideHeaderInitially = isHomePage // Only for home page now
-  
-  // If on get-started page, don't render header at all
-  if (isGetStartedPage) {
-    return null
-  }
 
-  // Define Navigation Items using the new structure
-  const navItems: NavItem[] = [
-    { name: 'How it Works', href: '/how-it-works', icon: FiBriefcase },
-    { name: 'Gallery', href: '/gallery', icon: FiImage },
-    {
-      name: 'Resources',
-      icon: FiBookOpen,
-      dropdown: [
-        { name: 'Guide', href: '/guide', icon: FiFileText, highlight: 'Your renovation roadmap' },
-        { name: 'FAQ', href: '/resources/faq', icon: FiHelpCircle, highlight: 'Answers to common questions' },
-        { name: 'Blog', href: '/blog', icon: FiFileText, highlight: 'Tips, trends, and insights' },
-        { name: 'Pricing Calculator', href: '/pricing', icon: FiDollarSign, highlight: 'Estimate your project cost' },
-        { name: 'Referral Program', href: '/real-estate-referral', icon: FiUsers, highlight: 'Partner with us' },
-      ]
-    },
-    { name: 'For Contractors', href: '/for-contractors', icon: FiAward },
-  ];
-
+  // ---> HOOKS MOVED HERE <---
   useEffect(() => {
     // Check if we're on mobile
     const checkIsMobile = () => {
@@ -136,6 +115,30 @@ const Header = () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [hideHeaderInitially, isMobile, isMenuOpen])
+  // ---> END HOOKS MOVED HERE <---
+
+  // If on get-started page, don't render header at all
+  if (isGetStartedPage) {
+    return null
+  }
+
+  // Define Navigation Items using the new structure
+  const navItems: NavItem[] = [
+    { name: 'How it Works', href: '/how-it-works', icon: FiBriefcase },
+    { name: 'Gallery', href: '/gallery', icon: FiImage },
+    {
+      name: 'Resources',
+      icon: FiBookOpen,
+      dropdown: [
+        { name: 'Guide', href: '/guide', icon: FiFileText, highlight: 'Your renovation roadmap' },
+        { name: 'FAQ', href: '/resources/faq', icon: FiHelpCircle, highlight: 'Answers to common questions' },
+        { name: 'Blog', href: '/blog', icon: FiFileText, highlight: 'Tips, trends, and insights' },
+        { name: 'Pricing Calculator', href: '/pricing', icon: FiDollarSign, highlight: 'Estimate your project cost' },
+        { name: 'Referral Program', href: '/real-estate-referral', icon: FiUsers, highlight: 'Partner with us' },
+      ]
+    },
+    { name: 'For Contractors', href: '/for-contractors', icon: FiAward },
+  ];
 
   // Handle menu opening - ensure header is visible when menu is open
   const handleMenuToggle = () => {

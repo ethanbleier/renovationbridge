@@ -8,6 +8,7 @@ import Autoplay from 'embla-carousel-autoplay' // Import Autoplay plugin
 // Using Heroicons for a more modern feel
 import { ShieldCheckIcon, ScaleIcon, UserGroupIcon, StarIcon, ArrowPathIcon, CheckBadgeIcon, BuildingOfficeIcon, MapPinIcon, BookOpenIcon, DocumentTextIcon, GiftIcon } from '@heroicons/react/24/outline'; // Added gift icon
 import { motion } from 'framer-motion' // Import for animation
+import React from 'react'
 
 // Enhanced TypeScript interfaces with stricter typing
 interface Feature {
