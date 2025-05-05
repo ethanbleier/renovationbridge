@@ -4,46 +4,82 @@ import Image from 'next/image'
 import ContractorForm from '@/components/forms/ContractorForm'
 
 export default function ForContractors() {
+  // Function to handle scroll down on arrow click
+  const handleScrollDown = () => {
+    const applyFormSection = document.getElementById('apply-form');
+    if (applyFormSection) {
+      applyFormSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      {/* Premium hero section with background pattern */}
-      <section className="relative mb-12 overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 bg-primary/10 pattern-grid-lg opacity-30"></div>
-        
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-lavender/30"></div>
-        
+    <div className="min-h-screen bg-white pb-16">
+      {/* Revamped Modern Hero Section - Full Screen */}
+      <section className="relative bg-black text-white overflow-hidden min-h-screen flex flex-col justify-center">
+        {/* Background Image */}
+        <div className="absolute inset-0 opacity-40">
+          <Image
+            src="/images/blog/contractor.png" // Updated image path
+            alt="Contractors working at sunset"
+            fill
+            className="object-cover"
+            priority // Load image faster
+          />
+        </div>
+        {/* Subtle dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/30"></div>
+
         {/* Content */}
-        <div className="container mx-auto px-4 py-20 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-secondary mb-6">Join Our Contractor Network</h1>
-            <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              Partner with Renovation Bridge to grow your business and connect with qualified homeowners seeking quality renovation services.
+        <div className="container mx-auto px-4 py-24 md:py-32 relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+              Build the Future With Us.
+            </h1>
+            <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+              Join Renovation Bridge and connect with homeowners ready for their next big project.
             </p>
             
             {/* Call to action button */}
             <a
               href="#apply-form"
-              className="mt-8 inline-block bg-primary text-white font-medium py-3 px-8 rounded-lg transition-all hover:bg-primary-dark hover:shadow-lg"
+              className="inline-block bg-primary text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 ease-in-out hover:bg-primary-dark hover:shadow-lg transform hover:-translate-y-1"
             >
-              Apply Today
+              Start Now
             </a>
           </div>
         </div>
-        
-        {/* Decorative bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" fill="white" preserveAspectRatio="none">
-            <path d="M0,0 C480,48 960,48 1440,0 L1440,48 L0,48 Z"></path>
-          </svg>
+
+        {/* Bobbing down arrow */}
+        <div className="absolute bottom-12 left-0 right-0 flex justify-center animate-bounce z-20">
+          <div 
+            className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
+            onClick={handleScrollDown}
+            aria-label="Scroll down"
+            role="button"
+            tabIndex={0}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" // Changed stroke to white for better contrast on dark bg 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="text-primary sm:h-6 sm:w-6"
+            >
+              <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+          </div>
         </div>
       </section>
       
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Form Section with improved styling */}
-          <div className="lg:col-span-7">
+          {/* Form Section with ID for scrolling */}
+          <div id="apply-form" className="lg:col-span-7 scroll-mt-20">
             <ContractorForm />
           </div>
           
@@ -110,7 +146,7 @@ export default function ForContractors() {
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl border-4 border-white transition-all transform hover:scale-[1.02]">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent z-10"></div>
               <Image
-                src="/images/blog/contractor-working.png"
+                src="/images/blog/blueprint.png"
                 alt="Contractor working on a renovation project"
                 fill
                 className="object-cover"
@@ -139,8 +175,8 @@ export default function ForContractors() {
                   <span className="font-bold text-xl text-primary">J</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-secondary">John Smith</h4>
-                  <p className="text-sm text-gray-600">Smith Building & Contracting</p>
+                  <h4 className="font-bold text-secondary">Jimmy D</h4>
+                  <p className="text-sm text-gray-600">Jim Construction</p>
                 </div>
               </div>
               <p className="italic text-gray-600 leading-relaxed">
@@ -160,7 +196,7 @@ export default function ForContractors() {
                   <span className="font-bold text-xl text-primary">M</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-secondary">Maria Garcia</h4>
+                  <h4 className="font-bold text-secondary">Maria G</h4>
                   <p className="text-sm text-gray-600">Garcia Home Renovations</p>
                 </div>
               </div>
@@ -180,7 +216,7 @@ export default function ForContractors() {
                   <span className="font-bold text-xl text-primary">D</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-secondary">David Johnson</h4>
+                  <h4 className="font-bold text-secondary">David J</h4>
                   <p className="text-sm text-gray-600">Premier Kitchen & Bath</p>
                 </div>
               </div>

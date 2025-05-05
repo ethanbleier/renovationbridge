@@ -1,28 +1,51 @@
 'use client'
 
+import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
+import { FiChevronDown, FiBriefcase, FiImage, FiBookOpen, FiHelpCircle, FiFileText, FiDollarSign, FiUsers, FiAward } from 'react-icons/fi'
 import { usePathname } from 'next/navigation'
+import MenuButton from '../ui/MenuButton'
+import CloseButton from '../ui/CloseButton'
+
+// Define menu structure
+interface MenuItem {
+  name: string;
+  href: string;
+  icon?: React.ElementType;
+  highlight?: string; // Optional highlight text for dropdown items
+}
+
+interface NavItem {
+  name: string;
+  href?: string; // Optional for top-level items that are just dropdown triggers
+  icon?: React.ElementType;
+  dropdown?: MenuItem[];
+}
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isResourcesOpen, setIsResourcesOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [headerVisible, setHeaderVisible] = useState(true)
   const [mobileHeaderVisible, setMobileHeaderVisible] = useState(true)
   const [isHeaderShrunk, setIsHeaderShrunk] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [menuVisible, setMenuVisible] = useState(false)
   const lastScrollY = useRef(0)
   const pathname = usePathname()
   
-  // Check if we're on the get-started page
+  // ---> DECLARE VARIABLES NEEDED BY HOOKS FIRST <---
   const isGetStartedPage = pathname === '/get-started'
+  const isHomePage = pathname === '/home'
+  const hideHeaderInitially = isHomePage // Only for home page now
 
+  // ---> HOOKS MOVED HERE <---
   useEffect(() => {
     // Check if we're on mobile
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768) // 768px is the md breakpoint in Tailwind by default
+      setIsMobile(window.innerWidth < 1024) // Use lg breakpoint for desktop nav switch
     }
     
     // Run once on mount
@@ -37,10 +60,13 @@ const Header = () => {
   }, [])
 
   useEffect(() => {
-    // Initialize header visibility
-    if (isGetStartedPage) {
-      setHeaderVisible(false)
-      setMobileHeaderVisible(false)
+    // Initialize header visibility based on page type
+    if (hideHeaderInitially) {
+      if (isMobile) {
+        setMobileHeaderVisible(false)
+      } else {
+        setHeaderVisible(true) // Start visible on desktop for home page
+      }
     } else {
       setHeaderVisible(true)
       setMobileHeaderVisible(true)
@@ -50,18 +76,21 @@ const Header = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       
-      if (isGetStartedPage) {
-        // On get-started page, show header when scrolling up, hide when scrolling down
+      // Shrink effect
+      if (currentScrollY > 10) {
+        setIsHeaderShrunk(true);
+      } else {
+        setIsHeaderShrunk(false);
+      }
+      
+      // Visibility logic for mobile
+      if (hideHeaderInitially && isMobile) {
         if (currentScrollY < lastScrollY.current && currentScrollY < 300) {
-          setHeaderVisible(true)
           setMobileHeaderVisible(true)
         } else if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
-          setHeaderVisible(false)
           setMobileHeaderVisible(false)
         }
-      } else if (isMobile) {
-        // On mobile devices only (except get-started page)
-        // Show header when scrolling up, hide when scrolling down
+      } else if (isMobile) { // Standard mobile logic
         if (currentScrollY < lastScrollY.current) {
           setMobileHeaderVisible(true)
         } else if (currentScrollY > 50 && currentScrollY > lastScrollY.current && !isMenuOpen) {
@@ -69,11 +98,13 @@ const Header = () => {
         }
       }
       
-      // Handle header shrinking on all pages
-      if (currentScrollY > 50) {
-        setIsHeaderShrunk(true)
-      } else {
-        setIsHeaderShrunk(false)
+      // Desktop visibility logic (for all pages including home page)
+      if (!isMobile) {
+        if (currentScrollY > 150 && currentScrollY > lastScrollY.current) {
+          setHeaderVisible(false)
+        } else {
+          setHeaderVisible(true)
+        }
       }
       
       lastScrollY.current = currentScrollY
@@ -83,207 +114,296 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [isGetStartedPage, isMobile, isMenuOpen])
+  }, [hideHeaderInitially, isMobile, isMenuOpen])
+  // ---> END HOOKS MOVED HERE <---
+
+  // If on get-started page, don't render header at all
+  if (isGetStartedPage) {
+    return null
+  }
+
+  // Define Navigation Items using the new structure
+  const navItems: NavItem[] = [
+    { name: 'How it Works', href: '/how-it-works', icon: FiBriefcase },
+    { name: 'Gallery', href: '/gallery', icon: FiImage },
+    {
+      name: 'Resources',
+      icon: FiBookOpen,
+      dropdown: [
+        { name: 'Guide', href: '/guide', icon: FiFileText, highlight: 'Your renovation roadmap' },
+        { name: 'FAQ', href: '/resources/faq', icon: FiHelpCircle, highlight: 'Answers to common questions' },
+        { name: 'Blog', href: '/blog', icon: FiFileText, highlight: 'Tips, trends, and insights' },
+        { name: 'Pricing Calculator', href: '/pricing', icon: FiDollarSign, highlight: 'Estimate your project cost' },
+        { name: 'Referral Program', href: '/real-estate-referral', icon: FiUsers, highlight: 'Partner with us' },
+      ]
+    },
+    { name: 'For Contractors', href: '/for-contractors', icon: FiAward },
+  ];
 
   // Handle menu opening - ensure header is visible when menu is open
   const handleMenuToggle = () => {
     const newMenuState = !isMenuOpen
-    setIsMenuOpen(newMenuState)
+    
+    // Set visibility with a small delay for closing animation
     if (newMenuState) {
+      // For opening: make menu element visible immediately
+      setMenuVisible(true)
+      // Then set menu to open state to trigger animation
+      setTimeout(() => {
+        setIsMenuOpen(true)
+      }, 10) // Small delay to ensure DOM update
+      
+      // Ensure header is visible when opening menu
       setMobileHeaderVisible(true)
-      if (isGetStartedPage) {
+      if (hideHeaderInitially && isMobile) { // Only need to set for mobile on home page
         setHeaderVisible(true)
       }
+    } else {
+      // For closing: set menu to closed state first to trigger animation
+      setIsMenuOpen(false)
+      // Then delay hiding the menu element to allow animation to finish
+      setTimeout(() => {
+        setMenuVisible(false)
+      }, 300) // Match this to the animation duration
+      
+      // Close resources dropdown
+      setIsResourcesOpen(false);
     }
   }
 
+  const handleMouseEnter = (itemName: string) => {
+    if (!isMobile && !hideHeaderInitially) {
+      setActiveDropdown(itemName);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile && !hideHeaderInitially) {
+      setActiveDropdown(null);
+    }
+  };
+
+  // Close mobile menu and dropdowns on link click
+  const handleMobileLinkClick = () => {
+    // Only close the menu on mobile or non-home pages
+    if (isMobile || !hideHeaderInitially) {
+      setIsMenuOpen(false);
+    }
+    setIsResourcesOpen(false);
+  };
+
   return (
-    <header className={`bg-white shadow-sm sticky top-0 z-50 transition-all duration-300 ${
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${ 
+      // Use combined logic for initial visibility
       isMobile ? (mobileHeaderVisible ? 'translate-y-0' : '-translate-y-full') : 
       (headerVisible ? 'translate-y-0' : '-translate-y-full')
-    } ${isHeaderShrunk ? 'py-1' : 'py-2'}`}>
-      <div className={`container-custom ${isHeaderShrunk ? 'py-2' : 'py-4'} pr-3 md:pr-5 lg:pr-8 transition-all duration-300`}>
-        <div className="flex items-center justify-between gap-4 lg:gap-8">
+    } ${ 
+      // Shrink effect styling
+      isHeaderShrunk ? 'bg-white shadow-md py-2' : 'bg-white py-4'
+    }`}> 
+      <div className="container-custom relative">
+        <div className="flex items-center justify-between gap-4 lg:gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0">
-            <Image 
-              src="/images/logos/logo.png" 
-              alt="Renovation Bridge Logo" 
-              width={180} 
-              height={40}
-              className={`transition-all duration-300 ${
-                isHeaderShrunk 
-                  ? 'w-[130px] sm:w-[150px] lg:w-[180px]' 
-                  : 'w-[150px] sm:w-[170px] lg:w-[220px]'
-              }`}
-              style={{ height: "auto" }}
-              priority
-            />
+          <Link href="/" className="flex items-center flex-shrink-0 group" onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}>
+            <div className="flex items-center justify-center">
+              <Image 
+                src="/images/logos/logo.png"
+                alt="Renovation Bridge Logo" 
+                width={180} 
+                height={40}
+                className={`transition-all duration-300 ${
+                  isHeaderShrunk 
+                    ? 'w-[140px] lg:w-[160px]'
+                    : 'w-[160px] lg:w-[180px]'
+                }`}
+                style={{ height: "auto" }}
+                priority
+              />
+            </div>
           </Link>
 
-          {/* Desktop Navigation - Hidden on get-started page for improved lead capture */}
-          {!isGetStartedPage && (
-            <nav className="hidden md:flex items-center space-x-4 lg:space-x-8 flex-grow justify-center">
-              <Link href="/how-it-works" className="text-gray-800 hover:text-primary transition-colors whitespace-nowrap">
-                How it Works
-              </Link>
-              
-              <Link href="/gallery" className="text-gray-800 hover:text-primary transition-colors">
-                Gallery
-              </Link>
-              
-              <Link href="/guide" className="text-gray-800 hover:text-primary transition-colors">
-                Guide
-              </Link>
-              
-              <div className="relative group">
-                <button 
-                  className="flex items-center text-gray-800 hover:text-primary transition-colors"
-                  onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+          {/* Desktop Navigation - Hidden on home page */}
+          {!hideHeaderInitially && (
+            <nav className="hidden lg:flex items-center space-x-1 flex-grow justify-center">
+              {navItems.map((item) => (
+                <div
+                  key={item.name}
+                  className="relative px-1"
+                  onMouseEnter={() => item.dropdown && handleMouseEnter(item.name)}
+                  onMouseLeave={() => item.dropdown && handleMouseLeave()}
                 >
-                  Resources
-                  <FiChevronDown className="ml-1 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
-                </button>
-                
-                <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 transform origin-top scale-95 group-hover:scale-100 border border-lavender/30 overflow-hidden">
-                  <Link href="/resources/faq" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px]">
-                    FAQ
-                  </Link>
-                  <Link href="/blog" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px]">
-                    Blog
-                  </Link>
-                  <Link href="/pricing" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px] animate-[fadeIn_0.3s_0.1s_both]">
-                    Pricing Calculator
-                  </Link>
-                  <Link href="/real-estate-referral" className="block px-4 py-2.5 text-sm text-gray-800 hover:bg-lavender/10 hover:text-primary transition-all duration-200 border-l-0 hover:border-l-2 hover:border-primary hover:pl-[18px] animate-[fadeIn_0.3s_0.2s_both]">
-                    Referral Program
-                  </Link>
+                  {item.href ? (
+                     <Link
+                       href={item.href}
+                       className={`group relative px-3 py-2 font-semibold text-sm rounded-md transition-all duration-200 flex items-center text-gray-700 hover:text-primary hover:bg-primary/10 ${
+                         activeDropdown === item.name ? 'text-primary bg-primary/10' : ''
+                       }`}
+                     >
+                       {item.icon && <item.icon className={`mr-1.5 h-4 w-4 text-primary/80 group-hover:text-primary transition-colors duration-200 ${activeDropdown === item.name ? 'text-primary' : ''}`} />}
+                       <span>{item.name}</span>
+                     </Link>
+                  ) : (
+                    <button
+                      className={`group relative px-3 py-2 font-semibold text-sm rounded-md transition-all duration-200 flex items-center text-gray-700 hover:text-primary hover:bg-primary/10 ${
+                         activeDropdown === item.name ? 'text-primary bg-primary/10' : ''
+                      }`}
+                       onClick={(e) => e.preventDefault()}
+                     >
+                       {item.icon && <item.icon className={`mr-1.5 h-4 w-4 text-primary/80 group-hover:text-primary transition-colors duration-200 ${activeDropdown === item.name ? 'text-primary' : ''}`} />}
+                       <span>{item.name}</span>
+                       {item.dropdown && (
+                         <FiChevronDown className={`ml-1 h-4 w-4 transition-transform duration-300 ${activeDropdown === item.name ? 'rotate-180 text-primary' : 'text-gray-500 group-hover:text-primary'}`} />
+                       )}
+                     </button>
+                  )}
+
+                  {/* Desktop Dropdown Panel */}
+                  {item.dropdown && (
+                    <div
+                      className={`
+                        absolute left-0 w-64 rounded-md
+                        bg-white ring-1 ring-gray-200 shadow-lg shadow-gray-300/20
+                        transition-all duration-200 ease-out origin-top
+                        ${activeDropdown === item.name
+                          ? 'opacity-100 scale-100 visible'
+                          : 'opacity-0 scale-95 invisible pointer-events-none'}
+                      `}
+                    >
+                      <div className="p-2">
+                        {item.dropdown.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            className="group flex flex-col rounded-md px-3 py-2.5 transition-colors duration-150 hover:bg-primary/5"
+                          >
+                            <div className="flex items-center">
+                               {subItem.icon && <subItem.icon className="mr-2 h-4 w-4 text-primary/70 group-hover:text-primary transition-colors duration-150" />}
+                              <span className="font-medium text-sm text-gray-800 group-hover:text-primary transition-colors duration-150">
+                                {subItem.name}
+                              </span>
+                            </div>
+                            {subItem.highlight && (
+                              <span className="ml-6 text-xs text-gray-500 group-hover:text-gray-600 mt-0.5 transition-colors duration-150">
+                                {subItem.highlight}
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              ))}
             </nav>
           )}
 
-          {/* CTA Buttons - Hidden on get-started page */}
-          {!isGetStartedPage && (
-            <div className="hidden md:flex items-center space-x-3 lg:space-x-4 flex-shrink-0">
-              <Link href="/for-contractors" className={`transition-all duration-300 ${
-                isHeaderShrunk 
-                  ? 'px-2.5 py-1.5 lg:px-3.5 lg:py-1.5 text-sm' 
-                  : 'px-3 py-2 lg:px-4 lg:py-2 text-sm lg:text-base'
-              } border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transform hover:scale-105 whitespace-nowrap`}>
-                For Contractors
-              </Link>
+          {/* CTA Button - Hidden on home page */}
+          {!hideHeaderInitially && (
+            <div className="hidden lg:flex items-center flex-shrink-0">
               <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
-                isHeaderShrunk 
-                  ? 'px-2.5 py-1.5 lg:px-4 lg:py-1.5 text-sm' 
-                  : 'px-3 py-2 lg:px-5 lg:py-2 text-sm lg:text-base'
+                isHeaderShrunk
+                  ? 'px-4 py-1.5 text-sm'
+                  : 'px-5 py-2 text-sm'
               }`}>
                 GET STARTED
               </Link>
             </div>
           )}
 
-          {/* On get-started page, add spacer div to push menu button to the right side */}
-          {isGetStartedPage && <div className="flex-grow"></div>}
+          {/* Spacer on home page for mobile */}
+          {hideHeaderInitially && <div className="flex-grow lg:hidden"></div>}
 
-          {/* Mobile Menu Button - Should only be visible on mobile or get-started page */}
-          <button
-            className={`text-gray-500 hover:text-gray-700 focus:outline-none ${isGetStartedPage ? 'hidden' : 'md:hidden'}`}
-            onClick={handleMenuToggle}
-          >
-            {isMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && !isGetStartedPage && (
-        <div className={`bg-white px-4 pt-2 pb-4 shadow-inner md:hidden`}>
-          <nav className="flex flex-col space-y-3">
-            <Link 
-              href="/how-it-works" 
-              className="text-gray-800 hover:text-primary py-2 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+          {/* Mobile Menu Button Container */}
+          <div className="relative flex-shrink-0 ml-auto flex items-center">
+            {/* Button */}
+            <button
+              className={`text-gray-500 hover:text-gray-700 focus:outline-none ${hideHeaderInitially ? 'lg:block' : 'lg:hidden'} z-50 flex items-center justify-center`}
+              onClick={handleMenuToggle}
             >
-              How it Works
-            </Link>
-            
-            <Link 
-              href="/gallery" 
-              className="text-gray-800 hover:text-primary py-2 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Gallery
-            </Link>
-            
-            <Link 
-              href="/guide" 
-              className="text-gray-800 hover:text-primary py-2 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Guide
-            </Link>
-
-            <button 
-              className="flex items-center justify-between text-gray-800 hover:text-primary py-2 transition-colors"
-              onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-            >
-              <span>Resources</span>
-              <FiChevronDown className={`h-4 w-4 transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`} />
+              {isMenuOpen ? 
+                <CloseButton size={24} /> : 
+                <MenuButton size={24} />
+              }
             </button>
             
-            {isResourcesOpen && (
-              <div className="pl-4 space-y-2 border-l-2 border-lavender animate-slideDown overflow-hidden">
-                <Link 
-                  href="/resources/faq" 
-                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.05s_both]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  FAQ
-                </Link>
-                <Link 
-                  href="/blog" 
-                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.15s_both]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Blog
-                </Link>
-                <Link 
-                  href="/pricing" 
-                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.25s_both]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Price Calculator
-                </Link>
-                <Link 
-                  href="/real-estate-referral" 
-                  className="block py-2 text-gray-800 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 animate-[fadeIn_0.3s_0.35s_both]"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Real Estate Referral Program
-                </Link>
-              </div>
-            )}
-
-            <div className="pt-2 flex flex-col space-y-3">
-              <Link 
-                href="/for-contractors" 
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                For Contractors
-              </Link>
-              <Link 
-                href="/get-started" 
-                className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2"
-                  onClick={() => setIsMenuOpen(false)}
-              >
-                GET STARTED
-              </Link>
+            {/* Dropdown Menu */}
+            <div 
+              className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
+                hideHeaderInitially ? 'block' : 'lg:hidden'
+              } ${
+                isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
+              }`}
+              style={{ display: isMenuOpen || menuVisible ? 'block' : 'none' }}
+            >
+              <nav className="flex flex-col space-y-1">
+                {navItems.map((item) => (
+                  <div key={item.name}>
+                    {item.href && !item.dropdown ? (
+                      <Link
+                        href={item.href}
+                        className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
+                        onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                      >
+                         {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
+                        {item.name}
+                      </Link>
+                    ) : item.dropdown ? (
+                      <>
+                        <button
+                          className="flex items-center justify-between w-full text-gray-800 hover:text-primary py-2.5 transition-colors"
+                          onClick={() => setIsResourcesOpen(item.name === 'Resources' ? !isResourcesOpen : false)}
+                        >
+                          <span className="flex items-center">
+                             {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
+                            {item.name}
+                          </span>
+                          <FiChevronDown className={`h-4 w-4 transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isResourcesOpen && item.name === 'Resources' && (
+                          <div className="pl-5 ml-3 space-y-1 border-l-2 border-primary/30 overflow-hidden transition-all duration-300 ease-in-out transform origin-top">
+                            {item.dropdown.map((subItem, index) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className={`flex items-center py-2 text-gray-700 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 opacity-0 animate-fade-slide-in`}
+                                onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                                style={{ animationDelay: `${index * 50}ms` }}
+                              >
+                                 {subItem.icon && <subItem.icon className="mr-3 h-4 w-4 text-primary/70" />}
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        href={item.href || '#'}
+                        className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
+                        onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                      >
+                         {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
+                        {item.name}
+                      </Link>
+                    )}
+                  </div>
+                ))}
+    
+                {/* Mobile CTAs */}
+                <div className="pt-3 flex flex-col space-y-3 border-t border-gray-200 mt-3">
+                   <Link
+                     href="/get-started" 
+                     className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2" 
+                     onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                   > 
+                     GET STARTED
+                   </Link>
+                </div>
+              </nav>
             </div>
-          </nav>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   )
 }

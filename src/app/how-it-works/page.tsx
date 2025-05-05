@@ -151,6 +151,15 @@ export default function HowItWorksPage() {
   const [isMounted, setIsMounted] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  
+  // Function to handle scroll down on arrow click
+  const handleScrollDown = () => {
+    const processSection = document.getElementById('process-section');
+    if (processSection) {
+      processSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   // Prevent hydration mismatch
   useEffect(() => {
@@ -170,8 +179,15 @@ export default function HowItWorksPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Hero Section - With background image */}
-      <section className="pt-24 pb-16 relative">
+      {/* Hero Section - Full Screen */}
+      <section className="relative min-h-screen flex flex-col justify-center pb-16">
+        <Link href="/" className="absolute left-4 top-16 inline-flex items-center text-white hover:text-blue-100 transition-colors z-20 sm:top-20 md:top-24">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+          Back
+        </Link>
+        
         <div className="absolute inset-0 z-0">
           <Image 
             src="/images/projects/new-home-1.jpg" 
@@ -181,18 +197,12 @@ export default function HowItWorksPage() {
             sizes="100vw"
             quality={isMobile ? 70 : 85}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhMUFRsf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AJeT8dgbK40zOrMZY1WNVQELvOgI5IJ1J5rn1YwJ3FO9gSktaIi/v//Z"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQIGAwAAAAAAAAAAAAABAgMABAUGERIhMUFRsf/EABUBAQEAAAAAAAAAAAAAAAAAAAAB/8QAFREBAQAAAAAAAAAAAAAAAAAAABH/2gAMAwEAAhEDEQA/AJeT8dgbK40zOrMZY1WNVQELvOgI5IJ1J5rn1YwJ3FO9gSktaIi/v//Z"
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40 mix-blend-multiply" />
         </div>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <Link href="/" className="absolute left-4 top-0 inline-flex items-center text-white hover:text-blue-100 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            Back
-          </Link>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-12 sm:pt-16 md:pt-20">
           <motion.div
             {...animationProps}
             className="text-center"
@@ -215,10 +225,36 @@ export default function HowItWorksPage() {
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Bobbing down arrow */}
+        <div className="absolute bottom-12 left-0 right-0 flex justify-center animate-bounce z-20">
+          <div 
+            className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
+            onClick={handleScrollDown}
+            aria-label="Scroll down"
+            role="button"
+            tabIndex={0}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" // Ensured stroke is visible on dark bg
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="text-primary sm:h-6 sm:w-6"
+            >
+              <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
       </section>
 
-      {/* Process Section - Modern timeline style */}
-      <section className="py-20 bg-white">
+      {/* Process Section - Added ID and scroll margin */}
+      <section id="process-section" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}

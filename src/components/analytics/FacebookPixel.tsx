@@ -253,6 +253,7 @@ export default function FacebookPixel() {
       
       {/* Fallback for browsers with JavaScript disabled */}
       <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           height="1"
           width="1"

@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import React from 'react'
 import '@/styles/globals.css'
 import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
 import JsonLd from '@/components/seo/JsonLd'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
@@ -11,6 +10,7 @@ import { generateOrganizationSchema, generateLocalBusinessSchema } from '@/lib/s
 import { sarabun } from '@/lib/fonts'
 import Script from 'next/script'
 import FacebookPixel from '@/components/analytics/FacebookPixel'
+import ClientLayoutWrapper from '@/components/layout/ClientLayoutWrapper'
 
 const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID;
 
@@ -104,10 +104,9 @@ export default function RootLayout({
         
         <div className="min-h-screen flex flex-col">
           <Header />
-          <main className="flex-grow">
+          <ClientLayoutWrapper>
             {children}
-          </main>
-          <Footer />
+          </ClientLayoutWrapper>
           <SpeedInsights dsn="ZNga99anB7eSaJjchi9phAZv6n7" />
           <Analytics />
         </div>

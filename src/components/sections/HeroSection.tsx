@@ -70,7 +70,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[90vh] pt-12 sm:pt-16 md:pt-24 pb-16 md:pb-32">
+    <section className="relative min-h-[90vh] pt-20 sm:pt-24 md:pt-28 pb-16 md:pb-32">
       {/* Image Carousel Background */}
       <div className="absolute inset-0 w-full h-full">
         {slides.map((slide, index) => (
