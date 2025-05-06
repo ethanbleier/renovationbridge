@@ -38,8 +38,6 @@ const Header = () => {
   
   // ---> DECLARE VARIABLES NEEDED BY HOOKS FIRST <---
   const isGetStartedPage = pathname === '/get-started'
-  const isHomePage = pathname === '/home'
-  const hideHeaderInitially = isHomePage // Only for home page now
 
   // ---> HOOKS MOVED HERE <---
   useEffect(() => {
@@ -60,18 +58,10 @@ const Header = () => {
   }, [])
 
   useEffect(() => {
-    // Initialize header visibility based on page type
-    if (hideHeaderInitially) {
-      if (isMobile) {
-        setMobileHeaderVisible(false)
-      } else {
-        setHeaderVisible(true) // Start visible on desktop for home page
-      }
-    } else {
-      setHeaderVisible(true)
-      setMobileHeaderVisible(true)
-    }
-    
+    // Initialize header visibility
+    setHeaderVisible(true)
+    setMobileHeaderVisible(true)
+
     // Handle scroll events
     const handleScroll = () => {
       const currentScrollY = window.scrollY
@@ -84,13 +74,7 @@ const Header = () => {
       }
       
       // Visibility logic for mobile
-      if (hideHeaderInitially && isMobile) {
-        if (currentScrollY < lastScrollY.current && currentScrollY < 300) {
-          setMobileHeaderVisible(true)
-        } else if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
-          setMobileHeaderVisible(false)
-        }
-      } else if (isMobile) { // Standard mobile logic
+      if (isMobile) { // Standard mobile logic
         if (currentScrollY < lastScrollY.current) {
           setMobileHeaderVisible(true)
         } else if (currentScrollY > 50 && currentScrollY > lastScrollY.current && !isMenuOpen) {
@@ -98,7 +82,7 @@ const Header = () => {
         }
       }
       
-      // Desktop visibility logic (for all pages including home page)
+      // Desktop visibility logic
       if (!isMobile) {
         if (currentScrollY > 150 && currentScrollY > lastScrollY.current) {
           setHeaderVisible(false)
@@ -114,7 +98,7 @@ const Header = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [hideHeaderInitially, isMobile, isMenuOpen])
+  }, [isMobile, isMenuOpen])
   // ---> END HOOKS MOVED HERE <---
 
   // If on get-started page, don't render header at all
@@ -155,9 +139,6 @@ const Header = () => {
       
       // Ensure header is visible when opening menu
       setMobileHeaderVisible(true)
-      if (hideHeaderInitially && isMobile) { // Only need to set for mobile on home page
-        setHeaderVisible(true)
-      }
     } else {
       // For closing: set menu to closed state first to trigger animation
       setIsMenuOpen(false)
@@ -172,23 +153,20 @@ const Header = () => {
   }
 
   const handleMouseEnter = (itemName: string) => {
-    if (!isMobile && !hideHeaderInitially) {
+    if (!isMobile) {
       setActiveDropdown(itemName);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile && !hideHeaderInitially) {
+    if (!isMobile) {
       setActiveDropdown(null);
     }
   };
 
   // Close mobile menu and dropdowns on link click
   const handleMobileLinkClick = () => {
-    // Only close the menu on mobile or non-home pages
-    if (isMobile || !hideHeaderInitially) {
-      setIsMenuOpen(false);
-    }
+    setIsMenuOpen(false);
     setIsResourcesOpen(false);
   };
 
@@ -204,7 +182,7 @@ const Header = () => {
       <div className="container-custom relative">
         <div className="flex items-center justify-between gap-4 lg:gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0 group" onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}>
+          <Link href="/" className="flex items-center flex-shrink-0 group" onClick={handleMobileLinkClick}>
             <div className="flex items-center justify-center">
               <Image 
                 src="/images/logos/logo.png"
@@ -222,102 +200,95 @@ const Header = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation - Hidden on home page */}
-          {!hideHeaderInitially && (
-            <nav className="hidden lg:flex items-center space-x-1 flex-grow justify-center">
-              {navItems.map((item) => (
-                <div
-                  key={item.name}
-                  className="relative px-1"
-                  onMouseEnter={() => item.dropdown && handleMouseEnter(item.name)}
-                  onMouseLeave={() => item.dropdown && handleMouseLeave()}
-                >
-                  {item.href ? (
-                     <Link
-                       href={item.href}
-                       className={`group relative px-3 py-2 font-semibold text-sm rounded-md transition-all duration-200 flex items-center text-gray-700 hover:text-primary hover:bg-primary/10 ${
-                         activeDropdown === item.name ? 'text-primary bg-primary/10' : ''
-                       }`}
-                     >
-                       {item.icon && <item.icon className={`mr-1.5 h-4 w-4 text-primary/80 group-hover:text-primary transition-colors duration-200 ${activeDropdown === item.name ? 'text-primary' : ''}`} />}
-                       <span>{item.name}</span>
-                     </Link>
-                  ) : (
-                    <button
-                      className={`group relative px-3 py-2 font-semibold text-sm rounded-md transition-all duration-200 flex items-center text-gray-700 hover:text-primary hover:bg-primary/10 ${
-                         activeDropdown === item.name ? 'text-primary bg-primary/10' : ''
-                      }`}
-                       onClick={(e) => e.preventDefault()}
-                     >
-                       {item.icon && <item.icon className={`mr-1.5 h-4 w-4 text-primary/80 group-hover:text-primary transition-colors duration-200 ${activeDropdown === item.name ? 'text-primary' : ''}`} />}
-                       <span>{item.name}</span>
-                       {item.dropdown && (
-                         <FiChevronDown className={`ml-1 h-4 w-4 transition-transform duration-300 ${activeDropdown === item.name ? 'rotate-180 text-primary' : 'text-gray-500 group-hover:text-primary'}`} />
-                       )}
-                     </button>
-                  )}
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1 flex-grow justify-center">
+            {navItems.map((item) => (
+              <div
+                key={item.name}
+                className="relative px-1"
+                onMouseEnter={() => item.dropdown && handleMouseEnter(item.name)}
+                onMouseLeave={() => item.dropdown && handleMouseLeave()}
+              >
+                {item.href ? (
+                   <Link
+                     href={item.href}
+                     className={`group relative px-3 py-2 font-semibold text-sm rounded-md transition-all duration-200 flex items-center text-gray-700 hover:text-primary hover:bg-primary/10 ${
+                       activeDropdown === item.name ? 'text-primary bg-primary/10' : ''
+                     }`}
+                   >
+                     {item.icon && <item.icon className={`mr-1.5 h-4 w-4 text-primary/80 group-hover:text-primary transition-colors duration-200 ${activeDropdown === item.name ? 'text-primary' : ''}`} />}
+                     <span>{item.name}</span>
+                   </Link>
+                ) : (
+                  <button
+                    className={`group relative px-3 py-2 font-semibold text-sm rounded-md transition-all duration-200 flex items-center text-gray-700 hover:text-primary hover:bg-primary/10 ${
+                       activeDropdown === item.name ? 'text-primary bg-primary/10' : ''
+                    }`}
+                     onClick={(e) => e.preventDefault()}
+                   >
+                     {item.icon && <item.icon className={`mr-1.5 h-4 w-4 text-primary/80 group-hover:text-primary transition-colors duration-200 ${activeDropdown === item.name ? 'text-primary' : ''}`} />}
+                     <span>{item.name}</span>
+                     {item.dropdown && (
+                       <FiChevronDown className={`ml-1 h-4 w-4 transition-transform duration-300 ${activeDropdown === item.name ? 'rotate-180 text-primary' : 'text-gray-500 group-hover:text-primary'}`} />
+                     )}
+                   </button>
+                )}
 
-                  {/* Desktop Dropdown Panel */}
-                  {item.dropdown && (
-                    <div
-                      className={`
-                        absolute left-0 w-64 rounded-md
-                        bg-white ring-1 ring-gray-200 shadow-lg shadow-gray-300/20
-                        transition-all duration-200 ease-out origin-top
-                        ${activeDropdown === item.name
-                          ? 'opacity-100 scale-100 visible'
-                          : 'opacity-0 scale-95 invisible pointer-events-none'}
-                      `}
-                    >
-                      <div className="p-2">
-                        {item.dropdown.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            href={subItem.href}
-                            className="group flex flex-col rounded-md px-3 py-2.5 transition-colors duration-150 hover:bg-primary/5"
-                          >
-                            <div className="flex items-center">
-                               {subItem.icon && <subItem.icon className="mr-2 h-4 w-4 text-primary/70 group-hover:text-primary transition-colors duration-150" />}
-                              <span className="font-medium text-sm text-gray-800 group-hover:text-primary transition-colors duration-150">
-                                {subItem.name}
-                              </span>
-                            </div>
-                            {subItem.highlight && (
-                              <span className="ml-6 text-xs text-gray-500 group-hover:text-gray-600 mt-0.5 transition-colors duration-150">
-                                {subItem.highlight}
-                              </span>
-                            )}
-                          </Link>
-                        ))}
-                      </div>
+                {/* Desktop Dropdown Panel */}
+                {item.dropdown && (
+                  <div
+                    className={`
+                      absolute left-0 w-64 rounded-md
+                      bg-white ring-1 ring-gray-200 shadow-lg shadow-gray-300/20
+                      transition-all duration-200 ease-out origin-top
+                      ${activeDropdown === item.name
+                        ? 'opacity-100 scale-100 visible'
+                        : 'opacity-0 scale-95 invisible pointer-events-none'}
+                    `}
+                  >
+                    <div className="p-2">
+                      {item.dropdown.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          href={subItem.href}
+                          className="group flex flex-col rounded-md px-3 py-2.5 transition-colors duration-150 hover:bg-primary/5"
+                        >
+                          <div className="flex items-center">
+                             {subItem.icon && <subItem.icon className="mr-2 h-4 w-4 text-primary/70 group-hover:text-primary transition-colors duration-150" />}
+                            <span className="font-medium text-sm text-gray-800 group-hover:text-primary transition-colors duration-150">
+                              {subItem.name}
+                            </span>
+                          </div>
+                          {subItem.highlight && (
+                            <span className="ml-6 text-xs text-gray-500 group-hover:text-gray-600 mt-0.5 transition-colors duration-150">
+                              {subItem.highlight}
+                            </span>
+                          )}
+                        </Link>
+                      ))}
                     </div>
-                  )}
-                </div>
-              ))}
-            </nav>
-          )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </nav>
 
-          {/* CTA Button - Hidden on home page */}
-          {!hideHeaderInitially && (
-            <div className="hidden lg:flex items-center flex-shrink-0">
-              <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
-                isHeaderShrunk
-                  ? 'px-4 py-1.5 text-sm'
-                  : 'px-5 py-2 text-sm'
-              }`}>
-                GET STARTED
-              </Link>
-            </div>
-          )}
-
-          {/* Spacer on home page for mobile */}
-          {hideHeaderInitially && <div className="flex-grow lg:hidden"></div>}
+          {/* CTA Button */}
+          <div className="hidden lg:flex items-center flex-shrink-0">
+            <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
+              isHeaderShrunk
+                ? 'px-4 py-1.5 text-sm'
+                : 'px-5 py-2 text-sm'
+            }`}>
+              GET STARTED
+            </Link>
+          </div>
 
           {/* Mobile Menu Button Container */}
-          <div className="relative flex-shrink-0 ml-auto flex items-center">
+          <div className="relative flex-shrink-0 ml-auto flex items-center lg:hidden">
             {/* Button */}
             <button
-              className={`text-gray-500 hover:text-gray-700 focus:outline-none ${hideHeaderInitially ? 'lg:block' : 'lg:hidden'} z-50 flex items-center justify-center`}
+              className="text-gray-500 hover:text-gray-700 focus:outline-none z-50 flex items-center justify-center"
               onClick={handleMenuToggle}
             >
               {isMenuOpen ? 
@@ -329,8 +300,6 @@ const Header = () => {
             {/* Dropdown Menu */}
             <div 
               className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
-                hideHeaderInitially ? 'block' : 'lg:hidden'
-              } ${
                 isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
               }`}
               style={{ display: isMenuOpen || menuVisible ? 'block' : 'none' }}
@@ -342,7 +311,7 @@ const Header = () => {
                       <Link
                         href={item.href}
                         className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
-                        onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                        onClick={handleMobileLinkClick}
                       >
                          {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
                         {item.name}
@@ -366,7 +335,7 @@ const Header = () => {
                                 key={subItem.name}
                                 href={subItem.href}
                                 className={`flex items-center py-2 text-gray-700 hover:text-primary transition-all duration-200 transform translate-x-0 hover:translate-x-1 opacity-0 animate-fade-slide-in`}
-                                onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                                onClick={handleMobileLinkClick}
                                 style={{ animationDelay: `${index * 50}ms` }}
                               >
                                  {subItem.icon && <subItem.icon className="mr-3 h-4 w-4 text-primary/70" />}
@@ -380,7 +349,7 @@ const Header = () => {
                       <Link
                         href={item.href || '#'}
                         className="flex items-center text-gray-800 hover:text-primary py-2.5 transition-colors"
-                        onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                        onClick={handleMobileLinkClick}
                       >
                          {item.icon && <item.icon className="mr-3 h-5 w-5 text-primary/80" />}
                         {item.name}
@@ -388,13 +357,13 @@ const Header = () => {
                     )}
                   </div>
                 ))}
-    
+        
                 {/* Mobile CTAs */}
                 <div className="pt-3 flex flex-col space-y-3 border-t border-gray-200 mt-3">
                    <Link
                      href="/get-started" 
                      className="cta-btn text-center transform hover:scale-105 transition-transform duration-200 px-3 py-2" 
-                     onClick={hideHeaderInitially && !isMobile ? () => {} : handleMobileLinkClick}
+                     onClick={handleMobileLinkClick}
                    > 
                      GET STARTED
                    </Link>

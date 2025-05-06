@@ -92,7 +92,7 @@ const useResponsiveAnimations = () => {
   return { isMobile };
 };
 
-export default function HomePage() {
+export default function SavePage() {
   const { isMobile } = useResponsiveAnimations();
   
   // Memoize static data to prevent unnecessary re-renders
@@ -236,7 +236,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto md:mx-0"
             >
-              We connect you with trusted, vetted contractors and provide you with multiple competitive bids so <span className="font-medium">you can bring your dream home to life</span>.
+              Renovating your home shouldn’t mean overpaying or guessing. With Renovation Bridge, you’ll get multiple competitive bids from trusted, vetted contractors—so you can compare prices, negotiate confidently, and <span className="font-medium">save thousands on your dream renovation</span>.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
