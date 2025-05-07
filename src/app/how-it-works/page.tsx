@@ -4,7 +4,6 @@ import React, { useState, ReactNode, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { useMediaQuery } from 'react-responsive';
 
 // Custom accordion component with smooth animations
@@ -342,7 +341,7 @@ export default function HowItWorksPage() {
             <p className="text-xl text-white/90 mb-8">Let us help you find the perfect contractor for your renovation project.</p>
             <Link
               href="/get-started"
-              className="inline-block bg-white text-primary font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-300"
+              className="inline-block bg-white text-primary font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:translate-y-0 active:scale-100"
             >
               Unlock Home Potential
             </Link>

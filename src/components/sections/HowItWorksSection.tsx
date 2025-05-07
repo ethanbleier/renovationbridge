@@ -88,12 +88,12 @@ export default function HowItWorksSection() {
             </ul>
             <div className="h-0.5 w-full bg-gray-100 mb-5"></div>
             <div className="mt-auto">
-              <span className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
+              <Link href="/get-started" className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
                 Get Started
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </span>
+              </Link>
             </div>
           </motion.div>
           
@@ -128,12 +128,12 @@ export default function HowItWorksSection() {
             </ul>
             <div className="h-0.5 w-full bg-gray-100 mb-5"></div>
             <div className="mt-auto">
-              <span className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
+              <Link href="/how-it-works" className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
                 How Matching Works
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </span>
+              </Link>
             </div>
           </motion.div>
           
@@ -168,12 +168,12 @@ export default function HowItWorksSection() {
             </ul>
             <div className="h-0.5 w-full bg-gray-100 mb-5"></div>
             <div className="mt-auto">
-              <span className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
+              <Link href="resources/faq/" className="text-primary text-sm font-medium group-hover:text-primary/80 transition-colors duration-200 inline-flex items-center">
                 Our Support Process
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </span>
+              </Link>
             </div>
           </motion.div>
         </motion.div>

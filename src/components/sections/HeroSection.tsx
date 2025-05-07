@@ -133,13 +133,24 @@ export default function HeroSection() {
               <div className="text-primary h-[1.5em] overflow-hidden text-xl sm:text-2xl md:text-3xl lg:text-4xl">{titles[currentSlide].highlight}</div>
             </div>
             
-            <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">
-              Renovation Bridge connects homeowners with vetted contractors for a seamless renovation experience. Our rigorous vetting process ensures quality workmanship for your project.
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">
+              We connect you with top-rated local contractors. Without the headaches.
             </p>
             
+            <div className="flex flex-col sm:flex-row gap-2 mt-2">
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg text-sm text-gray-700 font-medium flex-1 text-center">
+                Compare multiple bids
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg text-sm text-gray-700 font-medium flex-1 text-center">
+                Get expert support
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg text-sm text-gray-700 font-medium flex-1 text-center">
+                All at no cost
+              </div>
+            </div>
             <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
               <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-sm sm:text-base w-full xs:w-auto">
-                Explore Home Solutions
+                Start Your Dream Renovation
               </Link>
               <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all text-sm sm:text-base w-full xs:w-auto">
                 How It Works
@@ -193,7 +204,7 @@ export default function HeroSection() {
                       <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      <span>24/7 support from a dedicated RB Matchmaker</span>
+                      <span>24/7 support from our dedicated matchmakers</span>
                     </li>
                     <li className="flex items-start text-xs">
                       <svg className="w-4 h-4 text-green-500 mr-1 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

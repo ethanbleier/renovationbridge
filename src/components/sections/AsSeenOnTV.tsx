@@ -104,7 +104,6 @@ const AsSeenOnTV = () => {
             <div className="bg-[#1f1f1f] rounded-xl p-3 sm:p-4 mt-4">
               <div className="flex justify-between items-start mb-2">
                 <h4 className="text-sm sm:font-medium">Description</h4>
-                <button className="text-xs sm:text-sm text-blue-400">Show more</button>
               </div>
               <p className="text-gray-300 mb-4 text-xs sm:text-sm">
                 Many customers wish they have done more digging into the contractor's past before picking them. Now, some innovators are aiming to help people avoid the same predicament. Chris Chmura reports.
@@ -134,33 +133,77 @@ const AsSeenOnTV = () => {
             <h3 className="font-medium mb-3 sm:mb-4 text-base sm:text-lg">Featured Content</h3>
             
             {/* Recommended Video 1 */}
-            <div className="bg-[#1f1f1f] rounded-lg overflow-hidden mb-4 hover:bg-[#272727] transition cursor-pointer">
-              <div className="flex">
-                <div className="w-32 sm:w-40 relative h-20 sm:h-24">
-                  <Image 
-                    src="/images/profiles/tv.jpeg"
-                    alt="Renovation Bridge featured on NBC Bay Area with Spencer Christian"
-                    fill
-                    sizes="(max-width: 640px) 128px, 160px"
-                    className="object-cover"
-                  />
-                  <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-xxs sm:text-xs px-1">2:45</div>
+            <div className="bg-[#1f1f1f] rounded-lg overflow-hidden mb-4 hover:bg-[#272727] hover:scale-105 transition-all duration-200 ease-in-out cursor-pointer">
+              <Link href="/blog/kim-caffaro-success-story" className="block p-3 sm:p-4">
+                <div className="flex items-start gap-x-3 sm:gap-x-4">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 relative shrink-0 overflow-hidden rounded-md">
+                    <Image 
+                      src="/images/profiles/tv.jpeg"
+                      alt="Renovation Bridge featured on NBC Bay Area with Spencer Christian"
+                      fill
+                      sizes="(max-width: 639px) 96px, 112px"
+                      className="object-cover"
+                    />
+                    <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-xxs sm:text-xs px-1">2:45</div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-xs sm:text-sm font-medium line-clamp-2 mb-0.5 sm:mb-1">Renovation Bridge featured on NBC Bay Area with Spencer Christian</h4>
+                    <p className="text-[10px] leading-tight sm:text-xs sm:leading-snug text-gray-400">18K views • 2 months ago</p>
+                  </div>
                 </div>
-                <div className="p-2">
-                  <h4 className="text-xs sm:text-sm font-medium line-clamp-2">Renovation Bridge featured on NBC Bay Area with Spencer Christian</h4>
-                  <p className="text-xxs sm:text-xs text-gray-400 mt-1">18K views • 2 months ago</p>
-                </div>
-              </div>
+              </Link>
             </div>
             
+            {/* Recommended Video 2 (Instagram Reel) */}
+            <div className="bg-[#1f1f1f] rounded-lg overflow-hidden mb-4 hover:bg-[#272727] hover:scale-105 transition-all duration-200 ease-in-out cursor-pointer">
+              <Link href="https://www.instagram.com/renovationbridge/reel/DHBvfoZyh_V/" target="_blank" rel="noopener noreferrer" className="block p-3 sm:p-4">
+                <div className="flex items-start gap-x-3 sm:gap-x-4">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 relative shrink-0 overflow-hidden rounded-md">
+                    <Image 
+                      src="/images/blog/nbc.png" 
+                      alt="Renovation Bridge Instagram Reel"
+                      fill
+                      sizes="(max-width: 639px) 96px, 112px"
+                      className="object-cover"
+                    />
+                    <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-xxs sm:text-xs px-1">0:30</div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-xs sm:text-sm font-medium line-clamp-2 mb-0.5 sm:mb-1">Check out our latest Instagram Reel!</h4>
+                    <p className="text-[10px] leading-tight sm:text-xs sm:leading-snug text-gray-400">1.5K views • 1 day ago</p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            {/* Article Link */}
+            <div className="bg-[#1f1f1f] rounded-lg overflow-hidden mb-4 hover:bg-[#272727] hover:scale-105 transition-all duration-200 ease-in-out">
+              <Link href="https://www.nbcbayarea.com/investigations/consumer/entrepreneurs-aim-steep-crooked-incompetent-contractors/3790584/" target="_blank" rel="noopener noreferrer" className="block p-3 sm:p-4">
+                <div className="flex items-start gap-x-3 sm:gap-x-4">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 relative shrink-0 overflow-hidden rounded-md">
+                    <Image 
+                      src="/images/blog/article.png" 
+                      alt="Renovation Bridge featured in NBC Bay Area article"
+                      fill
+                      sizes="(max-width: 639px) 96px, 112px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-xs sm:text-sm font-medium line-clamp-3 mb-0.5 sm:mb-1">Read about how Renovation Bridge helps homeowners avoid crooked contractors on NBC Bay Area.</h4>
+                    <p className="text-[10px] leading-tight sm:text-xs sm:leading-snug text-gray-400 line-clamp-3">By Chris Chmura • Updated on February 11, 2025 at 11:37 pm</p>
+                  </div>
+                </div>
+              </Link>
+            </div>
             
             <div className="mt-4 sm:mt-6 bg-[#1f1f1f] rounded-xl p-3 sm:p-4">
               <p className="text-xs sm:text-sm text-gray-300">
                 Join thousands of satisfied homeowners who've found their perfect contractors through Renovation Bridge.
               </p>
-              <button className="mt-3 sm:mt-4 bg-red-600 text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium w-full hover:bg-red-700 transition duration-200">
+              <Link href="/get-started" className="mt-3 sm:mt-4 bg-red-600 text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium w-full hover:bg-red-700 transition duration-200 inline-block text-center">
                 Get Started Today
-              </button>
+              </Link>
             </div>
           </div>
         </div>
