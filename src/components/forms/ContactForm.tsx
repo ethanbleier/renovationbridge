@@ -410,7 +410,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         </div>
         
         <p className="text-xs text-gray-500 text-center mt-3">
-          Your information is securely processed. We'll never share your details without your permission.
+          Your information is securely processed. We'll never share your details.
         </p>
       </form>
     </div>

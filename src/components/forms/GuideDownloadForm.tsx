@@ -187,7 +187,7 @@ export default function GuideDownloadForm({
             id="phone"
             value={phone}
             onChange={handlePhoneChange}
-            placeholder="Phone Number (e.g., (555) 123-4567)" 
+            placeholder="Phone Number" 
             required
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
           />

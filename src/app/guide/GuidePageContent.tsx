@@ -93,15 +93,7 @@ export default function GuidePageContent({ guideTopics }: GuidePageContentProps)
           <div className="bg-slate-50 shadow-2xl rounded-xl overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-0 items-stretch">
               {/* Content column */}
-              <div className="md:col-span-7 p-8 md:p-12 lg:p-16 flex flex-col justify-center relative">
-                <div className="absolute inset-0 z-0 opacity-10">
-                  <Image 
-                    src="/images/abstract-bg.svg" // Placeholder for a subtle background pattern
-                    alt="Abstract Background"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+              <div className="md:col-span-7 bg-white p-8 md:p-12 lg:p-16 flex flex-col justify-center relative">
                 <div className="relative z-10">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
                     <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full tracking-wider">FREE DOWNLOAD</span>
@@ -157,7 +149,6 @@ export default function GuidePageContent({ guideTopics }: GuidePageContentProps)
                   successHeading="Your Guide is on its Way!"
                   successMessage="Thank you! Check your email for the download link."
                 />
-                <p className="text-xs text-slate-500 mt-4 text-center">We respect your privacy. Unsubscribe at any time.</p>
               </div>
             </div>
           </div>

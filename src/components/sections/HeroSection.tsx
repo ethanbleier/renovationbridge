@@ -109,7 +109,7 @@ export default function HeroSection() {
             
             <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
               {/* Main title with static prefix and animated keyword */}
-              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 <span>{titles[currentSlide].prefix} </span>
                 <TypeAnimation
                   sequence={[
@@ -130,18 +130,32 @@ export default function HeroSection() {
               </h1>
               
               {/* "with Confidence" remains unchanged */}
-              <div className="text-primary h-[1.5em] overflow-hidden text-2xl sm:text-3xl md:text-4xl lg:text-5xl">{titles[currentSlide].highlight}</div>
+              <div className="text-primary h-[1.5em] overflow-hidden text-3xl sm:text-4xl md:text-5xl lg:text-6xl">{titles[currentSlide].highlight}</div>
             </div>
             
             <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">
             We connect you with top-rated, local, vetted contractors and provide you with multiple bids to ensure you get the best deal for your renovations- hassle-free.
             </p>
             
-            <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 pt-4">
-              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-base sm:text-lg px-6 py-3 w-full xs:w-auto">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+              <Link
+                href="/get-started"
+                className="btn btn-primary btn-eclipse-glow shadow-lg shadow-primary/20 transition-all text-base sm:text-lg px-6 py-3 w-full sm:w-auto
+                  hover:bg-primary hover:text-white hover:shadow-md
+                  hover:-translate-y-0.5 hover:scale-[1.03]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
+                  active:scale-95"
+              >
                 Start Your Dream Renovation
               </Link>
-              <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all text-sm sm:text-base w-full xs:w-auto">
+              <Link
+                href="/how-it-works"
+                className="btn bg-white text-primary border border-primary/20 transition-all text-sm sm:text-base w-full sm:w-auto
+                  hover:bg-lavender hover:shadow-md
+                  hover:-translate-y-0.5 hover:scale-[1.03]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
+                  active:scale-95"
+              >
                 How It Works
               </Link>
             </div>
@@ -202,7 +216,7 @@ export default function HeroSection() {
       </div>
       
       {/* Bobbing down arrow - position adjusted for immediate visibility */}
-      <div className="absolute bottom-12 sm:bottom-16 md:bottom-20 left-0 right-0 flex justify-center animate-bounce z-20">
+      <div className="absolute bottom-12 sm:bottom-16 md:bottom-20 left-0 right-0 hidden sm:flex justify-center animate-bounce z-20">
         <div 
           className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
           onClick={handleScrollDown}

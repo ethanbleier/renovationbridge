@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FiChevronDown, FiBriefcase, FiImage, FiBookOpen, FiHelpCircle, FiFileText, FiDollarSign, FiUsers, FiAward } from 'react-icons/fi'
@@ -36,10 +36,34 @@ const Header = () => {
   const lastScrollY = useRef(0)
   const pathname = usePathname()
   
+  // Refs for click-outside and scroll logic
+  const desktopNavRef = useRef<HTMLElement>(null); // For desktop nav items container
+  const mobileMenuContainerRef = useRef<HTMLDivElement>(null); // For the mobile menu dropdown panel
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null); // For the mobile menu toggle button
+  
   // ---> DECLARE VARIABLES NEEDED BY HOOKS FIRST <---
   const isGetStartedPage = pathname === '/get-started'
 
-  // ---> HOOKS MOVED HERE <---
+  // Moved handleMenuToggle definition earlier as it's used by useEffect hooks
+  const handleMenuToggle = useCallback(() => {
+    const newMenuState = !isMenuOpen
+    
+    if (newMenuState) {
+      setMenuVisible(true)
+      setTimeout(() => {
+        setIsMenuOpen(true)
+      }, 10)
+      setMobileHeaderVisible(true) 
+    } else {
+      setIsMenuOpen(false)
+      setTimeout(() => {
+        setMenuVisible(false)
+      }, 300) 
+      setIsResourcesOpen(false);
+    }
+  }, [isMenuOpen, setMenuVisible, setIsMenuOpen, setMobileHeaderVisible, setIsResourcesOpen]);
+
+  // ---> HOOKS MOVED HERE <--- (or rather, hooks using handleMenuToggle come after its definition)
   useEffect(() => {
     // Check if we're on mobile
     const checkIsMobile = () => {
@@ -57,6 +81,40 @@ const Header = () => {
     }
   }, [])
 
+  // Effect for Click-Outside functionality
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Mobile menu click-outside
+      if (isMobile && isMenuOpen) {
+        if (
+          mobileMenuContainerRef.current &&
+          !mobileMenuContainerRef.current.contains(event.target as Node) &&
+          mobileMenuButtonRef.current &&
+          !mobileMenuButtonRef.current.contains(event.target as Node)
+        ) {
+          if (isMenuOpen) { // Ensure menu is still open before toggling
+             handleMenuToggle();
+          }
+        }
+      }
+
+      // Desktop dropdown click-outside
+      if (!isMobile && activeDropdown) {
+        if (
+          desktopNavRef.current &&
+          !desktopNavRef.current.contains(event.target as Node)
+        ) {
+          setActiveDropdown(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMobile, isMenuOpen, activeDropdown, handleMenuToggle, desktopNavRef, mobileMenuContainerRef, mobileMenuButtonRef]);
+
   useEffect(() => {
     // Initialize header visibility
     setHeaderVisible(true)
@@ -64,41 +122,53 @@ const Header = () => {
 
     // Handle scroll events
     const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollY.current;
+
       // Shrink effect
       if (currentScrollY > 10) {
         setIsHeaderShrunk(true);
       } else {
         setIsHeaderShrunk(false);
       }
-      
-      // Visibility logic for mobile
-      if (isMobile) { // Standard mobile logic
-        if (currentScrollY < lastScrollY.current) {
-          setMobileHeaderVisible(true)
-        } else if (currentScrollY > 50 && currentScrollY > lastScrollY.current && !isMenuOpen) {
-          setMobileHeaderVisible(false)
+
+      // Mobile visibility logic
+      if (isMobile) {
+        if (!scrollingDown) { // Scrolling up or stationary
+          setMobileHeaderVisible(true);
+        } else { // Scrolling down
+          if (currentScrollY > 50) { // Past threshold
+            if (isMenuOpen) {
+              // If menu is open and we're scrolling down, close the menu.
+              // The header will remain visible during this scroll event.
+              handleMenuToggle();
+            } else {
+              // Menu is closed, and we're scrolling down past threshold. Hide header.
+              setMobileHeaderVisible(false);
+            }
+          }
         }
       }
-      
+
       // Desktop visibility logic
       if (!isMobile) {
-        if (currentScrollY > 150 && currentScrollY > lastScrollY.current) {
-          setHeaderVisible(false)
+        if (currentScrollY > 150 && scrollingDown) {
+          if (activeDropdown) {
+            setActiveDropdown(null); // Close desktop dropdown before hiding header
+          }
+          setHeaderVisible(false);
         } else {
-          setHeaderVisible(true)
+          setHeaderVisible(true);
         }
       }
-      
-      lastScrollY.current = currentScrollY
-    }
+      lastScrollY.current = currentScrollY;
+    };
     
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [isMobile, isMenuOpen])
+  }, [isMobile, isMenuOpen, activeDropdown, handleMenuToggle]);
   // ---> END HOOKS MOVED HERE <---
 
   // If on get-started page, don't render header at all
@@ -123,34 +193,6 @@ const Header = () => {
     },
     { name: 'For Contractors', href: '/for-contractors', icon: FiAward },
   ];
-
-  // Handle menu opening - ensure header is visible when menu is open
-  const handleMenuToggle = () => {
-    const newMenuState = !isMenuOpen
-    
-    // Set visibility with a small delay for closing animation
-    if (newMenuState) {
-      // For opening: make menu element visible immediately
-      setMenuVisible(true)
-      // Then set menu to open state to trigger animation
-      setTimeout(() => {
-        setIsMenuOpen(true)
-      }, 10) // Small delay to ensure DOM update
-      
-      // Ensure header is visible when opening menu
-      setMobileHeaderVisible(true)
-    } else {
-      // For closing: set menu to closed state first to trigger animation
-      setIsMenuOpen(false)
-      // Then delay hiding the menu element to allow animation to finish
-      setTimeout(() => {
-        setMenuVisible(false)
-      }, 300) // Match this to the animation duration
-      
-      // Close resources dropdown
-      setIsResourcesOpen(false);
-    }
-  }
 
   const handleMouseEnter = (itemName: string) => {
     if (!isMobile) {
@@ -201,7 +243,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 flex-grow justify-center">
+          <nav className="hidden lg:flex items-center space-x-1 flex-grow justify-center" ref={desktopNavRef}>
             {navItems.map((item) => (
               <div
                 key={item.name}
@@ -288,6 +330,7 @@ const Header = () => {
           <div className="relative flex-shrink-0 ml-auto flex items-center lg:hidden">
             {/* Button */}
             <button
+              ref={mobileMenuButtonRef}
               className="text-gray-500 hover:text-gray-700 focus:outline-none z-50 flex items-center justify-center"
               onClick={handleMenuToggle}
             >
@@ -299,6 +342,7 @@ const Header = () => {
             
             {/* Dropdown Menu */}
             <div 
+              ref={mobileMenuContainerRef}
               className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
                 isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
               }`}
