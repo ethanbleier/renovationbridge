@@ -109,7 +109,7 @@ export default function HeroSection() {
             
             <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
               {/* Main title with static prefix and animated keyword */}
-              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
                 <span>{titles[currentSlide].prefix} </span>
                 <TypeAnimation
                   sequence={[
@@ -130,26 +130,15 @@ export default function HeroSection() {
               </h1>
               
               {/* "with Confidence" remains unchanged */}
-              <div className="text-primary h-[1.5em] overflow-hidden text-xl sm:text-2xl md:text-3xl lg:text-4xl">{titles[currentSlide].highlight}</div>
+              <div className="text-primary h-[1.5em] overflow-hidden text-2xl sm:text-3xl md:text-4xl lg:text-5xl">{titles[currentSlide].highlight}</div>
             </div>
             
             <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">
-              We connect you with top-rated local contractors. Without the headaches.
+            We connect you with top-rated, local, vetted contractors and provide you with multiple bids to ensure you get the best deal for your renovations- hassle-free.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-2 mt-2">
-              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg text-sm text-gray-700 font-medium flex-1 text-center">
-                Compare multiple bids
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg text-sm text-gray-700 font-medium flex-1 text-center">
-                Get expert support
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm p-2 rounded-lg text-sm text-gray-700 font-medium flex-1 text-center">
-                All at no cost
-              </div>
-            </div>
-            <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
-              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-sm sm:text-base w-full xs:w-auto">
+            <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 pt-4">
+              <Link href="/get-started" className="btn btn-primary shadow-lg shadow-primary/20 hover:translate-y-1 transition-all text-base sm:text-lg px-6 py-3 w-full xs:w-auto">
                 Start Your Dream Renovation
               </Link>
               <Link href="/how-it-works" className="btn bg-white text-primary border border-primary/20 hover:bg-lavender hover:shadow-md transition-all text-sm sm:text-base w-full xs:w-auto">
@@ -157,23 +146,8 @@ export default function HeroSection() {
               </Link>
             </div>
             
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 lg:gap-8 pt-6 sm:pt-8 md:pt-10">
-              <div className="text-center p-2 md:p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary">60+</div>
-                <p className="text-xxs xs:text-xs sm:text-sm lg:text-base text-gray-600">Vetted Contractors</p>
-              </div>
-              <div className="text-center p-2 md:p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary">2,000+</div>
-                <p className="text-xxs xs:text-xs sm:text-sm lg:text-base text-gray-600">Homeowners Helped</p>
-              </div>
-              <div className="text-center p-2 md:p-4 rounded-lg bg-white/80 backdrop-blur-sm shadow-sm">
-                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary">100%</div>
-                <p className="text-xxs xs:text-xs sm:text-sm lg:text-base text-gray-600">Matchmaking Success</p>
-              </div>
-            </div>
-            
             {/* Summer Special Offer */}
-            <div className="mt-6 sm:mt-8 rounded-lg bg-white/70 backdrop-blur-sm border border-primary/10 shadow-sm overflow-hidden">
+            <div className="hidden sm:block mt-6 sm:mt-8 rounded-lg bg-white/70 backdrop-blur-sm border border-primary/10 shadow-sm overflow-hidden">
               <div className="p-3 sm:p-4">
                 <div className="flex items-center mb-2">
                   <svg className="w-5 h-5 text-yellow-500 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

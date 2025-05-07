@@ -196,12 +196,12 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
   }
   
   return (
-    <div className="w-full rounded-lg bg-white p-6 md:p-8 shadow-lg transition-all hover:shadow-xl">
+    <div className="w-full rounded-lg bg-white p-5 md:p-6 shadow-lg transition-all hover:shadow-xl">
       {trackConversion && <ConversionTracker conversionType="contact_form" value={1.0} />}
       
-      <h3 className="text-xl md:text-2xl font-bold mb-5 md:mb-7 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-primary after:left-0 after:-bottom-2">Get Started Today</h3>
+      <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-gray-800 relative inline-block after:content-[''] after:absolute after:w-1/2 after:h-1 after:bg-primary after:left-0 after:-bottom-2">Get Started Today</h3>
       {isSuccess ? (
-        <div className="bg-green-50 text-green-800 p-4 rounded-md mb-6 border-l-4 border-green-500 flex items-center animate-fadeIn">
+        <div className="bg-green-50 text-green-800 p-3 rounded-md mb-5 border-l-4 border-green-500 flex items-center animate-fadeIn">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
@@ -210,7 +210,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
       ) : null}
       
       {error ? (
-        <div className="bg-red-50 text-red-800 p-4 rounded-md mb-6 border-l-4 border-red-500 flex items-center animate-fadeIn">
+        <div className="bg-red-50 text-red-800 p-3 rounded-md mb-5 border-l-4 border-red-500 flex items-center animate-fadeIn">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
@@ -218,10 +218,10 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         </div>
       ) : null}
       
-      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-5" aria-label="Contact form">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4" aria-label="Contact form">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-xs font-medium text-gray-700">
               Name <span className="text-red-500"></span>
             </label>
             <div className="relative group">
@@ -233,7 +233,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
                 type="text"
                 autoComplete="name"
                 autoFocus
-                className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
+                className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
                 placeholder="Full Name"
                 aria-required="true"
                 aria-invalid={errors.name ? "true" : "false"}
@@ -241,7 +241,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               />
             </div>
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600 flex items-center" id="name-error">
+              <p className="mt-1 text-xs text-red-600 flex items-center" id="name-error">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -251,7 +251,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
           </div>
           
           <div className="space-y-1">
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="city" className="block text-xs font-medium text-gray-700">
               City <span className="text-red-500"></span>
             </label>
             <div className="relative group">
@@ -262,7 +262,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
                 id="city"
                 type="text"
                 autoComplete="address-level2"
-                className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
+                className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
                 placeholder="City"
                 aria-required="true"
                 aria-invalid={errors.city ? "true" : "false"}
@@ -270,7 +270,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               />
             </div>
             {errors.city && (
-              <p className="mt-1 text-sm text-red-600 flex items-center" id="city-error">
+              <p className="mt-1 text-xs text-red-600 flex items-center" id="city-error">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -281,7 +281,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         </div>
         
         <div className="space-y-1">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-xs font-medium text-gray-700">
             Email <span className="text-red-500"></span>
           </label>
           <div className="relative group">
@@ -293,7 +293,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               id="email"
               type="email"
               autoComplete="email"
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
               placeholder="Email Address"
               aria-required="true"
               aria-invalid={errors.email ? "true" : "false"}
@@ -307,7 +307,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
             />
           </div>
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600 flex items-center" id="email-error">
+            <p className="mt-1 text-xs text-red-600 flex items-center" id="email-error">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
@@ -317,7 +317,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         </div>
         
         <div className="space-y-1">
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="phone" className="block text-xs font-medium text-gray-700">
             Phone Number <span className="text-red-500"></span>
           </label>
           <div className="relative group">
@@ -328,7 +328,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               id="phone"
               type="tel"
               autoComplete="tel"
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all`}
               placeholder="(123) 456-7890"
               aria-required="true"
               aria-invalid={errors.phone ? "true" : "false"}
@@ -344,7 +344,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
             />
           </div>
           {errors.phone && (
-            <p className="mt-1 text-sm text-red-600 flex items-center" id="phone-error">
+            <p className="mt-1 text-xs text-red-600 flex items-center" id="phone-error">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
@@ -354,7 +354,7 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
         </div>
         
         <div className="space-y-1">
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="message" className="block text-xs font-medium text-gray-700">
             Project Details <span className="text-red-500"></span>
           </label>
           <div className="relative group">
@@ -365,14 +365,14 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
               id="message"
               placeholder="Tell us briefly what you need help with today"
               rows={4}
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm ${errors.message ? 'border-red-500' : 'border-gray-300'} focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none`}
               aria-required="true"
               aria-invalid={errors.message ? "true" : "false"}
               {...register('message', { required: true })}
             ></textarea>
           </div>
           {errors.message && (
-            <p className="mt-1 text-sm text-red-600 flex items-center" id="message-error">
+            <p className="mt-1 text-xs text-red-600 flex items-center" id="message-error">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
@@ -381,10 +381,10 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
           )}
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-3 pt-3">
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
           <button
             type="submit"
-            className="flex-1 px-6 py-3 bg-primary hover:bg-opacity-90 text-white font-medium rounded-lg shadow transition-all hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:transform-none"
+            className="flex-1 px-6 py-2.5 bg-primary hover:bg-opacity-90 text-white text-sm font-medium rounded-lg shadow transition-all hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:transform-none"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -402,14 +402,14 @@ const ContactForm = ({ onSubmit }: ContactFormProps = {}) => {
             <button
               type="button"
               onClick={clearForm}
-              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
+              className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
             >
               Clear Form
             </button>
           )}
         </div>
         
-        <p className="text-xs text-gray-500 text-center mt-4">
+        <p className="text-xs text-gray-500 text-center mt-3">
           Your information is securely processed. We'll never share your details without your permission.
         </p>
       </form>
