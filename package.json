@@ -29,7 +29,7 @@
     "cors": "^2.8.5",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
-    "framer-motion": "^12.9.2",
+    "framer-motion": "^12.10.1",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "html2canvas": "^1.4.1",
