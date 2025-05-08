@@ -7,7 +7,7 @@ import { FaTiktok, FaXTwitter } from 'react-icons/fa6'
 
 const AsSeenOnTV = () => {
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-[#0f0f0f] text-white">
+    <section id="as-seen-on-tv-section" className="py-12 sm:py-16 md:py-20 bg-[#0f0f0f] text-white">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-white">As Seen on TV</h2>

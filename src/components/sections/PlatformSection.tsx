@@ -17,7 +17,7 @@ export default function PlatformSection() {
   const animationDuration = 30
   
   return (
-    <section className="py-8 sm:py-10 md:py-12 bg-white">
+    <section id="platform-section" className="py-16 sm:py-20 md:py-24 bg-white">
       <div className="container mx-auto px-4 sm:px-6">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-10">Trusted By</h2>
         

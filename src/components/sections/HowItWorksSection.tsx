@@ -29,6 +29,7 @@ export default function HowItWorksSection() {
 
   return (
     <section 
+      id="how-it-works-section"
       ref={sectionRef} 
       className="py-16 sm:py-20 md:py-32 bg-white"
     >

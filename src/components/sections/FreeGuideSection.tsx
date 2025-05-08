@@ -63,7 +63,7 @@ export default function FreeGuideSection() {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-slate-50 to-sky-100">
+    <section id="free-guide-section" className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-slate-50 to-sky-100">
       <div className="container-custom px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Image with Animation */}

@@ -127,6 +127,7 @@ const ServiceAreaMapSection = () => {
 
   return (
     <section
+      id="service-area-map-section"
       ref={sectionRef}
       className="relative pt-24 sm:pt-32 md:pt-40 pb-20 sm:pb-28 md:pb-36 min-h-[900px] sm:min-h-[1100px] md:min-h-[1300px] flex items-center justify-center overflow-hidden bg-cream"
       style={{}}

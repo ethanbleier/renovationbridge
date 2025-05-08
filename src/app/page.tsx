@@ -10,6 +10,7 @@ import ServiceAreaMapSection from '@/components/sections/ServiceAreaMapSection'
 import PageSeo from '@/components/seo/PageSeo'
 import { generateServiceSchema, generateFAQSchema } from '@/lib/structured-data'
 import { Metadata } from 'next'
+import SectionHotkeys from '@/components/SectionHotkeys'
 
 export const metadata: Metadata = {
   title: 'Renovation Bridge | Smart Home Renovation Solutions in Bay Area',
@@ -46,28 +47,29 @@ export default function Home() {
 
   return (
     <>
+      <SectionHotkeys />
       <PageSeo structuredData={[faqSchema, serviceSchema]} />
       
       {/* Hero Section */}
       <HeroSection />
-      
-      {/* Testimonials Section */}
-      <TestimonialsSection />
 
       {/* Trusted By Section */}
       <PlatformSection />
 
       {/* What We Offer Section */}
       <WhatWeOfferSection />
-      
-      {/* Free Guide Download Section */}
-      <FreeGuideSection />
+            
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* Service Area Map Section */}
+      <ServiceAreaMapSection />
 
       {/* How It Works Section */}
       <HowItWorksSection />
 
-      {/* Service Area Map Section */}
-      <ServiceAreaMapSection />
+      {/* Free Guide Download Section */}
+      <FreeGuideSection />
       
       {/* As Seen on TV Section */}
       <AsSeenOnTV />
