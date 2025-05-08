@@ -4,10 +4,9 @@ import React from 'react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiChevronDown, FiBriefcase, FiImage, FiBookOpen, FiHelpCircle, FiFileText, FiDollarSign, FiUsers, FiAward } from 'react-icons/fi'
+import { FiChevronDown, FiBriefcase, FiImage, FiBookOpen, FiHelpCircle, FiFileText, FiDollarSign, FiUsers, FiAward, FiInfo } from 'react-icons/fi'
 import { usePathname } from 'next/navigation'
 import MenuButton from '../ui/MenuButton'
-import CloseButton from '../ui/CloseButton'
 
 // Define menu structure
 interface MenuItem {
@@ -191,6 +190,7 @@ const Header = () => {
         { name: 'Referral Program', href: '/real-estate-referral', icon: FiUsers, highlight: 'Partner with us' },
       ]
     },
+    { name: 'About Us', href: '/about-us', icon: FiInfo },
     { name: 'For Contractors', href: '/for-contractors', icon: FiAward },
   ];
 

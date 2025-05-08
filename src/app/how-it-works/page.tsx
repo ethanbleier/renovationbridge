@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useMediaQuery } from 'react-responsive';
+import ServiceAreaMapSection from '@/components/sections/ServiceAreaMapSection';
 
 // Custom accordion component with smooth animations
 interface AccordionItemProps {
@@ -326,6 +327,8 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
+
+      <ServiceAreaMapSection />
 
       {/* CTA Section - Cleaner, more focused */}
       <section className="py-16 bg-primary">

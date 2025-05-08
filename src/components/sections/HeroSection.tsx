@@ -134,13 +134,13 @@ export default function HeroSection() {
             </div>
             
             <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">
-            We connect you with top-rated, local, vetted contractors and provide you with multiple bids to ensure you get the best deal for your renovations- hassle-free.
+            We connect you with top-rated, local, vetted contractors and provide you with multiple bids to ensure you get the best deal for your renovations, hassle-free.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-3 sm:gap-4 pt-4 max-w-xl">
               <Link
                 href="/get-started"
-                className="btn btn-primary btn-eclipse-glow shadow-lg shadow-primary/20 transition-all text-base sm:text-lg px-6 py-3 w-full sm:w-auto
+                className="btn btn-primary btn-eclipse-glow shadow-lg shadow-primary/20 transition-all text-base sm:text-lg px-6 py-3 w-full sm:flex-grow
                   hover:bg-primary hover:text-white hover:shadow-md
                   hover:-translate-y-0.5 hover:scale-[1.03]
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
@@ -150,7 +150,7 @@ export default function HeroSection() {
               </Link>
               <Link
                 href="/how-it-works"
-                className="btn bg-white text-primary border border-primary/20 transition-all text-sm sm:text-base w-full sm:w-auto
+                className="btn bg-white text-primary border border-primary/20 transition-all text-sm sm:text-base w-full sm:w-auto sm:whitespace-nowrap sm:min-w-[140px] flex justify-center items-center
                   hover:bg-lavender hover:shadow-md
                   hover:-translate-y-0.5 hover:scale-[1.03]
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
