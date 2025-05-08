@@ -2,8 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { FaFacebookF, FaInstagram } from 'react-icons/fa'
-import { FaThumbsUp, FaShare, FaEye, FaRegComment } from 'react-icons/fa'
+import { FaFacebookF, FaInstagram, FaYoutube, FaThumbsUp, FaShare, FaEye, FaRegComment } from 'react-icons/fa'
 import { FaTiktok, FaXTwitter } from 'react-icons/fa6'
 
 const AsSeenOnTV = () => {
@@ -18,10 +17,7 @@ const AsSeenOnTV = () => {
         <div className="mb-6 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold mb-2 inline-flex items-center">
             <span className="bg-red-600 p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3">
-              <svg viewBox="0 0 24 24" width="20" height="20" className="sm:w-24 sm:h-24" fill="white">
-                <path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.58 3.5 12 3.5 12 3.5s-7.58 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.8.55 9.38.55 9.38.55s7.58 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14c.5-1.88.5-5.81.5-5.81s0-3.93-.5-5.81z"/>
-                <path fill="#0f0f0f" d="M9.5 15.5V8.5l6 3.5-6 3.5z"/>
-              </svg>
+              <FaYoutube className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </span>
             <Link href="https://www.youtube.com/watch?v=956oI-dZcKQ&ab_channel=NBCBayArea" target="_blank" className="hover:text-red-500 transition-colors">
               NBC Bay Area

@@ -128,7 +128,7 @@ const ServiceAreaMapSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative pt-48 sm:pt-64 md:pt-80 pb-20 sm:pb-28 md:pb-36 min-h-[900px] sm:min-h-[1100px] md:min-h-[1300px] flex items-center justify-center overflow-hidden bg-cream"
+      className="relative pt-24 sm:pt-32 md:pt-40 pb-20 sm:pb-28 md:pb-36 min-h-[900px] sm:min-h-[1100px] md:min-h-[1300px] flex items-center justify-center overflow-hidden bg-cream"
       style={{}}
     >
       {/* Parallax Background Image */}
@@ -153,7 +153,7 @@ const ServiceAreaMapSection = () => {
       />
       {/* Content Overlay */}
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center">
-        <div className="text-center mb-8 sm:mb-12 select-none">
+        <div className="text-center mb-6 sm:mb-8 select-none">
           <motion.h2
             className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg tracking-tight"
             style={{ y: titleY, opacity: titleOpacity, willChange: 'transform, opacity' }}
