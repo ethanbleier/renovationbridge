@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import GuideDownloadForm from '@/components/forms/GuideDownloadForm';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment, useRef, useCallback } from 'react';
 
 interface GuideTopic {
   id: string;
@@ -16,12 +16,164 @@ interface GuidePageContentProps {
   guideTopics: GuideTopic[];
 }
 
+// Modern, accessible lightbox modal with carousel for guide previews
+interface GuidePreviewLightboxProps {
+  topic: GuideTopic;
+  onClose: () => void;
+  getImageFilenames: (id: string) => string[];
+}
+
+function GuidePreviewLightbox({ topic, onClose, getImageFilenames }: GuidePreviewLightboxProps) {
+  const images = getImageFilenames(topic.id);
+  const [current, setCurrent] = useState(0);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+
+  // Focus trap for accessibility
+  useEffect(() => {
+    const focusable = lightboxRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable?.[0];
+    const last = focusable?.[focusable.length - 1];
+    function handleTab(e: KeyboardEvent) {
+      if (!focusable || focusable.length === 0) return;
+      if (e.key === 'Tab') {
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight') setCurrent((c) => (c + 1) % images.length);
+      if (e.key === 'ArrowLeft') setCurrent((c) => (c - 1 + images.length) % images.length);
+      handleTab(e);
+    }
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [onClose, images.length]);
+
+  // Move to next/prev image
+  const goNext = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
+  const goPrev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
+
+  return (
+    <div
+      ref={lightboxRef}
+      className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 p-6 flex flex-col items-center animate-fadeIn border-2 border-blue-100 focus:outline-none"
+      tabIndex={0}
+      aria-label={`Preview images for ${topic.title}`}
+      role="document"
+      style={{ fontFamily: 'Nunito, Open Sans, sans-serif' }}
+    >
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 text-gray-500 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full p-2"
+        aria-label="Close preview"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7L7 17M7 7l10 10" />
+        </svg>
+      </button>
+      <h4 className="text-xl font-semibold mb-4 text-center font-inter text-blue-700">{topic.title} – Guide Preview</h4>
+      <div className="relative w-full flex flex-col items-center">
+        {/* Carousel controls */}
+        <button
+          onClick={goPrev}
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full p-2 shadow focus:outline-none focus:ring-2 focus:ring-blue-400 z-10"
+          aria-label="Previous image"
+          style={{ left: '-2.5rem' }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div className="relative w-72 h-96 sm:w-80 sm:h-[28rem] bg-gray-100 rounded-lg overflow-hidden shadow-md border border-gray-200 flex items-center justify-center">
+          <Image
+            src={images[current]}
+            alt={`${topic.title} preview page ${current + 1}`}
+            fill
+            className="object-contain"
+            sizes="(max-width: 768px) 80vw, 320px"
+            priority
+          />
+        </div>
+        <button
+          onClick={goNext}
+          className="absolute right-0 top-1/2 -translate-y-1/2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full p-2 shadow focus:outline-none focus:ring-2 focus:ring-blue-400 z-10"
+          aria-label="Next image"
+          style={{ right: '-2.5rem' }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      {/* Carousel indicators */}
+      <div className="flex gap-2 mt-4 justify-center">
+        {images.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrent(idx)}
+            className={`w-3 h-3 rounded-full border-2 ${idx === current ? 'bg-blue-600 border-blue-600' : 'bg-blue-100 border-blue-200'} focus:outline-none`}
+            aria-label={`Go to image ${idx + 1}`}
+          />
+        ))}
+      </div>
+      <p className="mt-6 text-gray-600 text-center text-sm font-nunito">Preview pages from the guide topic. Download the full guide for more details.</p>
+      <a
+        href="#download-guide"
+        className="mt-4 inline-flex items-center justify-center px-5 py-2 rounded-md bg-[#07049D] text-white font-medium shadow hover:bg-[#07049D]/90 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors text-sm font-nunito"
+        onClick={onClose}
+      >
+        Get the Complete Guide
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+      </a>
+    </div>
+  );
+}
+
 export default function GuidePageContent({ guideTopics }: GuidePageContentProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [previewTopic, setPreviewTopic] = useState<GuideTopic | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPreviewTopic(null);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, []);
+
+  // Helper to get image filenames based on topic id
+  // Map topic ids to image base names (must match guide-info PNGs)
+  const getImageFilenames = (id: string) => {
+    const map: Record<string, string> = {
+      getting_started: 'getting-started',
+      budget: 'budget',
+      selecting: 'selecting',
+      plan: 'plan',
+      making: 'making',
+      living: 'living',
+    };
+    const base = id;
+    return [
+      `/images/guide-info/${base}_1.png`,
+      `/images/guide-info/${base}_2.png`,
+    ];
+  };
 
   const handleScrollToForm = () => {
     const formSection = document.getElementById('download-guide');
@@ -182,34 +334,63 @@ export default function GuidePageContent({ guideTopics }: GuidePageContentProps)
         </section>
         
         <section id="topics" className="mb-20 scroll-mt-20">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-center tracking-tight">Guide Topics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-center tracking-tight font-inter text-[#07049D]">Guide Topics</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {guideTopics.map((topic) => (
-              <div key={topic.id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 flex flex-col h-full transform hover:-translate-y-1">
-                <div className="w-14 h-14 bg-lavender/20 rounded-full flex items-center justify-center mb-6">
-                  <Image src={topic.icon} alt="" width={28} height={28} />
+              <div
+                key={topic.id}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 flex flex-col h-full group border border-blue-100 focus-within:ring-2 focus-within:ring-blue-400"
+                tabIndex={0}
+                aria-label={`Preview images for ${topic.title}`}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setPreviewTopic(topic); }}
+              >
+                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-5 border border-blue-100">
+                  <Image src={topic.icon} alt={topic.title + ' icon'} width={32} height={32} />
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{topic.title}</h3>
-                <p className="text-gray-600 mb-6 flex-grow leading-relaxed">{topic.description}</p>
-                <a href="#download-guide" className="group text-blue-600 font-medium hover:text-blue-800 inline-flex items-center transition-colors">
-                  Read more
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <h3 className="text-lg font-semibold mb-2 font-inter text-slate-800">{topic.title}</h3>
+                <p className="text-gray-600 mb-4 flex-grow font-nunito">{topic.description}</p>
+                <button
+                  type="button"
+                  className="mt-auto inline-flex items-center justify-center px-4 py-2 rounded-md bg-[#07049D] text-white font-medium shadow hover:bg-[#07049D]/90 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors text-sm font-nunito"
+                  onClick={() => setPreviewTopic(topic)}
+                  aria-label={`Open preview for ${topic.title}`}
+                >
+                  Preview
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
+                </button>
               </div>
             ))}
           </div>
+
+          {/* Modern Lightbox Modal for Previews */}
+          {previewTopic && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-all"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Preview images for ${previewTopic.title}`}
+              tabIndex={-1}
+              onClick={e => { if (e.target === e.currentTarget) setPreviewTopic(null); }}
+            >
+              <GuidePreviewLightbox
+                topic={previewTopic}
+                onClose={() => setPreviewTopic(null)}
+                getImageFilenames={getImageFilenames}
+              />
+            </div>
+          )}
         </section>
         
         {/* Secondary CTA for Guide Download - Strategic placement after browsing topics */}
         <section className="mb-20">
           <div className="bg-gradient-to-r from-lavender/20 to-blue-50 shadow-lg p-8 rounded-xl text-center">
-            <h3 className="text-2xl font-semibold mb-3">Want to take this guide with you?</h3>
+            <h3 className="text-2xl font-semibold mb-3 text-[#07049D]">Want to take this guide with you?</h3>
             <p className="mb-5 text-gray-700 max-w-2xl mx-auto">
               Download our complete renovation guide PDF to reference offline and share with your family or contractor.
             </p>
-            <a href="#download-guide" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-md">
+            <a href="#download-guide" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#07049D] hover:bg-[#07049D]/90 transition-colors duration-200 shadow-md">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
@@ -219,13 +400,13 @@ export default function GuidePageContent({ guideTopics }: GuidePageContentProps)
         </section>
         
         <section className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 md:p-12 mb-10">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-center tracking-tight">Need Personalized Help?</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-center tracking-tight text-[#07049D]">Need Personalized Help?</h2>
           <p className="text-center text-gray-700 max-w-2xl mx-auto mb-10 leading-relaxed">
             If you have specific questions or need personalized guidance for your renovation project, 
             our team of experts is ready to help.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/get-started" className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200 shadow-md">
+            <Link href="/get-started" className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#07049D] hover:bg-[#07049D]/90 transition-colors duration-200 shadow-md">
               Begin Your Renovation Journey
             </Link>
             <Link href="/how-it-works" className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm">

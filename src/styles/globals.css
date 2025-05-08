@@ -309,7 +309,7 @@
   filter: blur(5.5px); /* Extra blur for a more fluid, diffused look */
   pointer-events: none;
   /* Even more fluid, organic animation timing and duration */
-  animation: eclipse-glow-fluid 11s cubic-bezier(0.77,0,0.18,1) infinite;
+  animation: eclipse-glow-fluid 4s cubic-bezier(0.77,0,0.18,1) infinite;
 }
 
 /* Even more fluid, organic keyframes for the eclipse glow */
@@ -318,29 +318,85 @@
     transform: translateX(-70%) scale(1.10,1.01) skewX(-2deg);
     opacity: 0.55;
   }
-  12% {
-    transform: translateX(-40%) scale(1.15,1.03) skewX(1deg);
+  5% {
+    transform: translateX(-62%) scale(1.12,1.015) skewX(-1.5deg);
+    opacity: 0.65;
+  }
+  10% {
+    transform: translateX(-54%) scale(1.14,1.02) skewX(-1deg);
+    opacity: 0.75;
+  }
+  15% {
+    transform: translateX(-46%) scale(1.15,1.03) skewX(-0.5deg);
+    opacity: 0.82;
+  }
+  20% {
+    transform: translateX(-38%) scale(1.16,1.035) skewX(0deg);
     opacity: 0.88;
   }
-  28% {
-    transform: translateX(0%) scale(1.22,1.06) skewX(-1deg);
+  25% {
+    transform: translateX(-30%) scale(1.18,1.04) skewX(0.5deg);
+    opacity: 0.91;
+  }
+  30% {
+    transform: translateX(-22%) scale(1.19,1.045) skewX(1deg);
+    opacity: 0.93;
+  }
+  35% {
+    transform: translateX(-14%) scale(1.20,1.05) skewX(1.2deg);
+    opacity: 0.95;
+  }
+  40% {
+    transform: translateX(-6%) scale(1.21,1.055) skewX(1deg);
+    opacity: 0.96;
+  }
+  45% {
+    transform: translateX(2%) scale(1.22,1.06) skewX(0.5deg);
     opacity: 0.97;
   }
-  48% {
-    transform: translateX(60%) scale(1.18,1.04) skewX(2deg);
+  50% {
+    transform: translateX(10%) scale(1.21,1.055) skewX(0deg);
+    opacity: 0.98;
+  }
+  55% {
+    transform: translateX(18%) scale(1.20,1.05) skewX(-0.5deg);
     opacity: 0.99;
   }
-  68% {
-    transform: translateX(110%) scale(1.13,1.01) skewX(-1deg);
-    opacity: 0.85;
+  60% {
+    transform: translateX(26%) scale(1.19,1.045) skewX(-1deg);
+    opacity: 0.97;
   }
-  82% {
-    transform: translateX(140%) scale(1.09,1) skewX(0deg);
+  65% {
+    transform: translateX(34%) scale(1.18,1.04) skewX(-1.2deg);
+    opacity: 0.95;
+  }
+  70% {
+    transform: translateX(42%) scale(1.17,1.035) skewX(-1deg);
+    opacity: 0.93;
+  }
+  75% {
+    transform: translateX(50%) scale(1.16,1.03) skewX(-0.5deg);
+    opacity: 0.91;
+  }
+  80% {
+    transform: translateX(58%) scale(1.15,1.025) skewX(0deg);
+    opacity: 0.88;
+  }
+  85% {
+    transform: translateX(66%) scale(1.13,1.02) skewX(0.5deg);
+    opacity: 0.82;
+  }
+  90% {
+    transform: translateX(74%) scale(1.11,1.015) skewX(1deg);
+    opacity: 0.75;
+  }
+  95% {
+    transform: translateX(82%) scale(1.10,1.01) skewX(1.5deg);
     opacity: 0.65;
   }
   100% {
-    transform: translateX(170%) scale(1.10,1.01) skewX(-2deg);
-    opacity: 0.45;
+    transform: translateX(90%) scale(1.10,1.01) skewX(-2deg);
+    opacity: 0.55;
   }
 }
 

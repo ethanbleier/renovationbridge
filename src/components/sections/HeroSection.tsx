@@ -70,7 +70,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[90vh] pt-20 sm:pt-24 md:pt-28 pb-16 md:pb-32">
+    <section className="relative min-h-[90vh] pt-20 sm:pt-24 md:pt-28 pb-16 md:min-h-screen md:pb-0">
       {/* Image Carousel Background */}
       <div className="absolute inset-0 w-full h-full">
         {slides.map((slide, index) => (
@@ -109,7 +109,7 @@ export default function HeroSection() {
             
             <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-secondary leading-tight space-y-2 lg:max-w-[650px]">
               {/* Main title with static prefix and animated keyword */}
-              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+              <h1 className="min-h-[1.5em] h-[1.5em] w-full overflow-visible text-ellipsis text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl">
                 <span>{titles[currentSlide].prefix} </span>
                 <TypeAnimation
                   sequence={[
@@ -130,7 +130,7 @@ export default function HeroSection() {
               </h1>
               
               {/* "with Confidence" remains unchanged */}
-              <div className="text-primary h-[1.5em] overflow-hidden text-3xl sm:text-4xl md:text-5xl lg:text-6xl">{titles[currentSlide].highlight}</div>
+              <div className="text-primary h-[1.5em] overflow-hidden text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl">{titles[currentSlide].highlight}</div>
             </div>
             
             <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-xl font-medium backdrop-blur-sm bg-white/10 p-2 sm:p-3 rounded-lg">

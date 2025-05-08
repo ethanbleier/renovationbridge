@@ -334,10 +334,8 @@ const Header = () => {
               className="text-gray-500 hover:text-gray-700 focus:outline-none z-50 flex items-center justify-center"
               onClick={handleMenuToggle}
             >
-              {isMenuOpen ? 
-                <CloseButton size={24} /> : 
-                <MenuButton size={24} />
-              }
+              {/* Use MenuButton for both open and closed states, switching icon with 'open' prop */}
+              <MenuButton size={24} open={isMenuOpen} />
             </button>
             
             {/* Dropdown Menu */}

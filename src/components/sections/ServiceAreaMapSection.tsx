@@ -44,6 +44,7 @@ const ServiceAreaMapSection = () => {
                 src="/images/maps/bay-area-map.png"
                 alt="Bay Area Service Map"
                 fill
+                sizes="(min-width: 1024px) 66vw, 100vw"
                 className="object-cover"
               />
             </div>
