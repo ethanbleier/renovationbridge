@@ -154,7 +154,7 @@ export default function AboutUsPage() {
                   title="Video Transcript"
                   className="mt-6"
                 >
-                  <div className="text-sm text-gray-300 space-y-2">
+                  <div className="text-sm text-gray-300 space-y-2 max-h-[300px] overflow-y-auto sm:max-h-none sm:overflow-y-visible">
                     <p>Renovation Bridge: Making Home Renovations Easier</p>
                     <p>Founded by Onn Matalon and Jacob Gabriel, Renovation Bridge is transforming the home renovation industry. Our platform connects homeowners with fully vetted, top-rated local contractors.</p>
                     <p>We handle everything from initial planning to project completion, making your dream home a reality has never been easier. Featured on local news channels across the Bay Area, join thousands of satisfied homeowners who chose Renovation Bridge.</p>
@@ -177,7 +177,7 @@ export default function AboutUsPage() {
                   title="Video Transcript"
                   className="mt-6"
                 >
-                  <div className="text-sm text-gray-300 space-y-2">
+                  <div className="text-sm text-gray-300 space-y-2 max-h-[300px] overflow-y-auto sm:max-h-none sm:overflow-y-visible">
                     <p>To say that home contractors took big money, then blundered or bailed on them. Many of those jilted customers wish they'd done more digging into the contractor's past before picking them. Now, some innovators are aiming to help you avoid those mistakes.</p>
                     <p>The entrepreneurs you're about to meet saw the messes contractors leave behind and found a business opportunity. They say they'll vet a contractor's background for you before you break ground.</p>
                     <p>Kim Cafaro in Livermore says she dragged her feet beginning her kitchen renovation project because she dreaded picking a contractor. The state contractor board says it receives about 20,000 contractor complaints each year, then revokes 30 to 60 contractor licenses each month.</p>

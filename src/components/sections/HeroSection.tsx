@@ -293,6 +293,7 @@ export default function HeroSection() {
         className={`fixed z-50 top-1/2 transform -translate-y-1/2 transition-all duration-500 ease-in-out
           h-10 w-10 bg-white/40 backdrop-blur-sm rounded-l-md flex items-center justify-center
           border-l border-t border-b border-white/20 shadow-sm hover:bg-white/60
+          hidden md:flex
           ${isNavExpanded ? 'right-[calc(11.67rem+1px)]' : 'right-1'}`}
         aria-label={isNavExpanded ? "Collapse navigation" : "Expand navigation"}
       >

@@ -218,9 +218,9 @@ export default function HowItWorksPage() {
             >
               <Link
                 href="/get-started"
-                className="inline-block bg-primary text-white font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-primary-dark transition-all duration-300"
+                className="inline-block bg-primary text-white font-medium px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg hover:bg-primary-dark transition-all duration-300"
               >
-                Continue
+                Skip & Get Started
               </Link>
             </motion.div>
           </motion.div>
