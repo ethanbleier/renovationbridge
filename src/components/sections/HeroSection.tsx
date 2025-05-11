@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
 import { TypeAnimation } from 'react-type-animation'
+import AIChatFooter from '@/components/ui/AIChatFooter'
 
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -466,6 +467,9 @@ export default function HeroSection() {
           </div>
         </div>
       </div>
+      
+      {/* Add the AIChatFooter component */}
+      <AIChatFooter />
     </section>
   )
 } 
