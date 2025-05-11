@@ -10,7 +10,7 @@ const Footer = () => {
   const pathname = usePathname()
   
   // Don't render the footer on the get-started page OR the home page
-  if (pathname === '/get-started' || pathname === '/home') {
+  if (pathname === '/get-started' || pathname === '/home' || pathname === '/ai') {
     return null
   }
   

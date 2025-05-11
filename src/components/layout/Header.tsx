@@ -213,16 +213,16 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${ 
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${
       // Use combined logic for initial visibility
       isMobile ? (mobileHeaderVisible ? 'translate-y-0' : '-translate-y-full') : 
       (headerVisible ? 'translate-y-0' : '-translate-y-full')
-    } ${ 
-      // Shrink effect styling
-      isHeaderShrunk ? 'bg-white shadow-md py-2' : 'bg-white py-4'
-    }`}> 
-      <div className="container-custom relative">
-        <div className="flex items-center justify-between gap-4 lg:gap-6">
+    } ${
+      // Shrink effect styling with backdrop blur
+      isHeaderShrunk ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-sm py-1 sm:py-1.5' : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm py-2 sm:py-3'
+    }`}>
+      <div className="container-custom relative px-4 sm:px-6">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0 group" onClick={handleMobileLinkClick}>
             <div className="flex items-center justify-center">
@@ -233,8 +233,8 @@ const Header = () => {
                 height={40}
                 className={`transition-all duration-300 ${
                   isHeaderShrunk 
-                    ? 'w-[140px] lg:w-[160px]'
-                    : 'w-[160px] lg:w-[180px]'
+                    ? 'w-[120px] sm:w-[140px] lg:w-[160px]'
+                    : 'w-[140px] sm:w-[160px] lg:w-[180px]'
                 }`}
                 style={{ height: "auto" }}
                 priority
@@ -317,10 +317,10 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="hidden lg:flex items-center flex-shrink-0">
-            <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
+            <Link href="/get-started" className={`cta-btn transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 whitespace-nowrap ${
               isHeaderShrunk
-                ? 'px-4 py-1.5 text-sm'
-                : 'px-5 py-2 text-sm'
+                ? 'px-3 sm:px-4 py-1.5 text-xs sm:text-sm'
+                : 'px-4 sm:px-5 py-2 text-sm'
             }`}>
               GET STARTED
             </Link>
@@ -331,11 +331,11 @@ const Header = () => {
             {/* Button */}
             <button
               ref={mobileMenuButtonRef}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none z-50 flex items-center justify-center"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none z-50 flex items-center justify-center p-1"
               onClick={handleMenuToggle}
             >
               {/* Use MenuButton for both open and closed states, switching icon with 'open' prop */}
-              <MenuButton size={24} open={isMenuOpen} />
+              <MenuButton size={22} open={isMenuOpen} />
             </button>
             
             {/* Dropdown Menu */}
