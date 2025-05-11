@@ -190,8 +190,8 @@ const Header = () => {
         { name: 'Referral Program', href: '/real-estate-referral', icon: FiUsers, highlight: 'Partner with us' },
       ]
     },
-    { name: 'About Us', href: '/about-us', icon: FiInfo },
     { name: 'For Contractors', href: '/for-contractors', icon: FiAward },
+    { name: 'About Us', href: '/about-us', icon: FiInfo },
   ];
 
   const handleMouseEnter = (itemName: string) => {
