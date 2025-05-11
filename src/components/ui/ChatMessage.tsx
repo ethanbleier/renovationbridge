@@ -2,7 +2,6 @@ import { Message, ToolInvocation } from 'ai';
 import { ToolCallDisplay } from './ToolCallDisplay';
 import { useState } from 'react';
 import { UserCircleIcon, ChevronDownIcon, ChevronUpIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
-import { RiChatAiFill } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -151,25 +150,54 @@ export function ChatMessage({ message }: ChatMessageProps) {
         ${messageAppearAnimation}
         ${markdownClassNames}
         ${markdownColorOverrides}
+        /* Pulsating white dot animation (expand and shrink slowly, no bounce) */
+        @keyframes dotPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.18); }
+        }
+        @keyframes colorCycle {
+          0%   { background: #fff; box-shadow: 0 0 12px 2px #38bdf8, 0 0 24px 6px #818cf8; }
+          20%  { background: #38bdf8; box-shadow: 0 0 12px 2px #818cf8, 0 0 24px 6px #06b6d4; }
+          40%  { background: #818cf8; box-shadow: 0 0 12px 2px #06b6d4, 0 0 24px 6px #a21caf; }
+          60%  { background: #06b6d4; box-shadow: 0 0 12px 2px #a21caf, 0 0 24px 6px #38bdf8; }
+          80%  { background: #a21caf; box-shadow: 0 0 12px 2px #38bdf8, 0 0 24px 6px #fff; }
+          100% { background: #fff; box-shadow: 0 0 12px 2px #38bdf8, 0 0 24px 6px #818cf8; }
+        }
+        .ai-cycling-dot {
+          background: #fff;
+        }
       `}</style>
+      {/*
+        Add horizontal padding here so message bubbles do not touch the edges of the scrollable area,
+        even when the scrollable area is full width. This keeps the chat visually balanced.
+      */}
       <div 
-        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-messageAppear`}
+        className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-messageAppear px-4 md:px-6`}
         style={{ animation: 'messageAppear 0.3s ease-out forwards' }}
       >
         <div
-          className={`p-5 rounded-2xl max-w-[85%] md:max-w-[75%] shadow-md transition-all duration-150
-            ${isUser 
-              ? 'bg-indigo-600 text-white' 
-              : 'bg-slate-800 text-slate-100'
-            }`
+          className={`p-3 py-1.5 rounded-2xl max-w-[85%] md:max-w-[75%] shadow-md transition-all duration-150
+            ${isUser ? 'bg-indigo-600 text-white px-3 py-1.5' : 'bg-slate-800 text-slate-100 p-5'}`
           }
           style={{ marginBottom: '0.25rem' }}
         >
-          <div className="flex items-center mb-2">
+          
+          <div className="flex items-center justify-between mb-2 w-full">
+            <p className="text-sm font-medium text-slate-400">{isUser ? 'You' : 'Renovation Bridge Assistant'}</p>
             {isUser ? null : (
               <>
-                <RiChatAiFill className="h-6 w-6 mr-2 text-indigo-400" />
-                <p className="text-sm font-medium text-slate-200">Renovation Bridge</p>
+                {/* Container to center the dot with equal padding */}
+                <div className="flex items-center justify-center w-8 h-8">
+                  {/* Modern AI animated color-cycling dot with glow */}
+                  <span
+                    className="inline-block h-1 w-1 rounded-full ai-cycling-dot"
+                    style={{
+                      animation: 'dotPulse 2.2s ease-in-out infinite, colorCycle 3.5s linear infinite',
+                      boxShadow: '0 0 12px 2px rgba(80,200,255,0.45), 0 0 24px 6px rgba(120,80,255,0.18)'
+                    }}
+                    aria-label="AI status indicator"
+                  />
+                </div>
               </>
             )}
           </div>

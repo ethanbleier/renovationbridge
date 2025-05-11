@@ -20,7 +20,7 @@ export function ChatThread({ messages, isLoading }: ChatThreadProps) {
   return (
     <div 
       ref={scrollRef}
-      className="flex-1 overflow-y-auto overflow-x-hidden mb-4 p-4 md:p-6 space-y-5 bg-slate-950 rounded-lg"
+      className="flex-1 overflow-y-auto overflow-x-hidden mb-4 bg-slate-950 rounded-lg"
     >
       {messages.length > 0 ? (
         messages.map((message) => (
@@ -37,7 +37,31 @@ export function ChatThread({ messages, isLoading }: ChatThreadProps) {
         <div className="flex justify-start mb-4">
           <div className="p-4 rounded-xl max-w-[85%] md:max-w-[75%] bg-slate-800 text-slate-100 rounded-bl-none">
             <div className="flex items-center mb-2">
-              <RiChatAiFill className="h-6 w-6 mr-2 text-indigo-400" />
+              {/* Animated color-cycling dot with glow for a modern AI look, now 2x smaller */}
+              <span
+                className="inline-block h-1 w-1 mr-2 rounded-full ai-cycling-dot"
+                style={{
+                  animation: 'dotPulse 2.2s ease-in-out infinite, colorCycle 3.5s linear infinite',
+                  boxShadow: '0 0 12px 2px rgba(80,200,255,0.45), 0 0 24px 6px rgba(120,80,255,0.18)'
+                }}
+              />
+              <style>{`
+                @keyframes dotPulse {
+                  0%, 100% { transform: scale(1); }
+                  50% { transform: scale(1.18); }
+                }
+                @keyframes colorCycle {
+                  0%   { background: #fff; box-shadow: 0 0 12px 2px #38bdf8, 0 0 24px 6px #818cf8; }
+                  20%  { background: #38bdf8; box-shadow: 0 0 12px 2px #818cf8, 0 0 24px 6px #06b6d4; }
+                  40%  { background: #818cf8; box-shadow: 0 0 12px 2px #06b6d4, 0 0 24px 6px #a21caf; }
+                  60%  { background: #06b6d4; box-shadow: 0 0 12px 2px #a21caf, 0 0 24px 6px #38bdf8; }
+                  80%  { background: #a21caf; box-shadow: 0 0 12px 2px #38bdf8, 0 0 24px 6px #fff; }
+                  100% { background: #fff; box-shadow: 0 0 12px 2px #38bdf8, 0 0 24px 6px #818cf8; }
+                }
+                .ai-cycling-dot {
+                  background: #fff;
+                }
+              `}</style>
               <p className="text-sm font-medium text-slate-200">RenovationBridgeAI</p>
             </div>
             <div className="flex space-x-1.5 items-center pl-8">

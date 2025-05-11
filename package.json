@@ -1,6 +1,6 @@
 {
   "name": "renovationbridge",
-  "version": "4.2.1",
+  "version": "4.2.4",
   "private": true,
   "engines": {
     "node": ">=20.0.0"
@@ -44,6 +44,7 @@
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "libphonenumber-js": "^1.12.7",
+    "lucide-react": "^0.509.0",
     "next": "^14.2.27",
     "nodemailer": "^6.9.8",
     "plaiceholder": "^3.0.0",

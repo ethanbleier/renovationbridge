@@ -48,10 +48,10 @@ export function ChatInput({ input, handleInputChange, handleSubmit, isLoading }:
   }, [input]);
 
   return (
-    <div className="sticky bottom-0 w-full bg-slate-900 rounded-tl-xl rounded-tr-xl mx-2 sm:mx-4 md:mx-auto overflow-visible">
+    <div className="sticky bottom-0 w-full max-w-5xl mx-auto bg-slate-900 rounded-tl-xl rounded-tr-xl overflow-visible">
       <form 
         onSubmit={handleSubmit} 
-        className="relative mb-2 sm:mb-4 bg-slate-900 w-full max-w-3xl rounded-xl shadow-xl overflow-visible"
+        className="relative mb-2 sm:mb-4 bg-slate-900 w-full max-w-none rounded-xl shadow-xl overflow-visible"
       >
         <textarea
           ref={textareaRef}

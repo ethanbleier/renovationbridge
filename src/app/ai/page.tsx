@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useChat } from 'ai/react';
+import { FaEdit } from "react-icons/fa";
 import { ChatHeader } from '@/components/ui/ChatHeader';
 import { ChatThread } from '@/components/ui/ChatThread';
 import { ChatInput } from '@/components/ui/ChatInput';
@@ -25,18 +26,13 @@ export default function ChatPage() {
     error,
     setInput,
     append,
-    // Assuming you might want to use reload or stop functions
-    // reload,
-    // stop,
   } = useChat({
     api: '/api/chat',
     onFinish: (message) => {
       console.log('Chat finished with message:', message.id);
-      // Potentially trigger other actions upon completion
     },
     onError: (err) => {
       console.error('Chat error:', err);
-      // Handle errors more visibly in the UI if desired
     }
   });
 
@@ -63,47 +59,72 @@ export default function ChatPage() {
     append({ content: chipText, role: 'user' }); // Added: Send message directly
   };
 
-  return (
-    // Updated for a dark, full-height layout, with content centered horizontally
-    <main className="min-h-screen h-screen bg-slate-950 flex flex-col text-slate-100">
-      {/* This div centers the chat content horizontally and makes it take available vertical space */}
-      <div className="flex flex-col flex-grow min-h-screen w-full max-w-3xl mx-auto bg-slate-950 overflow-visible">
-        <ChatHeader title="Renovation AI Assistant" />
-        
-        {/* Scrollable container for messages, "Meet RenovateAI" text, and chips */}
-        <div className="flex-grow overflow-y-auto overflow-x-hidden p-4 md:p-6">
-          {/* Show "Meet RenovateAI" and chips only if there are no messages */}
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full"> {/* h-full to center content vertically */}
-              <div className="text-center my-8 md:my-12"> {/* Adjusted margins */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
-                  Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-teal-500 to-indigo-500">RenovateAI</span>,
-                </h1>
-                <p className="text-2xl sm:text-3xl md:text-4xl text-slate-300 mt-2">
-                  your personal AI assistant
-                </p>
-              </div>
-              {/* ConversationContext (chips) shown below the intro text */}
-              <ConversationContext messages={messages} onChipClick={handleChipClick} />
-            </div>
-          )}
+  // Update function to handle new chat
+  const handleNewChat = () => {
+    // Reload the page to start a completely fresh chat
+    window.location.reload();
+  };
 
-          {/* ChatThread will display messages and push the above content out of view if messages exist */}
-          {messages.length > 0 && (
-            <ChatThread 
-              messages={messages} 
-              isLoading={isLoading} 
-            />
-          )}
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Command (Mac) + Enter
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleNewChat();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []); // Empty dependency array since handleNewChat is stable
+
+  return (
+    // Main layout: full viewport height, dark background, vertical flex
+    <main className="min-h-screen h-screen bg-slate-950 flex flex-col text-slate-100 pt-16">
+      {/* Center chat content horizontally, take available vertical space */}
+      <div className="relative flex flex-col flex-grow w-full max-w-5xl mx-auto bg-slate-950 overflow-visible h-[90vh] rounded-xl shadow-lg">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+          <ChatHeader title="Renovation AI Assistant" />
         </div>
-        
-        {/* ChatInput is a direct child of the flex-grow container, using its own sticky positioning */}
+        {/* Fixed-height, scrollable chat area. Height is calculated to leave space for input. */}
+        <div className="flex-1 min-h-0 flex flex-col">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6" style={{ maxHeight: 'calc(100vh - 220px)' }}>
+            {/* Show intro and chips if no messages */}
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="text-center my-8 md:my-12">
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
+                    Meet <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-teal-500 to-indigo-500">RenovateAI</span>,
+                  </h1>
+                  <p className="text-2xl sm:text-3xl md:text-4xl text-slate-300 mt-2">
+                    your personal AI assistant
+                  </p>
+                </div>
+                {/* ConversationContext (chips) shown below the intro text */}
+                <ConversationContext messages={messages} onChipClick={handleChipClick} />
+              </div>
+            )}
+            {/* ChatThread displays messages and scrolls within this area */}
+            {messages.length > 0 && (
+              <ChatThread 
+                messages={messages} 
+                isLoading={isLoading} 
+              />
+            )}
+          </div>
+        </div>
         <ChatInput 
           input={input} 
           handleInputChange={handleInputChange} 
           handleSubmit={customHandleSubmit} 
           isLoading={isLoading} 
         />
+        
+        {/* Pro Tip Pill */}
+        <div className="fixed bottom-20 right-8 z-50 bg-slate-800/90 text-slate-300 text-xs px-3 py-1.5 rounded-full border border-slate-700/50 shadow-lg">
+          Pro tip: Press ⌘ + Enter for new chat
+        </div>
       </div>
     </main>
   );
