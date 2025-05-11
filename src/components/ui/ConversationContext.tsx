@@ -10,56 +10,42 @@ export function ConversationContext({ messages, onChipClick }: ConversationConte
   // Simulate suggestion chips similar to the image
   // For now, these are static, but could be made dynamic later.
   const suggestionChips = [ 
-    "Why choose Renovation Bridge?",
-    "Typical project timeline with us",
-    "Sample cost breakdown",
-    "Our licensed contractor network",
-    "What happens after you sign",
-    "Warranty & after-care support",
+    "Why Choose Renovation Bridge?",
+    "Typical Project Timeline with Renovation Bridge",
+    "Sample Cost Breakdown",
+    "Renovation Bridge Licensed Contractor Network",
+    "What Happens After You Sign",
+    "Warranty and After-Care Support",
   ];
 
   const [scrollOffset, setScrollOffset] = useState(0);
-  const [canStartAnimation, setCanStartAnimation] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const chipsContainerRef = useRef<HTMLDivElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const firstSetWidth = useRef<number>(0);
 
-  // Effect to start animation after a delay
+  // Use IntersectionObserver to detect when the element is visible
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCanStartAnimation(true);
-    }, 6000);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-    return () => clearTimeout(timer);
+    if (chipsContainerRef.current) {
+      observer.observe(chipsContainerRef.current);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
-  // Effect to calculate the width of one set of chips
+  // Start animation when element becomes visible
   useEffect(() => {
-    const calculateWidth = () => {
-      if (chipsContainerRef.current && 
-          chipsContainerRef.current.children.length === suggestionChips.length * 2 && 
-          suggestionChips.length > 0) {
-        const currentTotalWidth = chipsContainerRef.current.scrollWidth;
-        if (currentTotalWidth > 0) {
-            firstSetWidth.current = currentTotalWidth / 2;
-        }
-      } else if (suggestionChips.length === 0) {
-        firstSetWidth.current = 0;
-      }
-    };
-
-    const timeoutId = setTimeout(calculateWidth, 0);
-    window.addEventListener('resize', calculateWidth);
-
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', calculateWidth);
-    };
-  }, [suggestionChips.length]);
-
-  // Effect for scroll animation
-  useEffect(() => {
-    if (!canStartAnimation || firstSetWidth.current === 0 || suggestionChips.length === 0) {
+    if (!isVisible || messages.length > 0 || suggestionChips.length === 0) {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
         animationFrameId.current = null;
@@ -67,9 +53,23 @@ export function ConversationContext({ messages, onChipClick }: ConversationConte
       return;
     }
 
-    const scrollSpeed = 0.1;
+    const calculateWidth = () => {
+      if (chipsContainerRef.current) {
+        const currentTotalWidth = chipsContainerRef.current.scrollWidth;
+        if (currentTotalWidth > 0) {
+          firstSetWidth.current = currentTotalWidth / 2;
+        }
+      }
+    };
 
+    // Calculate initial width
+    calculateWidth();
+
+    // Start animation
+    const scrollSpeed = 0.1;
     const animateScroll = () => {
+      if (!chipsContainerRef.current) return;
+      
       setScrollOffset(prevOffset => {
         let newOffset = prevOffset + scrollSpeed;
         if (newOffset >= firstSetWidth.current) {
@@ -80,14 +80,22 @@ export function ConversationContext({ messages, onChipClick }: ConversationConte
       animationFrameId.current = requestAnimationFrame(animateScroll);
     };
 
+    // Start animation immediately
     animationFrameId.current = requestAnimationFrame(animateScroll);
+
+    // Handle resize
+    const handleResize = () => {
+      calculateWidth();
+    };
+    window.addEventListener('resize', handleResize);
 
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
+      window.removeEventListener('resize', handleResize);
     };
-  }, [canStartAnimation, suggestionChips.length]);
+  }, [isVisible, messages.length, suggestionChips.length]);
 
   if (messages.length > 0 || suggestionChips.length === 0) {
     return null;

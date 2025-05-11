@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, KeyboardEvent, useRef, useEffect } from 'react';
+import React, { ChangeEvent, FormEvent, KeyboardEvent, useRef, useEffect } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'; // Using solid for a more prominent send icon
 
 interface ChatInputProps {

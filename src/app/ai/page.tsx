@@ -1,11 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useChat } from 'ai/react';
 import { ChatHeader } from '@/components/ui/ChatHeader';
 import { ChatThread } from '@/components/ui/ChatThread';
 import { ChatInput } from '@/components/ui/ChatInput';
 import { ConversationContext } from '@/components/ui/ConversationContext';
+
+// Add global style for html and body background
+<style jsx global>{`
+  html, body {
+    background-color: #020617 !important;
+    min-height: 100vh;
+  }
+`}</style>
 
 export default function ChatPage() {
   const { 
@@ -57,9 +65,9 @@ export default function ChatPage() {
 
   return (
     // Updated for a dark, full-height layout, with content centered horizontally
-    <main className="h-screen bg-slate-950 flex flex-col text-slate-100">
+    <main className="min-h-screen h-screen bg-slate-950 flex flex-col text-slate-100">
       {/* This div centers the chat content horizontally and makes it take available vertical space */}
-      <div className="flex flex-col flex-grow w-full max-w-3xl mx-auto bg-slate-950 overflow-visible">
+      <div className="flex flex-col flex-grow min-h-screen w-full max-w-3xl mx-auto bg-slate-950 overflow-visible">
         <ChatHeader title="Renovation AI Assistant" />
         
         {/* Scrollable container for messages, "Meet RenovateAI" text, and chips */}
