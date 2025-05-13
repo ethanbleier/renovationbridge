@@ -461,10 +461,10 @@ export default function HeroSection() {
               </div>
             )}
           </div>
-          
-          <div className="relative mt-6 sm:mt-8 lg:mt-0 rounded-lg shadow-lg">
-            <ContactForm />
-          </div>
+          {/* Contact Form */}
+            <div>
+              <ContactForm />
+            </div>
         </div>
       </div>
       

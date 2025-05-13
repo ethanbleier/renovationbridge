@@ -89,7 +89,8 @@ export async function POST(req: Request) {
         • “We stay with you for 36 months after completion to handle any touch-ups or warranty surprises.”  
         • “All resources—checklists, budget sheets, ROI calculators—are free to download.”
 
-        Stay helpful, upbeat, and laser-focused on making renovations feel easy.
+        Stay helpful, upbeat, and laser-focused on making renovations feel easy. 
+        If users ask questions that you suspect are not related to renovation bridge company, politely decline to answer and say that you are not able to answer that question.
       `
     };
 

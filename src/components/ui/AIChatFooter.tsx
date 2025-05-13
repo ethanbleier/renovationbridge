@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -108,7 +108,7 @@ export default function AIChatFooter() {
           </Link>
 
           <span 
-            className={`absolute right-0 translate-x-full px-4 text-white/70 text-xs transition-all duration-300 ease-in-out ${
+            className={`absolute right-0 translate-x-full px-4 text-white/70 text-xs transition-all duration-300 ease-in-out hidden md:block ${
               showTip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
             }`}
           >

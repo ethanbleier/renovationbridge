@@ -221,20 +221,20 @@ const Header = () => {
       // Shrink effect styling with backdrop blur
       isHeaderShrunk ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-sm py-1 sm:py-1.5' : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm py-2 sm:py-3'
     }`}>
-      <div className="container-custom relative px-4 sm:px-6">
-        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-6">
+      <div className="container-custom relative">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 px-4 sm:px-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center flex-shrink-0 group" onClick={handleMobileLinkClick}>
-            <div className="flex items-center justify-center">
+          <Link href="/" className="flex items-center flex-shrink-0 group -ml-1 sm:ml-0" onClick={handleMobileLinkClick}>
+            <div className="flex items-center">
               <Image 
-                src="/images/logos/logo.png"
+                src="/images/logos/new-new-logo.png"
                 alt="Renovation Bridge Logo" 
                 width={180} 
                 height={40}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 grayscale ${
                   isHeaderShrunk 
-                    ? 'w-[120px] sm:w-[140px] lg:w-[160px]'
-                    : 'w-[140px] sm:w-[160px] lg:w-[180px]'
+                    ? 'w-[110px] sm:w-[130px] lg:w-[150px]'
+                    : 'w-[130px] sm:w-[150px] lg:w-[170px]'
                 }`}
                 style={{ height: "auto" }}
                 priority
