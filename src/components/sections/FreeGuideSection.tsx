@@ -4,6 +4,7 @@ import GuideImageCarousel from '@/components/ui/GuideImageCarousel'
 import GuideDownloadForm from '@/components/forms/GuideDownloadForm'
 import { useState, useRef, useEffect } from 'react'
 import type { MouseEvent } from 'react'
+import Link from 'next/link';
 
 export default function FreeGuideSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -62,7 +63,7 @@ export default function FreeGuideSection() {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white to-gray-50">
+    <section id="free-guide-section" className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-slate-50 to-sky-100">
       <div className="container-custom px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Image with Animation */}
@@ -187,15 +188,25 @@ export default function FreeGuideSection() {
                 <span>Timeline & project management tools</span>
               </li>
             </ul>
-            <div className="pt-2">
+            {/* Form Card Container */}
+            <div className="mt-6 sm:mt-8">
               <GuideDownloadForm 
                 guideTitle="Complete Renovation Planning Guide"
                 guideType="renovation"
                 downloadUrl="/pdfs/guide.pdf"
-                buttonText="Get Free Guide"
+                buttonText="Download"
                 successHeading="Thank you!"
                 successMessage="Your guide is ready to download"
               />
+            </div>
+            
+            {/* Learn More Button - Centered and Spaced */}
+            <div className="mt-8 flex justify-center">
+              <Link href="/guide" legacyBehavior>
+                <a className="px-6 py-3 text-base font-medium text-primary bg-transparent border border-primary rounded-lg hover:bg-primary hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50">
+                  Learn More
+                </a>
+              </Link>
             </div>
           </div>
         </div>

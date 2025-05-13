@@ -287,4 +287,150 @@
   100% {
     background-position: 300% 50%;
   }
+}
+
+/* Eclipse Glow Effect for CTA Button */
+.btn-eclipse-glow {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* The animated blue "eclipse" shine - now even more fluid, with a longer, more organic movement and subtle opacity shifts */
+.btn-eclipse-glow::before {
+  content: '';
+  position: absolute;
+  top: -45%;
+  left: -70%;
+  width: 240%;
+  height: 200%;
+  background: radial-gradient(circle at 60% 50%, rgba(100,180,255,0.38) 0%, rgba(100,180,255,0.14) 44%, transparent 70%);
+  opacity: 0.82;
+  filter: blur(5.5px); /* Extra blur for a more fluid, diffused look */
+  pointer-events: none;
+  /* Even more fluid, organic animation timing and duration */
+  animation: eclipse-glow-fluid 4s cubic-bezier(0.77,0,0.18,1) infinite;
+}
+
+/* Even more fluid, organic keyframes for the eclipse glow */
+@keyframes eclipse-glow-fluid {
+  0% {
+    transform: translateX(-70%) scale(1.10,1.01) skewX(-2deg);
+    opacity: 0.55;
+  }
+  5% {
+    transform: translateX(-62%) scale(1.12,1.015) skewX(-1.5deg);
+    opacity: 0.65;
+  }
+  10% {
+    transform: translateX(-54%) scale(1.14,1.02) skewX(-1deg);
+    opacity: 0.75;
+  }
+  15% {
+    transform: translateX(-46%) scale(1.15,1.03) skewX(-0.5deg);
+    opacity: 0.82;
+  }
+  20% {
+    transform: translateX(-38%) scale(1.16,1.035) skewX(0deg);
+    opacity: 0.88;
+  }
+  25% {
+    transform: translateX(-30%) scale(1.18,1.04) skewX(0.5deg);
+    opacity: 0.91;
+  }
+  30% {
+    transform: translateX(-22%) scale(1.19,1.045) skewX(1deg);
+    opacity: 0.93;
+  }
+  35% {
+    transform: translateX(-14%) scale(1.20,1.05) skewX(1.2deg);
+    opacity: 0.95;
+  }
+  40% {
+    transform: translateX(-6%) scale(1.21,1.055) skewX(1deg);
+    opacity: 0.96;
+  }
+  45% {
+    transform: translateX(2%) scale(1.22,1.06) skewX(0.5deg);
+    opacity: 0.97;
+  }
+  50% {
+    transform: translateX(10%) scale(1.21,1.055) skewX(0deg);
+    opacity: 0.98;
+  }
+  55% {
+    transform: translateX(18%) scale(1.20,1.05) skewX(-0.5deg);
+    opacity: 0.99;
+  }
+  60% {
+    transform: translateX(26%) scale(1.19,1.045) skewX(-1deg);
+    opacity: 0.97;
+  }
+  65% {
+    transform: translateX(34%) scale(1.18,1.04) skewX(-1.2deg);
+    opacity: 0.95;
+  }
+  70% {
+    transform: translateX(42%) scale(1.17,1.035) skewX(-1deg);
+    opacity: 0.93;
+  }
+  75% {
+    transform: translateX(50%) scale(1.16,1.03) skewX(-0.5deg);
+    opacity: 0.91;
+  }
+  80% {
+    transform: translateX(58%) scale(1.15,1.025) skewX(0deg);
+    opacity: 0.88;
+  }
+  85% {
+    transform: translateX(66%) scale(1.13,1.02) skewX(0.5deg);
+    opacity: 0.82;
+  }
+  90% {
+    transform: translateX(74%) scale(1.11,1.015) skewX(1deg);
+    opacity: 0.75;
+  }
+  95% {
+    transform: translateX(82%) scale(1.10,1.01) skewX(1.5deg);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateX(90%) scale(1.10,1.01) skewX(-2deg);
+    opacity: 0.55;
+  }
+}
+
+.btn-eclipse-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 18px 6px rgba(100,180,255,0.13), 0 0 32px 12px rgba(100,180,255,0.08);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Smoother, more gradual eclipse sweep */
+@keyframes eclipse-glow-move {
+  0% {
+    transform: translateX(-60%) scale(1.08,1);
+    opacity: 0.6;
+  }
+  18% {
+    opacity: 0.92;
+    transform: translateX(-30%) scale(1.13,1.01);
+  }
+  50% {
+    transform: translateX(40%) scale(1.18,1.04);
+    opacity: 0.98;
+  }
+  82% {
+    opacity: 0.85;
+    transform: translateX(90%) scale(1.12,1.01);
+  }
+  100% {
+    transform: translateX(120%) scale(1.08,1);
+    opacity: 0.3;
+  }
 } 

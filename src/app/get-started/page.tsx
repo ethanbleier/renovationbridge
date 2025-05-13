@@ -24,7 +24,7 @@ export default function GetStartedPage() {
   }, []);
 
   return (
-    <div className="py-12 md:py-16 w-full">
+    <div className="py-12 md:py-16 w-full h-auto md:h-screen md:overflow-hidden">
       <div className="max-w-[1400px] mx-auto relative px-4 xl:px-8">
         {/* Background decorative elements - expanded to use more screen real estate */}
         <div className="absolute -top-20 -left-20 w-40 h-40 bg-lavender/20 rounded-full blur-3xl opacity-70 hidden md:block"></div>

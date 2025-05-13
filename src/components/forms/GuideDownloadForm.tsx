@@ -16,7 +16,7 @@ export default function GuideDownloadForm({
   guideTitle,
   guideType,
   downloadUrl,
-  buttonText = "Get Free Guide",
+  buttonText = "Download Guide",
   successHeading = "Thank you!",
   successMessage = "Your guide is ready to download"
 }: GuideDownloadFormProps) {
@@ -137,59 +137,76 @@ export default function GuideDownloadForm({
   }
 
   return (
-    <div className="bg-amber-50 p-5 rounded-lg">
-      <h3 className="text-lg font-medium mb-2">Get instant access</h3>
-      <p className="text-gray-600 mb-4">Enter your details to download the free guide</p>
+    <div className="bg-white p-8 rounded-xl shadow-xl">
+      <h3 className="text-lg font-medium mb-4 text-secondary leading-normal">Download Your Free Guide</h3>
+      <p className="text-gray-700 mb-6 leading-relaxed">Enter your details below to get instant access.</p>
       
       {error && <p className="text-red-500 mb-2">{error}</p>}
       
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
+          <label htmlFor="name" className="sr-only">Name</label>
           <input 
             type="text" 
+            id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Name" 
+            placeholder="Full Name" 
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
           />
         </div>
         <div>
+          <label htmlFor="email" className="sr-only">Email</label>
           <input 
             type="email" 
+            id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email Address" 
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
           />
         </div>
         <div>
+          <label htmlFor="city" className="sr-only">City</label>
           <input 
-            type="city" 
+            type="text" // Changed from city to text for broader input, but validation is key server-side
+            id="city"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="City" 
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
           />
         </div>
         <div>
+          <label htmlFor="phone" className="sr-only">Phone Number</label>
           <input 
             type="tel" 
+            id="phone"
             value={phone}
             onChange={handlePhoneChange}
             placeholder="Phone Number" 
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
           />
         </div>
         <button 
           type="submit"
           disabled={isLoading}
-          className="btn btn-primary w-full flex justify-center items-center transition-all duration-300"
+          className="btn btn-primary w-full flex justify-center items-center transition-all duration-300 hover:-translate-y-1 py-2.5 text-base"
         >
-          {isLoading ? 'Processing...' : buttonText}
+          {isLoading ? (
+            'Processing...'
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {buttonText}
+            </>
+          )}
         </button>
         <p className="text-xs text-gray-500 text-center">
           We respect your privacy. Unsubscribe at any time.

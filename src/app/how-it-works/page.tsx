@@ -4,8 +4,8 @@ import React, { useState, ReactNode, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { useMediaQuery } from 'react-responsive';
+import ServiceAreaMapSection from '@/components/sections/ServiceAreaMapSection';
 
 // Custom accordion component with smooth animations
 interface AccordionItemProps {
@@ -218,9 +218,9 @@ export default function HowItWorksPage() {
             >
               <Link
                 href="/get-started"
-                className="inline-block bg-primary text-white font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-primary-dark transition-all duration-300"
+                className="inline-block bg-primary text-white font-medium px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg hover:bg-primary-dark transition-all duration-300"
               >
-                Continue
+                Skip & Get Started
               </Link>
             </motion.div>
           </motion.div>
@@ -328,6 +328,8 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      <ServiceAreaMapSection />
+
       {/* CTA Section - Cleaner, more focused */}
       <section className="py-16 bg-primary">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -342,7 +344,7 @@ export default function HowItWorksPage() {
             <p className="text-xl text-white/90 mb-8">Let us help you find the perfect contractor for your renovation project.</p>
             <Link
               href="/get-started"
-              className="inline-block bg-white text-primary font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-300"
+              className="inline-block bg-white text-primary font-medium px-8 py-3 rounded-lg shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:translate-y-0 active:scale-100"
             >
               Unlock Home Potential
             </Link>

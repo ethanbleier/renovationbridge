@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import ContractorForm from '@/components/forms/ContractorForm'
+import { ClockIcon } from '@heroicons/react/24/outline'
 
 export default function ForContractors() {
   // Function to handle scroll down on arrow click
@@ -97,7 +98,7 @@ export default function ForContractors() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg text-secondary">High-Quality Leads</h4>
+                    <h4 className="font-semibold text-lg text-secondary">High-Quality Appointments</h4>
                     <p className="text-gray-600 mt-1">Connect with pre-qualified homeowners who are ready to start their renovation projects.</p>
                   </div>
                 </div>
@@ -129,10 +130,7 @@ export default function ForContractors() {
                 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-lavender/50 flex items-center justify-center flex-shrink-0 border-2 border-lavender">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2 10a8 8 0 1116 0 8 8 0 01-16 0z" />
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                    </svg>
+                    <ClockIcon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg text-secondary">Save Time</h4>
@@ -175,8 +173,8 @@ export default function ForContractors() {
                   <span className="font-bold text-xl text-primary">J</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-secondary">Jimmy D</h4>
-                  <p className="text-sm text-gray-600">Jim Construction</p>
+                  <h4 className="font-bold text-secondary">Mike Turner</h4>
+                  <p className="text-sm text-gray-600">Turner Building and Contracting</p>
                 </div>
               </div>
               <p className="italic text-gray-600 leading-relaxed">
@@ -231,55 +229,45 @@ export default function ForContractors() {
         <section className="mt-20 mb-20 bg-lavender/20 py-16 px-4 rounded-3xl">
           <h2 className="text-3xl font-bold text-center mb-12 relative">
             Frequently Asked Questions
-            <span className="block w-20 h-1 bg-primary mx-auto mt-4"></span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Enhanced FAQ items */}
-            <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 transition-all hover:shadow-xl">
-              <h3 className="font-bold text-lg text-secondary mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            {/* FAQ Card 1 */}
+            <div className="bg-white rounded-3xl p-10 shadow-md border border-gray-200 transition-all hover:shadow-xl flex flex-col">
+              <h3 className="font-bold text-lg text-secondary mb-2">
                 Is there a fee to join the network?
               </h3>
+              <span className="block w-16 h-1 mb-4 bg-pink-500 rounded"></span>
               <p className="text-gray-600 leading-relaxed">
-                There is no upfront cost to join our contractor network. We work on a commission basis only when you get a project through our platform.
+                There are no upfront costs or monthly fees to join our network. You are only charged when you choose to bid on specific projects. Our compensation is commission-based and is collected only upon the successful completion of a project.
               </p>
             </div>
-            
-            {/* Continue with similar styling for other FAQ items */}
-            <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 transition-all hover:shadow-xl">
-              <h3 className="font-bold text-lg text-secondary mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            {/* FAQ Card 2 */}
+            <div className="bg-white rounded-3xl p-10 shadow-md border border-gray-200 transition-all hover:shadow-xl flex flex-col">
+              <h3 className="font-bold text-lg text-secondary mb-2">
                 What types of contractors do you work with?
               </h3>
+              <span className="block w-16 h-1 mb-4 bg-yellow-400 rounded"></span>
               <p className="text-gray-600 leading-relaxed">
                 We work with licensed contractors across various specialties including general contractors, kitchen and bath specialists, and more.
               </p>
             </div>
-            
-            <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 transition-all hover:shadow-xl">
-              <h3 className="font-bold text-lg text-secondary mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            {/* FAQ Card 3 */}
+            <div className="bg-white rounded-3xl p-10 shadow-md border border-gray-200 transition-all hover:shadow-xl flex flex-col">
+              <h3 className="font-bold text-lg text-secondary mb-2">
                 How does the vetting process work?
               </h3>
+              <span className="block w-16 h-1 mb-4 bg-cyan-500 rounded"></span>
               <p className="text-gray-600 leading-relaxed">
                 Our vetting process includes license verification, insurance checks, reference calls, and an interview with our team to ensure quality standards.
               </p>
             </div>
-            
-            <div className="bg-white rounded-2xl p-8 shadow-md border border-gray-100 transition-all hover:shadow-xl">
-              <h3 className="font-bold text-lg text-secondary mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                How quickly will I start receiving leads?
+            {/* FAQ Card 4 */}
+            <div className="bg-white rounded-3xl p-10 shadow-md border border-gray-200 transition-all hover:shadow-xl flex flex-col">
+              <h3 className="font-bold text-lg text-secondary mb-2">
+                How quickly will I start receiving projects?
               </h3>
+              <span className="block w-16 h-1 mb-4 bg-violet-500 rounded"></span>
               <p className="text-gray-600 leading-relaxed">
                 Once approved, you could start receiving leads within days, depending on the demand in your service area and your specific expertise.
               </p>
