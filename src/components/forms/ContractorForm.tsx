@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 
 type FormValues = {
   firstName: string
   lastName: string
+  email: string
   phone: string
   licenseNumber: string
   website?: string
@@ -56,10 +58,23 @@ const ContractorForm = () => {
     setError(null)
     
     try {
+      // Validate phone number using libphonenumber-js
+      const phoneInput = data.phone.replace(/\D/g, '');
+      const formattedPhone = `+1${phoneInput}`; // Assuming US phone numbers
+      
+      if (!isValidPhoneNumber(formattedPhone, 'US')) {
+        throw new Error('Please enter a valid phone number');
+      }
+
+      // Validate email
+      if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(data.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
       // Add contractor application details as projectDescription
       const formData = {
         ...data,
-        projectDescription: `Contractor Application - ${data.firstName} ${data.lastName} - License: ${data.licenseNumber} - Location: ${data.location}${data.hearAboutUs ? ` - Heard About Us: ${data.hearAboutUs}` : ''}`
+        message: `Contractor Application: Name: ${data.firstName} ${data.lastName}, Email: ${data.email}, Phone: ${data.phone}, Location: ${data.location}, License: ${data.licenseNumber}${data.website ? `, Website: ${data.website}` : ''}${data.hearAboutUs ? `, Heard About Us: ${data.hearAboutUs}` : ''}`
       };
       
       // Send data to our API route that connects to GoHighLevel
@@ -163,6 +178,30 @@ const ContractorForm = () => {
               </p>
             )}
           </div>
+        </div>
+        
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input
+            id="email"
+            type="email"
+            className={`w-full px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+            {...register('email', { 
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Invalid email address'
+              }
+            })}
+          />
+          {errors.email && (
+            <p className="mt-2 text-sm text-red-600 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              {errors.email.message}
+            </p>
+          )}
         </div>
         
         <div>
