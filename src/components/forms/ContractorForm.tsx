@@ -311,13 +311,13 @@ const ContractorForm = () => {
                     id="licenseNumber"
                     type="text"
                     placeholder="Please enter your current active contractor license number"
-                    maxLength={7}
+                    maxLength={8}
                     className={`w-full px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary ${errors.licenseNumber ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
                     {...register('licenseNumber', { 
                       required: 'License number is required',
                       pattern: {
-                        value: /^\d{7}$/,
-                        message: 'Please enter a valid license number'
+                        value: /^\d{6,8}$/,
+                        message: 'Please enter a valid license number (usually 7 digits)'
                       }
                     })}
                   />
