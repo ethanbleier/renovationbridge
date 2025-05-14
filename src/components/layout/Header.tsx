@@ -253,7 +253,7 @@ const Header = () => {
           <Link href="/" className="flex items-center flex-shrink-0 group -ml-1 sm:ml-0" onClick={handleMobileLinkClick}>
             <div className="flex items-center">
               <Image 
-                src="/images/logos/new-new-logo.png"
+                src="/images/logos/logo.png"
                 alt="Renovation Bridge Logo" 
                 width={180} 
                 height={40}
