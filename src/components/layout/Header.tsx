@@ -172,7 +172,28 @@ const Header = () => {
 
   // If on get-started page, don't render header at all
   if (isGetStartedPage) {
-    return null
+    return (
+      <header className="fixed w-full top-0 z-50 bg-white py-2 shadow-md">
+        <div className="container-custom relative">
+          <div className="flex items-center justify-start">
+            {/* Logo */}
+            <Link href="/" className="flex items-center flex-shrink-0 group">
+              <div className="flex items-center justify-center">
+                <Image 
+                  src="/images/logos/logo.png"
+                  alt="Renovation Bridge Logo" 
+                  width={180} 
+                  height={40}
+                  className="w-[140px] lg:w-[160px]"
+                  style={{ height: "auto" }}
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
+        </div>
+      </header>
+    );
   }
 
   // Define Navigation Items using the new structure
@@ -208,8 +229,13 @@ const Header = () => {
 
   // Close mobile menu and dropdowns on link click
   const handleMobileLinkClick = () => {
+    if (!isMenuOpen) return; // Do nothing if menu is already closed or closing
     setIsMenuOpen(false);
-    setIsResourcesOpen(false);
+    // Delay hiding the menu and resetting resources to allow animation to complete
+    setTimeout(() => {
+      setMenuVisible(false);
+      setIsResourcesOpen(false);
+    }, 300);
   };
 
   return (
@@ -344,7 +370,7 @@ const Header = () => {
               className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
                 isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
               }`}
-              style={{ display: isMenuOpen || menuVisible ? 'block' : 'none' }}
+              style={{ display: menuVisible ? 'block' : 'none' }}
             >
               <nav className="flex flex-col space-y-1">
                 {navItems.map((item) => (
