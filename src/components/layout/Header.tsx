@@ -224,16 +224,14 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${ 
-      // Use combined logic for initial visibility
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 h-20 ${
       isMobile ? (mobileHeaderVisible ? 'translate-y-0' : '-translate-y-full') : 
       (headerVisible ? 'translate-y-0' : '-translate-y-full')
     } ${ 
-      // Shrink effect styling
-      isHeaderShrunk ? 'bg-white shadow-md py-2' : 'bg-white py-4'
+      isHeaderShrunk ? 'bg-white shadow-md' : 'bg-white'
     }`}> 
-      <div className="container-custom relative">
-        <div className="flex items-center justify-between gap-4 lg:gap-6">
+      <div className="container-custom relative h-full flex items-center">
+        <div className="flex items-center justify-between gap-4 lg:gap-6 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0 group" onClick={handleMobileLinkClick}>
             <div className="flex items-center justify-center">
