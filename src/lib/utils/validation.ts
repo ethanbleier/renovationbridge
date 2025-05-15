@@ -58,6 +58,7 @@ export const getStartedFormSchema = z.object({
 export const contractorFormSchema = z.object({
   firstName: z.string().min(2, { message: 'First name must be at least 2 characters long' }),
   lastName: z.string().min(2, { message: 'Last name must be at least 2 characters long' }),
+  email: z.string().email({ message: 'Invalid email address' }),
   phone: z.string().min(10, { message: 'Phone number must be at least 10 characters long' }),
   licenseNumber: z.string().min(2, { message: 'License number is required' }),
   website: z.string().url({ message: 'Website must be a valid URL' }).optional(),

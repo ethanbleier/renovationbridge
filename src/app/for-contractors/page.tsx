@@ -16,14 +16,14 @@ export default function ForContractors() {
   return (
     <div className="min-h-screen bg-white pb-16">
       {/* Revamped Modern Hero Section - Full Screen */}
-      <section className="relative bg-black text-white overflow-hidden min-h-screen flex flex-col justify-center">
+      <section className="relative bg-black text-white overflow-hidden min-h-[90vh] md:h-screen flex flex-col justify-center">
         {/* Background Image */}
         <div className="absolute inset-0 opacity-40">
           <Image
             src="/images/blog/contractor.png" // Updated image path
             alt="Contractors working at sunset"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority // Load image faster
           />
         </div>
@@ -31,19 +31,19 @@ export default function ForContractors() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/30"></div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 py-24 md:py-32 relative z-10">
+        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32 relative z-10 flex flex-col items-center justify-center flex-grow">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 leading-tight">
               Build the Future With Us.
             </h1>
-            <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-6 sm:mb-8 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
               Join Renovation Bridge and connect with homeowners ready for their next big project.
             </p>
             
             {/* Call to action button */}
             <a
               href="#apply-form"
-              className="inline-block bg-primary text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 ease-in-out hover:bg-primary-dark hover:shadow-lg transform hover:-translate-y-1"
+              className="inline-block bg-primary text-white font-semibold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-all duration-300 ease-in-out hover:bg-primary-dark hover:shadow-lg transform hover:-translate-y-1"
             >
               Start Now
             </a>
@@ -51,7 +51,7 @@ export default function ForContractors() {
         </div>
 
         {/* Bobbing down arrow */}
-        <div className="absolute bottom-12 left-0 right-0 flex justify-center animate-bounce z-20">
+        <div className="absolute bottom-6 sm:bottom-8 md:bottom-12 left-0 right-0 flex justify-center animate-bounce z-20">
           <div 
             className="bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:bg-white/90 transition-all" 
             onClick={handleScrollDown}
@@ -77,6 +77,90 @@ export default function ForContractors() {
         </div>
       </section>
       
+      {/* Value Proposition Section */}
+      <section className="py-16 sm:py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-3">
+              The Renovation Bridge Advantage
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover how we empower contractors to achieve more with less effort.
+            </p>
+            <span className="block w-20 h-1 bg-primary mx-auto mt-4"></span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Benefit Card 1 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
+              <div className="p-3 bg-blue-100 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">30% Faster Close Rate</h3>
+              <p className="text-gray-600">Pre-qualified homeowners ready to start immediately.</p>
+            </div>
+
+            {/* Benefit Card 2 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
+              <div className="p-3 bg-green-100 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Zero Marketing Costs</h3>
+              <p className="text-gray-600">We handle all lead generation so you focus on what you do best.</p>
+            </div>
+
+            {/* Benefit Card 3 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
+              <div className="p-3 bg-indigo-100 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">4x Higher Quality Leads</h3>
+              <p className="text-gray-600">Only matched with homeowners whose projects perfectly fit your expertise.</p>
+            </div>
+
+            {/* Benefit Card 4 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
+              <div className="p-3 bg-pink-100 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">60% Less Time Bidding</h3>
+              <p className="text-gray-600">We pre-screen projects to match your specialties.</p>
+            </div>
+
+            {/* Benefit Card 5 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
+              <div className="p-3 bg-yellow-100 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 14c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1zm6 0c.552 0 1 .448 1 1s-.448 1-1 1-1-.448-1-1 .448-1 1-1z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">95% Client Match Success</h3>
+              <p className="text-gray-600">We connect you with your ideal clients.</p>
+            </div>
+
+            {/* Benefit Card 6 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col items-center text-center">
+              <div className="p-3 bg-purple-100 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Reduce Admin by 40%</h3>
+              <p className="text-gray-600">We handle scheduling, follow-ups, and more.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto px-4 mt-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Form Section with ID for scrolling */}
