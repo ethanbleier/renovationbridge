@@ -216,7 +216,7 @@ export default function HomePage() {
   };
 
   return (
-    <section className="bg-cream text-black font-sans min-h-screen relative">
+    <section className="bg-cream text-black font-sans min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
         {/* Hero Section - Enhanced Responsiveness */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center mb-16 sm:mb-20 md:mb-24">

@@ -236,7 +236,7 @@ export default function TrustPage() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto md:mx-0"
             >
-              Don’t gamble with your home. Get multiple competitive bids from trusted, vetted contractors—so you can choose <span className="font-medium">with confidence</span>.
+              Don't gamble with your home. Get multiple competitive bids from trusted, vetted contractors—so you can choose <span className="font-medium">with confidence</span>.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
