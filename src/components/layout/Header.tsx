@@ -115,49 +115,43 @@ const Header = () => {
   }, [isMobile, isMenuOpen, activeDropdown, handleMenuToggle, desktopNavRef, mobileMenuContainerRef, mobileMenuButtonRef]);
 
   useEffect(() => {
-    // Initialize header visibility
-    setHeaderVisible(true)
-    setMobileHeaderVisible(true)
+    // Initialize header visibility - these will now be controlled by scroll logic
+    // setHeaderVisible(true)
+    // setMobileHeaderVisible(true)
 
     // Handle scroll events
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const scrollingDown = currentScrollY > lastScrollY.current;
+      const HIDE_THRESHOLD = 64; // New header height
 
-      // Shrink effect
+      // Shrink effect (for shadow and minor size adjustments)
       if (currentScrollY > 10) {
         setIsHeaderShrunk(true);
       } else {
         setIsHeaderShrunk(false);
       }
 
-      // Mobile visibility logic
+      // Header visibility on scroll
+      if (scrollingDown && currentScrollY > HIDE_THRESHOLD) {
+        setHeaderVisible(false);
+        if (isMobile) setMobileHeaderVisible(false);
+      } else if (!scrollingDown || currentScrollY <= HIDE_THRESHOLD) {
+        setHeaderVisible(true);
+        if (isMobile) setMobileHeaderVisible(true);
+      }
+
+      // Mobile: Close menu if open and scrolling down
       if (isMobile) {
-        if (!scrollingDown) { // Scrolling up or stationary
-          setMobileHeaderVisible(true);
-        } else { // Scrolling down
-          if (currentScrollY > 50) { // Past threshold
-            if (isMenuOpen) {
-              // If menu is open and we're scrolling down, close the menu.
-              // The header will remain visible during this scroll event.
-              handleMenuToggle();
-            } else {
-              // Menu is closed, and we're scrolling down past threshold. Hide header.
-              setMobileHeaderVisible(false);
-            }
-          }
+        if (scrollingDown && currentScrollY > 50 && isMenuOpen) {
+          handleMenuToggle(); // Close menu if open and scrolling down
         }
       }
 
-      // Desktop visibility logic
+      // Desktop: Close dropdown if open and scrolling down past threshold
       if (!isMobile) {
-        if (currentScrollY > 150 && scrollingDown) {
-          if (activeDropdown) {
-            setActiveDropdown(null); // Close desktop dropdown before hiding header
-          }
-          setHeaderVisible(false);
-        } else {
-          setHeaderVisible(true);
+        if (currentScrollY > 150 && scrollingDown && activeDropdown) {
+          setActiveDropdown(null); // Still good to close dropdown
         }
       }
       lastScrollY.current = currentScrollY;
@@ -239,16 +233,14 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${ 
-      // Use combined logic for initial visibility
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 h-16 ${
       isMobile ? (mobileHeaderVisible ? 'translate-y-0' : '-translate-y-full') : 
       (headerVisible ? 'translate-y-0' : '-translate-y-full')
     } ${ 
-      // Shrink effect styling
-      isHeaderShrunk ? 'bg-white shadow-md py-2' : 'bg-white py-4'
+      isHeaderShrunk ? 'bg-white shadow-md' : 'bg-white'
     }`}> 
-      <div className="container-custom relative">
-        <div className="flex items-center justify-between gap-4 lg:gap-6">
+      <div className="container-custom relative h-full flex items-center">
+        <div className="flex items-center justify-between gap-4 lg:gap-6 w-full">
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0 group" onClick={handleMobileLinkClick}>
             <div className="flex items-center justify-center">
@@ -259,8 +251,8 @@ const Header = () => {
                 height={40}
                 className={`transition-all duration-300 ${
                   isHeaderShrunk 
-                    ? 'w-[140px] lg:w-[160px]'
-                    : 'w-[160px] lg:w-[180px]'
+                    ? 'w-[120px] lg:w-[140px]'
+                    : 'w-[140px] lg:w-[160px]'
                 }`}
                 style={{ height: "auto" }}
                 priority
@@ -345,8 +337,8 @@ const Header = () => {
           <div className="hidden lg:flex items-center flex-shrink-0">
             <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
               isHeaderShrunk
-                ? 'px-4 py-1.5 text-sm'
-                : 'px-5 py-2 text-sm'
+                ? 'px-3 py-1 text-xs'
+                : 'px-4 py-1.5 text-sm'
             }`}>
               GET STARTED
             </Link>
@@ -367,7 +359,7 @@ const Header = () => {
             {/* Dropdown Menu */}
             <div 
               ref={mobileMenuContainerRef}
-              className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
+              className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-50 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
                 isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
               }`}
               style={{ display: menuVisible ? 'block' : 'none' }}

@@ -12,20 +12,24 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children }) =
   const pathname = usePathname();
   // Add effect to ensure proper scroll behavior
   useEffect(() => {
-    // Reset scroll position on mount
+    // Reset scroll position on navigation
     window.scrollTo(0, 0);
     
-    // Prevent overscroll bounce effect on iOS
-    document.body.style.overscrollBehavior = 'none';
-    
-    return () => {
-      document.body.style.overscrollBehavior = '';
-    };
-  }, []);
+    // Ensure both html and body are scrollable and their heights are not fixed
+    // This helps prevent issues where parent elements might block scrolling.
+    document.documentElement.style.overflow = ''; // For <html> element
+    document.documentElement.style.height = '';   // For <html> element
+    document.body.style.overflow = '';            // For <body> element
+    document.body.style.height = '';              // For <body> element
+
+    // No specific cleanup function needed for these style resets,
+    // as they should generally remain permissive to allow scrolling.
+    return undefined;
+  }, [pathname]); // Re-run this effect when the pathname changes
 
   return (
     <>
-      <main className={`flex-grow bg-white overflow-x-hidden ${pathname === '/for-contractors' ? 'pt-0' : 'pt-20'}`}>
+      <main className={`flex-grow bg-white overflow-x-hidden overflow-y-auto min-h-screen pt-16`}>
         {children}
       </main>
       <Footer />
@@ -33,4 +37,4 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children }) =
   );
 };
 
-export default ClientLayoutWrapper; 
+export default ClientLayoutWrapper;
