@@ -221,7 +221,7 @@ export default function TrustPage() {
         {/* Hero Section - Enhanced Responsiveness */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center mb-16 sm:mb-20 md:mb-24">
           {/* Text Content Area - Improved Typography and Spacing */}
-          <div className="text-center md:text-left space-y-6 overflow-hidden">
+          <div className="text-center md:text-left space-y-6">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
