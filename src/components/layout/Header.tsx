@@ -115,7 +115,8 @@ const Header = () => {
   }, [isMobile, isMenuOpen, activeDropdown, handleMenuToggle, desktopNavRef, mobileMenuContainerRef, mobileMenuButtonRef]);
 
   useEffect(() => {
-    // Initialize header visibility
+    // Initialize header visibility - these will now ensure header is always visible
+    // as the scroll handler no longer changes them to false.
     setHeaderVisible(true)
     setMobileHeaderVisible(true)
 
@@ -124,40 +125,24 @@ const Header = () => {
       const currentScrollY = window.scrollY;
       const scrollingDown = currentScrollY > lastScrollY.current;
 
-      // Shrink effect
+      // Shrink effect - REMAINS
       if (currentScrollY > 10) {
         setIsHeaderShrunk(true);
       } else {
         setIsHeaderShrunk(false);
       }
 
-      // Mobile visibility logic
+      // Mobile: Close menu if open and scrolling down
       if (isMobile) {
-        if (!scrollingDown) { // Scrolling up or stationary
-          setMobileHeaderVisible(true);
-        } else { // Scrolling down
-          if (currentScrollY > 50) { // Past threshold
-            if (isMenuOpen) {
-              // If menu is open and we're scrolling down, close the menu.
-              // The header will remain visible during this scroll event.
-              handleMenuToggle();
-            } else {
-              // Menu is closed, and we're scrolling down past threshold. Hide header.
-              setMobileHeaderVisible(false);
-            }
-          }
+        if (scrollingDown && currentScrollY > 50 && isMenuOpen) {
+          handleMenuToggle(); // Close menu if open and scrolling down
         }
       }
 
-      // Desktop visibility logic
+      // Desktop: Close dropdown if open and scrolling down past threshold
       if (!isMobile) {
-        if (currentScrollY > 150 && scrollingDown) {
-          if (activeDropdown) {
-            setActiveDropdown(null); // Close desktop dropdown before hiding header
-          }
-          setHeaderVisible(false);
-        } else {
-          setHeaderVisible(true);
+        if (currentScrollY > 150 && scrollingDown && activeDropdown) {
+          setActiveDropdown(null); // Still good to close dropdown
         }
       }
       lastScrollY.current = currentScrollY;
@@ -367,7 +352,7 @@ const Header = () => {
             {/* Dropdown Menu */}
             <div 
               ref={mobileMenuContainerRef}
-              className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-40 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
+              className={`absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg px-6 pt-3 pb-4 w-64 z-50 border border-gray-200 transition-all duration-300 ease-in-out origin-top-right ${
                 isMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-4 pointer-events-none'
               }`}
               style={{ display: menuVisible ? 'block' : 'none' }}
