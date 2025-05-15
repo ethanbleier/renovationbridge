@@ -115,21 +115,30 @@ const Header = () => {
   }, [isMobile, isMenuOpen, activeDropdown, handleMenuToggle, desktopNavRef, mobileMenuContainerRef, mobileMenuButtonRef]);
 
   useEffect(() => {
-    // Initialize header visibility - these will now ensure header is always visible
-    // as the scroll handler no longer changes them to false.
-    setHeaderVisible(true)
-    setMobileHeaderVisible(true)
+    // Initialize header visibility - these will now be controlled by scroll logic
+    // setHeaderVisible(true)
+    // setMobileHeaderVisible(true)
 
     // Handle scroll events
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const scrollingDown = currentScrollY > lastScrollY.current;
+      const HIDE_THRESHOLD = 64; // New header height
 
-      // Shrink effect - REMAINS
+      // Shrink effect (for shadow and minor size adjustments)
       if (currentScrollY > 10) {
         setIsHeaderShrunk(true);
       } else {
         setIsHeaderShrunk(false);
+      }
+
+      // Header visibility on scroll
+      if (scrollingDown && currentScrollY > HIDE_THRESHOLD) {
+        setHeaderVisible(false);
+        if (isMobile) setMobileHeaderVisible(false);
+      } else if (!scrollingDown || currentScrollY <= HIDE_THRESHOLD) {
+        setHeaderVisible(true);
+        if (isMobile) setMobileHeaderVisible(true);
       }
 
       // Mobile: Close menu if open and scrolling down
@@ -224,7 +233,7 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 h-20 ${
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 h-16 ${
       isMobile ? (mobileHeaderVisible ? 'translate-y-0' : '-translate-y-full') : 
       (headerVisible ? 'translate-y-0' : '-translate-y-full')
     } ${ 
@@ -242,8 +251,8 @@ const Header = () => {
                 height={40}
                 className={`transition-all duration-300 ${
                   isHeaderShrunk 
-                    ? 'w-[140px] lg:w-[160px]'
-                    : 'w-[160px] lg:w-[180px]'
+                    ? 'w-[120px] lg:w-[140px]'
+                    : 'w-[140px] lg:w-[160px]'
                 }`}
                 style={{ height: "auto" }}
                 priority
@@ -328,8 +337,8 @@ const Header = () => {
           <div className="hidden lg:flex items-center flex-shrink-0">
             <Link href="/get-started" className={`cta-btn transform hover:scale-105 transition-all duration-300 whitespace-nowrap ${
               isHeaderShrunk
-                ? 'px-4 py-1.5 text-sm'
-                : 'px-5 py-2 text-sm'
+                ? 'px-3 py-1 text-xs'
+                : 'px-4 py-1.5 text-sm'
             }`}>
               GET STARTED
             </Link>

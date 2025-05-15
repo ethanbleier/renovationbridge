@@ -328,7 +328,7 @@ export default function SavePage() {
                       width={180}
                       height={60}
                       className="object-contain opacity-90 mx-auto"
-                      style={{ maxHeight: '60px' }}
+                      style={{ maxHeight: '60px', width: 'auto' }}
                       sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 20vw"
                     />
                   </div>
