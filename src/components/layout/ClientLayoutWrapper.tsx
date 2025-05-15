@@ -29,7 +29,7 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children }) =
 
   return (
     <>
-      <main className={`flex-grow bg-white overflow-x-hidden overflow-y-auto min-h-screen ${pathname === '/for-contractors' ? 'pt-0' : 'pt-20'}`}>
+      <main className={`flex-grow bg-white overflow-x-hidden overflow-y-auto min-h-screen pt-16`}>
         {children}
       </main>
       <Footer />

@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useMemo } from 'react' // Import useMemo
-import useEmblaCarousel from 'embla-carousel-react' // Import Embla hook
+import { useMemo, useState, useEffect } from 'react' // Import useMemo, useState, useEffect
+// import useEmblaCarousel from 'embla-carousel-react' // Import Embla hook
 // Using Heroicons for a more modern feel
 import { ShieldCheckIcon, ScaleIcon, UserGroupIcon, StarIcon, ArrowPathIcon, CheckBadgeIcon, BuildingOfficeIcon, MapPinIcon, BookOpenIcon, DocumentTextIcon, GiftIcon } from '@heroicons/react/24/outline'; // Added gift icon
 import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
 
 // Enhanced TypeScript interfaces with stricter typing
 interface Feature {
@@ -40,6 +41,31 @@ interface Step {
 }
 
 export default function HomePage() {
+  const animationDuration = 30; // ADDED
+  const heroImages = useMemo(() => [
+    {
+      id: "progress",
+      src: "/images/projects/progress.png",
+      alt: "Home renovation in progress",
+      overlay: <div className="absolute inset-0 bg-gradient-to-b from-gray-100/40 to-transparent mix-blend-overlay z-10" aria-hidden="true" />
+    },
+    {
+      id: "after",
+      src: "/images/projects/after.png",
+      alt: "Completed home renovation",
+      overlay: <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent mix-blend-overlay z-10" aria-hidden="true" />
+    },
+  ], []);
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex(prevIndex => (prevIndex + 1) % heroImages.length);
+    }, 5000); // Change image every 5 seconds
+    return () => clearInterval(timer); // Cleanup interval on component unmount
+  }, [heroImages.length]);
+
   // Memoize static data to prevent unnecessary re-renders
   const features: Feature[] = useMemo(() => [
     { 
@@ -123,15 +149,15 @@ export default function HomePage() {
   ], []);
   
   // Setup Embla carousel with improved options
-  const [emblaRef] = useEmblaCarousel(
-    { 
-      loop: true,
-      align: 'center',
-      skipSnaps: false,
-      dragFree: false,
-      containScroll: 'trimSnaps'
-    }
-  );
+  // const [emblaRef] = useEmblaCarousel(
+  //   { 
+  //     loop: true,
+  //     align: 'center',
+  //     skipSnaps: false,
+  //     dragFree: false,
+  //     containScroll: 'trimSnaps'
+  //   }
+  // );
 
   return (
     <section className="bg-cream text-black font-sans min-h-screen relative">
@@ -169,60 +195,84 @@ export default function HomePage() {
             role="img"
             aria-label="Before and after renovation comparison"
           >
-            {/* Base image with subtle texture overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-100/40 to-transparent mix-blend-overlay z-10" aria-hidden="true"></div>
-            <Image
-              src="/images/projects/progress.png"
-              alt="Home renovation in progress"
-              fill
-              priority
-              className="absolute inset-0 object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-            
-            {/* Static display for image */}
-            <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent mix-blend-overlay z-10" aria-hidden="true"></div>
-              <Image
-                src="/images/projects/after.png"
-                alt="Completed home renovation"
-                fill
-                priority
-                className="absolute inset-0 object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={heroImages[currentImageIndex].id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.0 }} // Fade duration 1 second
+                className="absolute inset-0"
+              >
+                {heroImages[currentImageIndex].overlay}
+                <Image
+                  src={heroImages[currentImageIndex].src}
+                  alt={heroImages[currentImageIndex].alt}
+                  fill
+                  priority={currentImageIndex === 0} // Priority for the first image in the sequence on initial load
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Trust Logos Section - Enhanced Carousel */}
-        {trustLogos.length > 0 && (
-          <div className="max-w-4xl mx-auto text-center py-8 sm:py-12">
-            <p className="text-sm font-medium text-gray-500 mb-6">
-              Featured and trusted by users on platforms like
-            </p>
-            <div className="overflow-hidden" ref={emblaRef} role="region" aria-label="Trusted platforms carousel">
-              <div className="flex">
+        {/* Platform Trust Section */}
+        <div className="py-16 sm:py-20 md:py-24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-10 text-black">Trusted By</h2>
+          
+          <div className="relative w-full max-w-5xl mx-auto overflow-hidden h-[70px] sm:h-[100px]">
+            <div className="absolute left-0 top-0 bottom-0 w-[50px] sm:w-[100px] z-10 bg-gradient-to-r from-cream to-transparent"></div>
+            
+            <div className="w-full h-full flex items-center relative">
+              <motion.div 
+                className="flex space-x-8 sm:space-x-16 absolute whitespace-nowrap pl-4 sm:pl-8"
+                animate={{
+                  x: ["0%", "-50%"]
+                }}
+                transition={{
+                  x: {
+                    duration: animationDuration,
+                    repeat: Infinity,
+                    ease: "linear",
+                    repeatType: "loop"
+                  }
+                }}
+              >
                 {trustLogos.map((logo) => (
-                  <div 
-                    className="flex-[0_0_33.33%] sm:flex-[0_0_25%] md:flex-[0_0_20%] min-w-0 pl-4" 
+                  <div
                     key={logo.id}
+                    className="inline-flex items-center justify-center w-[80px] sm:w-[120px] h-[50px] sm:h-[80px]"
                   >
                     <Image
                       src={logo.logo}
-                      alt={`${logo.name} logo`}
-                      width={180}
-                      height={60}
-                      className="object-contain opacity-90 mx-auto"
-                      style={{ maxHeight: '60px', width: 'auto' }}
-                      sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 20vw"
+                      alt={logo.name}
+                      width={120}
+                      height={80}
+                      className="object-contain max-h-[50px] sm:max-h-[80px] max-w-[80px] sm:max-w-[120px]"
                     />
                   </div>
                 ))}
-              </div>
+                {trustLogos.map((logo) => (
+                  <div
+                    key={`${logo.id}-duplicate`}
+                    className="inline-flex items-center justify-center w-[80px] sm:w-[120px] h-[50px] sm:h-[80px]"
+                  >
+                    <Image
+                      src={logo.logo}
+                      alt={logo.name}
+                      width={120}
+                      height={80}
+                      className="object-contain max-h-[50px] sm:max-h-[80px] max-w-[80px] sm:max-w-[120px]"
+                    />
+                  </div>
+                ))}
+              </motion.div>
             </div>
+            <div className="absolute right-0 top-0 bottom-0 w-[50px] sm:w-[100px] z-10 bg-gradient-to-l from-cream to-transparent"></div>
           </div>
-        )}
+        </div>
 
         {/* What We Offer Section - Enhanced Grid Layout */}
         <div 
