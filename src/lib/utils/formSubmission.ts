@@ -69,7 +69,9 @@ export function formatGHLData(formData: any, formType: FormType) {
     'tags', 'dnd', 'contact', 'city',// GHL system fields 
     // Explicitly handled/mapped fields
     'message', 'projectDescription', 'description', 'additional_comments',
-    'work_description', 'project_details', 'location', 'propertyCity' 
+    'work_description', 'project_details', 'location', 'propertyCity',
+    // Contractor form specific fields that are explicitly mapped
+    'licenseNumber', 'hearAboutUs', 'website' 
   ];
 
   // Build the customField OBJECT
@@ -84,6 +86,26 @@ export function formatGHLData(formData: any, formType: FormType) {
   if (cityOrLocation) {
     // Map the extracted value to the 'location' custom field key
     customFieldObject['location'] = cityOrLocation; 
+  }
+
+  // Contractor specific custom fields
+  if (formType === 'contractor') {
+    if (formData.licenseNumber) {
+      customFieldObject['license'] = formData.licenseNumber;
+    }
+    if (formData.hearAboutUs) {
+      customFieldObject['hear_about_us'] = formData.hearAboutUs;
+    }
+    if (formData.website) {
+      customFieldObject['website'] = formData.website;
+    }
+    // Shotgun approach for description fields for contractor forms
+    if (description && description !== "No description provided") {
+      customFieldObject['project_description'] = description;
+      customFieldObject['project_details'] = description;
+      customFieldObject['work_description'] = description;
+      // 'additional_comments' is already added above
+    }
   }
 
   // Add any other non-standard fields from formData
