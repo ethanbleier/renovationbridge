@@ -15,17 +15,16 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children }) =
     // Reset scroll position on mount
     window.scrollTo(0, 0);
     
-    // Prevent overscroll bounce effect on iOS
-    document.body.style.overscrollBehavior = 'none';
-    
-    return () => {
-      document.body.style.overscrollBehavior = '';
-    };
+    // Clean up any stale inline overflow properties that could block scrolling (e.g. from a modal)
+    document.body.style.overflow = '';
+
+    // No cleanup necessary
+    return undefined;
   }, []);
 
   return (
     <>
-      <main className={`flex-grow bg-white overflow-x-hidden ${pathname === '/for-contractors' ? 'pt-0' : 'pt-20'}`}>
+      <main className={`flex-grow bg-white overflow-x-hidden overflow-y-auto min-h-screen ${pathname === '/for-contractors' ? 'pt-0' : 'pt-20'}`}>
         {children}
       </main>
       <Footer />
