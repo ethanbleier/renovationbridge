@@ -221,7 +221,7 @@ export default function SavePage() {
         {/* Hero Section - Enhanced Responsiveness */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center mb-16 sm:mb-20 md:mb-24">
           {/* Text Content Area - Improved Typography and Spacing */}
-          <div className="text-center md:text-left space-y-6">
+          <div className="text-center md:text-left space-y-6 overflow-hidden">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -236,7 +236,7 @@ export default function SavePage() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto md:mx-0"
             >
-              Renovating your home shouldn't mean overpaying or guessing. With Renovation Bridge, you’ll get multiple competitive bids from trusted, vetted contractors—so you can compare prices, negotiate confidently, and <span className="font-medium">save thousands on your dream renovation</span>.
+              Renovating your home shouldn't mean overpaying or guessing. With Renovation Bridge, you'll get multiple competitive bids from trusted, vetted contractors—so you can compare prices, negotiate confidently, and <span className="font-medium">save thousands on your dream renovation</span>.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
