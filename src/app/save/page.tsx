@@ -294,7 +294,7 @@ export default function SavePage() {
               </motion.div>
             ) : (
               // Static display for mobile with no hover effects
-              <div className="absolute inset-0 opacity-0">
+              <div className="absolute inset-0 opacity-0 pointer-events-none">
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent mix-blend-overlay z-10" aria-hidden="true"></div>
                 <Image
                   src="/images/projects/after.png"
